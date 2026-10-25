@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smart-garden-v1.5';
+const CACHE_NAME = 'smart-garden-v1.6';
 
 const STATIC_ASSETS = [
   './',
@@ -51,8 +51,8 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // Skip chrome-extension and non-http(s)
-  if (!url.protocol.startsWith('http')) return;
+  // Skip chrome-extension, non-http(s), and external analytics (Yandex.Metrika)
+  if (!url.protocol.startsWith('http') || url.hostname.includes('yandex.ru')) return;
 
   event.respondWith(
     caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
