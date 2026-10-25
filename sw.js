@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smart-garden-v1.1';
+const CACHE_NAME = 'smart-garden-v1.3';
 
 const STATIC_ASSETS = [
   './',
@@ -55,7 +55,7 @@ self.addEventListener('fetch', (event) => {
   if (!url.protocol.startsWith('http')) return;
 
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
+    caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
       // Return cached response if found
       const fetchPromise = fetch(event.request).then((networkResponse) => {
         // If valid response, update cache in background
@@ -70,7 +70,7 @@ self.addEventListener('fetch', (event) => {
         // Network failed (offline)
         // If requesting a page/document, fallback to cached index.html
         if (event.request.mode === 'navigate') {
-          return caches.match('./index.html') || cachedResponse;
+          return caches.match('./index.html', { ignoreSearch: true }) || cachedResponse;
         }
         return cachedResponse;
       });

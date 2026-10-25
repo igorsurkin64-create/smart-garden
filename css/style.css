@@ -5005,17 +5005,45 @@ a {
 }
 
 .pwa-install-header-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
   color: #fff !important;
   border: none !important;
-  font-weight: 700;
+  font-weight: 700 !important;
+  white-space: nowrap;
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
   animation: pulse-subtle 2.5s infinite;
+  cursor: pointer;
+}
+
+.pwa-install-header-btn:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.45);
 }
 
 @keyframes pulse-subtle {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.04); }
+}
+
+.modal-install-card {
+  max-width: 650px;
+  width: 95%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.install-guide-box {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.install-guide-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .modal-feedback-card {

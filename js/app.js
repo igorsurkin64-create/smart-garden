@@ -3804,11 +3804,18 @@ class GardenApp {
     // Обработка системного события установки PWA
     this.deferredInstallPrompt = null;
     const pwaBtn = document.getElementById('pwa-install-btn');
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+    if (isStandalone && pwaBtn) {
+      pwaBtn.innerHTML = window.t ? window.t('pwa_installed_label') : '✓ Установлено';
+      pwaBtn.style.animation = 'none';
+      pwaBtn.style.opacity = '0.85';
+    }
 
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       this.deferredInstallPrompt = e;
-      if (pwaBtn) {
+      if (pwaBtn && !isStandalone) {
         pwaBtn.style.display = 'inline-flex';
       }
     });
@@ -3816,24 +3823,201 @@ class GardenApp {
     window.addEventListener('appinstalled', () => {
       this.deferredInstallPrompt = null;
       if (pwaBtn) {
-        pwaBtn.style.display = 'none';
+        pwaBtn.innerHTML = window.t ? window.t('pwa_installed_label') : '✓ Установлено';
+        pwaBtn.style.animation = 'none';
       }
       this.showToast(window.t ? window.t('pwa_installed_toast') : '✓ «Умный Огород» установлен на ваше устройство!');
     });
   }
 
   promptPwaInstall() {
-    if (!this.deferredInstallPrompt) {
-      this.showToast(window.t ? window.t('btn_pwa_install_title') : 'Установка доступна в меню браузера (значок «Установить» в строке адреса)');
-      return;
+    if (this.deferredInstallPrompt) {
+      this.deferredInstallPrompt.prompt();
+      this.deferredInstallPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          const pwaBtn = document.getElementById('pwa-install-btn');
+          if (pwaBtn) {
+            pwaBtn.innerHTML = window.t ? window.t('pwa_installed_label') : '✓ Установлено';
+            pwaBtn.style.animation = 'none';
+          }
+        }
+        this.deferredInstallPrompt = null;
+      });
+    } else {
+      this.openInstallModal();
     }
-    this.deferredInstallPrompt.prompt();
-    this.deferredInstallPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === 'accepted') {
-        const pwaBtn = document.getElementById('pwa-install-btn');
-        if (pwaBtn) pwaBtn.style.display = 'none';
-      }
-      this.deferredInstallPrompt = null;
+  }
+
+  openInstallModal() {
+    const modal = document.getElementById('general-modal');
+    const modalContent = document.getElementById('modal-dynamic-content');
+    if (!modal || !modalContent) return;
+
+    const tr = (k) => (window.t ? window.t(k) : k);
+    const liveUrl = 'https://igorsurkin64-create.github.io/smart-garden/';
+    const appUrl = window.location.protocol.startsWith('http') ? window.location.href.split('#')[0] : liveUrl;
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isFirefox = userAgent.includes('firefox');
+    const isEdge = userAgent.includes('edg');
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+    modalContent.innerHTML = `
+      <div class="modal-card modal-install-card">
+        <div class="modal-header">
+          <div class="modal-header-info">
+            <h3 style="display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+              📲 ${tr('install_modal_title') || 'Установка «Умного Огорода» на устройство'}
+            </h3>
+            <span class="modal-subtitle" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">
+              ${tr('install_modal_subtitle') || 'Запускайте программу в отдельном окне с рабочего стола и пользуйтесь даже без интернета!'}
+            </span>
+          </div>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+
+        <div class="modal-body" style="padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 1.15rem;">
+          ${isStandalone ? `
+            <div style="background: rgba(16, 185, 129, 0.12); border: 1.5px solid #10b981; border-radius: var(--radius-md); padding: 1rem 1.2rem; display: flex; align-items: center; gap: 0.8rem;">
+              <span style="font-size: 2rem;">✅</span>
+              <div>
+                <div style="font-weight: 700; color: #059669; font-size: 1rem;">Приложение уже установлено!</div>
+                <div style="font-size: 0.85rem; color: var(--text-main); margin-top: 0.2rem;">
+                  Вы уже запустили «Умный Огород» как автономное приложение. Все данные автоматически сохраняются и доступны оффлайн.
+                </div>
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Если браузер поддерживает прямой prompt -->
+          ${this.deferredInstallPrompt ? `
+            <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.08)); border: 2px solid #10b981; border-radius: var(--radius-md); padding: 1.1rem; text-align: center;">
+              <p style="font-weight: 700; font-size: 1.05rem; margin-bottom: 0.6rem; color: #065f46;">
+                Ваш браузер готов к быстрой установке!
+              </p>
+              <button id="direct-install-action-btn" class="btn btn-primary" style="padding: 0.75rem 1.75rem; font-size: 1rem; font-weight: 700; background: #10b981; border: none; box-shadow: 0 4px 14px rgba(16,185,129,0.4); cursor: pointer;">
+                📲 Нажмите сюда для установки
+              </button>
+            </div>
+          ` : ''}
+
+          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+
+            ${isFirefox ? `
+              <!-- Для пользователей Firefox -->
+              <div class="install-guide-box" style="border: 2px solid #f59e0b; border-radius: var(--radius-md); padding: 1.1rem; background: rgba(245, 158, 11, 0.08);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+                  <div style="font-weight: 700; font-size: 0.98rem; display: flex; align-items: center; gap: 0.4rem; color: #d97706;">
+                    🦊 Вы просматриваете сайт через Mozilla Firefox
+                  </div>
+                  <span style="background: #f59e0b; color: #fff; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 999px;">
+                    Ваш браузер
+                  </span>
+                </div>
+                <p style="font-size: 0.88rem; line-height: 1.5; color: var(--text-main); margin: 0 0 0.75rem 0;">
+                  В настольной версии Firefox разработчиками отключена функция установки веб-сайтов как автономных программ. Чтобы установить «Умный Огород» как отдельную программу на компьютер:
+                </p>
+                <div style="font-size: 0.88rem; line-height: 1.5; color: var(--text-main); margin-bottom: 0.8rem; background: var(--bg-card); padding: 0.75rem 0.9rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                  <div><b>1. Скопируйте ссылку ниже</b> и откройте её в <b>Google Chrome</b> или <b>Microsoft Edge</b> (Edge уже встроен в Windows!).</div>
+                  <div style="margin-top: 0.35rem;"><b>2.</b> В Chrome / Edge нажмите на значок <b>«Установить»</b> <i>(монитор со стрелочкой 📥)</i> в правой части строки адреса.</div>
+                  <div style="margin-top: 0.35rem;"><b>3. Либо в Firefox:</b> Нажмите <kbd style="background: var(--bg-hover); padding: 0.15rem 0.4rem; border-radius: 4px; border: 1px solid var(--border-color); font-weight: 600;">Ctrl + D</kbd>, чтобы сохранить огород в Закладки браузера.</div>
+                </div>
+                <button type="button" class="btn btn-primary copy-garden-url-btn" style="background: #f59e0b; border: none; font-weight: 700; padding: 0.6rem 1.1rem; cursor: pointer;">
+                  📋 Скопировать ссылку для Edge / Chrome
+                </button>
+              </div>
+            ` : ''}
+
+            <!-- Карточка: ПК Chrome / Edge / Яндекс -->
+            <div class="install-guide-box" style="border: ${!isFirefox && !isMobile ? '2px solid #10b981' : '1px solid var(--border-color)'}; border-radius: var(--radius-md); padding: 1.1rem; background: ${!isFirefox && !isMobile ? 'rgba(16, 185, 129, 0.06)' : 'var(--bg-card)'};">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+                <div style="font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-main);">
+                  🖥️ Google Chrome, Microsoft Edge, Яндекс.Браузер (Windows / Mac)
+                </div>
+                ${!isFirefox && !isMobile ? '<span style="background: #10b981; color: #fff; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 999px;">Ваш браузер</span>' : ''}
+              </div>
+              <ol style="margin: 0.4rem 0 0 1.2rem; padding: 0; font-size: 0.88rem; line-height: 1.55; color: var(--text-main);">
+                <li>Посмотрите в <b>правую часть адресной строки</b> вверху браузера (где написан адрес сайта).</li>
+                <li>Нажмите на значок <b>«Установить приложение»</b> <i>(мониторчик со стрелочкой 📥 или плюс ➕)</i>.</li>
+                <li><i>Либо в меню браузера:</i> нажмите <b>⋮</b> (три точки в правом верхнем углу) ➔ <b>«Приложения»</b> ➔ <b>«Установить этот сайт как приложение»</b>.</li>
+                <li>Программа появится отдельным окном без адресной строки, на Рабочем столе и в меню «Пуск»!</li>
+              </ol>
+            </div>
+
+            <!-- Карточка: Смартфоны и планшеты -->
+            <div class="install-guide-box" style="border: ${isMobile ? '2px solid #10b981' : '1px solid var(--border-color)'}; border-radius: var(--radius-md); padding: 1rem; background: var(--bg-card);">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+                <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">
+                  📱 Смартфоны и планшеты (Android / iPhone / iPad)
+                </div>
+                ${isMobile ? '<span style="background: #10b981; color: #fff; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 999px;">Ваше устройство</span>' : ''}
+              </div>
+              <div style="font-size: 0.88rem; line-height: 1.5; color: var(--text-main);">
+                <div>• <b>Android (Chrome):</b> Нажмите кнопку меню <b>⋮</b> ➔ <b>«Установить приложение»</b> (или «Добавить на главный экран»).</div>
+                <div style="margin-top: 0.35rem;">• <b>iPhone / iPad (Safari):</b> Нажмите кнопку «Поделиться» <i>(квадрат со стрелкой вверх)</i> ➔ <b>«На экран "Домой"»</b>.</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Ссылка на сайт -->
+          <div style="background: var(--bg-hover); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; font-size: 0.82rem;">
+            <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-muted);">
+              Ссылка: <span style="color: var(--text-main); font-weight: 600;">${appUrl}</span>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline copy-garden-url-btn" style="flex-shrink: 0; cursor: pointer;">
+              📋 Скопировать
+            </button>
+          </div>
+
+        </div>
+
+        <div class="modal-footer" style="padding: 0.85rem 1.5rem; background: var(--bg-hover); display: flex; justify-content: flex-end;">
+          <button class="btn btn-secondary modal-close-btn" style="padding: 0.5rem 1.25rem;">
+            ${tr('btn_close') || 'Закрыть'}
+          </button>
+        </div>
+      </div>
+    `;
+
+    modal.classList.add('active');
+
+    const closeBtns = modalContent.querySelectorAll('.modal-close-btn');
+    closeBtns.forEach(btn => {
+      btn.onclick = () => modal.classList.remove('active');
+    });
+
+    const directInstallBtn = modalContent.querySelector('#direct-install-action-btn');
+    if (directInstallBtn && this.deferredInstallPrompt) {
+      directInstallBtn.onclick = () => {
+        modal.classList.remove('active');
+        this.deferredInstallPrompt.prompt();
+        this.deferredInstallPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            const pwaBtn = document.getElementById('pwa-install-btn');
+            if (pwaBtn) {
+              pwaBtn.innerHTML = window.t ? window.t('pwa_installed_label') : '✓ Установлено';
+              pwaBtn.style.animation = 'none';
+            }
+          }
+          this.deferredInstallPrompt = null;
+        });
+      };
+    }
+
+    const copyBtns = modalContent.querySelectorAll('.copy-garden-url-btn');
+    copyBtns.forEach(btn => {
+      btn.onclick = () => {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(appUrl).then(() => {
+            this.showToast('✓ Ссылка скопирована! Откройте её в Google Chrome или Microsoft Edge.');
+          }).catch(() => {
+            prompt('Скопируйте ссылку вручную:', appUrl);
+          });
+        } else {
+          prompt('Скопируйте ссылку вручную:', appUrl);
+        }
+      };
     });
   }
 

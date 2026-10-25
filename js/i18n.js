@@ -77,7 +77,10 @@ const UI_TRANSLATIONS = {
     feedback_author_email: "Прямой email автора:",
     feedback_toast_copied: "✓ Текст обращения скопирован в буфер обмена!",
     feedback_toast_sent: "✓ Текст скопирован! Запускаю почтовую программу для отправки...",
+    pwa_installed_label: "✓ Установлено",
     pwa_installed_toast: "✓ «Умный Огород» установлен на ваше устройство! Теперь его можно открывать прямо с рабочего стола.",
+    install_modal_title: "Установка «Умного Огорода» на устройство",
+    install_modal_subtitle: "Запускайте программу в отдельном окне с рабочего стола и пользуйтесь даже без интернета!",
 
     // Help Modal
     help_modal_title: "📖 Руководство пользователя «Мой Огород»",
@@ -90,6 +93,7 @@ const UI_TRANSLATIONS = {
     help_tab_donate: "☕ Поддержать автора",
     help_btn_download_manual: "📥 Скачать инструкцию (.md)",
     help_btn_close: "Понятно",
+    btn_close: "Закрыть",
 
     // Tabs
     tab_map: "План огорода",
@@ -315,7 +319,10 @@ const UI_TRANSLATIONS = {
     feedback_author_email: "Autori otsene e-post:",
     feedback_toast_copied: "✓ Teate tekst on kopeeritud lõikelauale!",
     feedback_toast_sent: "✓ Tekst kopeeritud! Avatakse e-posti programm...",
+    pwa_installed_label: "✓ Paigaldatud",
     pwa_installed_toast: "✓ «Nutikas Aed» on seadmesse paigaldatud! Saate selle avada otse töölaualt.",
+    install_modal_title: "«Nutika Aia» paigaldamine seadmesse",
+    install_modal_subtitle: "Käivitage programm eraldi aknas töölaualt ja kasutage seda ka ilma internetita!",
 
     // Help Modal
     help_modal_title: "📖 Kasutusjuhend «Minu Aed»",
@@ -328,6 +335,7 @@ const UI_TRANSLATIONS = {
     help_tab_donate: "☕ Toeta autorit",
     help_btn_download_manual: "📥 Laadi alla juhend (.md)",
     help_btn_close: "Selge",
+    btn_close: "Sulge",
 
     // Tabs
     tab_map: "Aiamaa plaan",
@@ -553,7 +561,10 @@ const UI_TRANSLATIONS = {
     feedback_author_email: "Autora tiešais e-pasts:",
     feedback_toast_copied: "✓ Ziņojuma teksts nokopēts starpliktuvē!",
     feedback_toast_sent: "✓ Teksts nokopēts! Tiek atvērta e-pasta programma...",
+    pwa_installed_label: "✓ Uzstādīts",
     pwa_installed_toast: "✓ «Gudrais Dārzs» instalēts ierīcē! Tagad to var atvērt tieši no darbvirsmas.",
+    install_modal_title: "«Gudrā Dārza» uzstādīšana ierīcē",
+    install_modal_subtitle: "Palaidiet programmu atsevišķā logā no darbvirsmas un lietojiet pat bez interneta!",
 
     // Help Modal
     help_modal_title: "📖 Lietotāja rokasgrāmata «Mans Dārzs»",
@@ -566,6 +577,7 @@ const UI_TRANSLATIONS = {
     help_tab_donate: "☕ Atbalstīt autoru",
     help_btn_download_manual: "📥 Lejupielādēt pamācību (.md)",
     help_btn_close: "Sapratu",
+    btn_close: "Aizvērt",
 
     // Tabs
     tab_map: "Dārza plāns",
@@ -791,7 +803,10 @@ const UI_TRANSLATIONS = {
     feedback_author_email: "Tiesioginis autoriaus el. paštas:",
     feedback_toast_copied: "✓ Žinutės tekstas nukopijuotas į iškarpinę!",
     feedback_toast_sent: "✓ Tekstas nukopijuotas! Atidaroma el. pašto programa...",
+    pwa_installed_label: "✓ Įdiegta",
     pwa_installed_toast: "✓ «Mano Daržas» įdiegtas įrenginyje! Dabar galite atidaryti tiesiai iš darbalaukio.",
+    install_modal_title: "«Išmaniojo Sodo» įdiegimas į įrenginį",
+    install_modal_subtitle: "Paleiskite programą atskirame lange iš darbalaukio ir naudokitės net be interneto!",
 
     // Help Modal
     help_modal_title: "📖 Vartotojo vadovas «Mano Daržas»",
@@ -804,6 +819,7 @@ const UI_TRANSLATIONS = {
     help_tab_donate: "☕ Paremti autorių",
     help_btn_download_manual: "📥 Atsisiųsti instrukciją (.md)",
     help_btn_close: "Supratau",
+    btn_close: "Uždaryti",
 
     // Tabs
     tab_map: "Daržo planas",
