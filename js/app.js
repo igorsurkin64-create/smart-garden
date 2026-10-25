@@ -4184,6 +4184,11 @@ class GardenApp {
             </button>
           </div>
 
+          <!-- Подсказка по отправке в Telegram -->
+          <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; margin-top: 0.75rem; background: var(--bg-secondary); padding: 0.6rem 0.85rem; border-radius: 8px; border-left: 3px solid #0088cc;">
+            ${tr('feedback_tip_telegram') || '💡 При нажатии текст скопируется в буфер, и Telegram откроется с готовым сообщением. В чате также можно просто нажать «Вставить» (Ctrl+V).'}
+          </div>
+
         </div>
 
         <div class="modal-footer" style="padding: 1rem 1.5rem; background: var(--bg-tertiary); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
@@ -4221,6 +4226,25 @@ class GardenApp {
       });
     });
 
+    // Надежное копирование в буфер обмена (синхронное через execCommand + async navigator.clipboard)
+    const copyToClipboard = (text) => {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        ta.style.top = '-9999px';
+        ta.setAttribute('readonly', '');
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      } catch (e) {}
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(() => {});
+      }
+    };
+
     const getFormattedMessage = () => {
       const msg = document.getElementById('feedback-message-input')?.value.trim() || '';
       const contact = document.getElementById('feedback-contact-input')?.value.trim() || 'Не указан';
@@ -4243,13 +4267,36 @@ class GardenApp {
     const sendTelegramBtn = document.getElementById('feedback-send-telegram-btn');
     if (sendTelegramBtn) {
       sendTelegramBtn.addEventListener('click', () => {
-        const { body } = getFormattedMessage();
-        navigator.clipboard.writeText(body).then(() => {
-          this.showToast(tr('feedback_toast_telegram') || '✓ Текст обращения скопирован! Открываю Telegram-чат @smartgarden_chat...');
-        }).catch(() => {});
+        const { msg, contact, catText } = getFormattedMessage();
 
-        const tgUrl = 'https://t.me/smartgarden_chat';
-        window.open(tgUrl, '_blank');
+        // Проверка на пустое сообщение
+        if (!msg || msg.trim().length === 0) {
+          const emptyMsg = tr('feedback_toast_empty_msg') || '⚠️ Пожалуйста, напишите текст вашего сообщения или вопроса!';
+          this.showToast(emptyMsg);
+          const inputEl = document.getElementById('feedback-message-input');
+          if (inputEl) {
+            inputEl.focus();
+            inputEl.style.borderColor = 'var(--danger, #e53935)';
+            setTimeout(() => { if (inputEl) inputEl.style.borderColor = ''; }, 2500);
+          }
+          return;
+        }
+
+        // Формируем аккуратное сообщение для Telegram
+        const contactLine = (contact && contact !== 'Не указан' && contact !== 'Nav norādīts' && contact !== 'Määramata' && contact !== 'Nenurodyta') 
+          ? `👤 От: ${contact}\n` 
+          : '';
+        const telegramShareText = `🌱 [Умный Огород]\n📌 ${catText}\n${contactLine}💬 ${msg}\n\n👉 @smartgarden_chat`;
+
+        // Гарантированно копируем в буфер обмена перед открытием
+        copyToClipboard(telegramShareText);
+
+        // Показываем пользователю тост с четкой инструкцией
+        this.showToast(tr('feedback_toast_telegram') || '✓ Текст обращения скопирован! Открываю Telegram: выберите чат и нажмите «Share» (или «Вставить» / Ctrl+V)...');
+
+        // Официальный Telegram Share URL, который предзаполняет черновик сообщения в Telegram
+        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('https://t.me/smartgarden_chat')}&text=${encodeURIComponent(telegramShareText)}`;
+        window.open(shareUrl, '_blank');
       });
     }
 
@@ -4257,13 +4304,12 @@ class GardenApp {
     const copyEmailBtn = document.getElementById('feedback-copy-email-btn');
     if (copyEmailBtn) {
       copyEmailBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(authorEmail).then(() => {
-          copyEmailBtn.textContent = '✓ Скопировано!';
-          this.showToast('✓ Email автора скопирован: ' + authorEmail);
-          setTimeout(() => {
-            copyEmailBtn.textContent = '📋 Скопировать email';
-          }, 2000);
-        });
+        copyToClipboard(authorEmail);
+        copyEmailBtn.textContent = '✓ Скопировано!';
+        this.showToast('✓ Email автора скопирован: ' + authorEmail);
+        setTimeout(() => {
+          copyEmailBtn.textContent = '📋 Скопировать email';
+        }, 2000);
       });
     }
 
@@ -4271,14 +4317,17 @@ class GardenApp {
     const copyTextBtn = document.getElementById('feedback-copy-text-btn');
     if (copyTextBtn) {
       copyTextBtn.addEventListener('click', () => {
-        const { body } = getFormattedMessage();
-        navigator.clipboard.writeText(body).then(() => {
-          copyTextBtn.textContent = '✓ Текст скопирован!';
-          this.showToast(tr('feedback_toast_copied') || '✓ Текст обращения скопирован в буфер обмена!');
-          setTimeout(() => {
-            copyTextBtn.textContent = tr('feedback_btn_copy') || '📋 Скопировать текст';
-          }, 2000);
-        });
+        const { body, msg } = getFormattedMessage();
+        if (!msg) {
+          this.showToast(tr('feedback_toast_empty_msg') || '⚠️ Пожалуйста, напишите текст вашего сообщения или вопроса!');
+          return;
+        }
+        copyToClipboard(body);
+        copyTextBtn.textContent = '✓ Текст скопирован!';
+        this.showToast(tr('feedback_toast_copied') || '✓ Текст обращения скопирован в буфер обмена!');
+        setTimeout(() => {
+          copyTextBtn.textContent = tr('feedback_btn_copy') || '📋 Скопировать текст';
+        }, 2000);
       });
     }
 
@@ -4286,8 +4335,12 @@ class GardenApp {
     const openGmailBtn = document.getElementById('feedback-open-gmail-btn');
     if (openGmailBtn) {
       openGmailBtn.addEventListener('click', () => {
-        const { subject, body } = getFormattedMessage();
-        navigator.clipboard.writeText(body).catch(() => {});
+        const { subject, body, msg } = getFormattedMessage();
+        if (!msg) {
+          this.showToast(tr('feedback_toast_empty_msg') || '⚠️ Пожалуйста, напишите текст вашего сообщения или вопроса!');
+          return;
+        }
+        copyToClipboard(body);
         const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(authorEmail)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         window.open(gmailUrl, '_blank');
       });
@@ -4297,10 +4350,13 @@ class GardenApp {
     const sendPrimaryBtn = document.getElementById('feedback-send-primary-btn');
     if (sendPrimaryBtn) {
       sendPrimaryBtn.addEventListener('click', () => {
-        const { subject, body } = getFormattedMessage();
-        navigator.clipboard.writeText(body).then(() => {
-          this.showToast(tr('feedback_toast_sent') || '✓ Текст скопирован! Запускаю почтовую программу для отправки...');
-        }).catch(() => {});
+        const { subject, body, msg } = getFormattedMessage();
+        if (!msg) {
+          this.showToast(tr('feedback_toast_empty_msg') || '⚠️ Пожалуйста, напишите текст вашего сообщения или вопроса!');
+          return;
+        }
+        copyToClipboard(body);
+        this.showToast(tr('feedback_toast_sent') || '✓ Текст скопирован! Запускаю почтовую программу для отправки...');
 
         const mailtoUrl = `mailto:${encodeURIComponent(authorEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         window.location.href = mailtoUrl;
