@@ -1120,6 +1120,18 @@ class GardenMap {
   }
 
   handleTouchStart(e) {
+    if (e.touches.length === 2) {
+      this.isPinching = true;
+      this.initialPinchDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      this.initialPinchZoom = this.zoom;
+      this.pinchCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      this.pinchCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      return;
+    }
+
     if (e.touches.length === 1 && !this.dragBedState.isDragging) {
       const touch = e.touches[0];
       this.panState = {
@@ -1133,6 +1145,20 @@ class GardenMap {
   }
 
   handleTouchMove(e) {
+    if (this.isPinching && e.touches.length === 2) {
+      e.preventDefault();
+      const currentDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      if (this.initialPinchDistance > 10) {
+        const factor = currentDist / this.initialPinchDistance;
+        const newZoom = Math.max(0.3, Math.min(2.5, this.initialPinchZoom * factor));
+        this.zoomBy(newZoom / this.zoom, this.pinchCenterX, this.pinchCenterY);
+      }
+      return;
+    }
+
     if (this.dragBedState.isDragging && e.touches.length === 1) {
       e.preventDefault();
       this.handleGlobalMouseMove(e.touches[0]);
@@ -1142,7 +1168,10 @@ class GardenMap {
     }
   }
 
-  handleTouchEnd() {
+  handleTouchEnd(e) {
+    if (!e.touches || e.touches.length < 2) {
+      this.isPinching = false;
+    }
     this.handleGlobalMouseUp();
   }
 }

@@ -1802,6 +1802,77 @@ class GardenApp {
     if (pwaInstallBtn) {
       pwaInstallBtn.addEventListener('click', () => this.promptPwaInstall());
     }
+
+    // Мобильное меню для смартфонов
+    this.initMobileMenu();
+  }
+
+  initMobileMenu() {
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const overlay = document.getElementById('mobile-menu-overlay');
+    const closeBtn = document.getElementById('close-mobile-menu-btn');
+    if (!mobileMenuBtn || !overlay) return;
+
+    const openMenu = () => overlay.classList.add('active');
+    const closeMenu = () => overlay.classList.remove('active');
+
+    mobileMenuBtn.addEventListener('click', openMenu);
+    if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeMenu();
+    });
+
+    const bindMobileAction = (id, action) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('click', () => {
+          closeMenu();
+          action();
+        });
+      }
+    };
+
+    bindMobileAction('m-backup-btn', () => this.openDbModal());
+    bindMobileAction('m-demo-btn', () => this.loadDemoPlan());
+    bindMobileAction('m-clear-btn', () => this.confirmClearPlan());
+    bindMobileAction('m-feedback-btn', () => this.openFeedbackModal());
+    bindMobileAction('m-install-btn', () => this.promptPwaInstall());
+    bindMobileAction('m-help-btn', () => this.openHelpModal());
+    bindMobileAction('m-donate-btn', () => this.openDonateModal());
+
+    const mThemeBtn = document.getElementById('m-theme-btn');
+    if (mThemeBtn) {
+      mThemeBtn.addEventListener('click', () => {
+        this.toggleTheme();
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        mThemeBtn.textContent = currentTheme === 'dark' ? '☀️ Светлая тема' : '🌙 Тёмная тема';
+      });
+    }
+
+    // Языковые кнопки в мобильном меню
+    const langPills = document.querySelectorAll('.m-lang-pill');
+    langPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        const lang = pill.getAttribute('data-lang');
+        if (window.i18n && lang) {
+          window.i18n.setLanguage(lang);
+          langPills.forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+        }
+      });
+    });
+
+    window.addEventListener('language-changed', (e) => {
+      const cur = e.detail?.language || (window.i18n ? window.i18n.getLanguage() : 'ru');
+      langPills.forEach(p => {
+        if (p.getAttribute('data-lang') === cur) {
+          p.classList.add('active');
+        } else {
+          p.classList.remove('active');
+        }
+      });
+    });
   }
 
   confirmClearPlan() {
@@ -4084,11 +4155,14 @@ class GardenApp {
                    placeholder="${tr('feedback_contact_placeholder') || 'Иван, ivan@example.com (чтобы автор мог ответить)'}">
           </div>
 
-          <!-- Прямой email автора -->
+          <!-- Прямые контакты автора (Email и Telegram) -->
           <div class="feedback-author-card">
             <div>
-              <span style="color: var(--text-muted); font-size: 0.82rem; display: block;">${tr('feedback_author_email') || 'Прямой email автора:'}</span>
-              <strong style="color: var(--primary); font-family: monospace; font-size: 0.95rem;">${authorEmail}</strong>
+              <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Прямые контакты автора для связи:</span>
+              <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.25rem; font-size: 0.9rem;">
+                <span>📧 <a href="mailto:${authorEmail}" style="color: var(--primary); font-weight: 700;">${authorEmail}</a></span>
+                <span>✈️ <a href="https://t.me/igorSurkin" target="_blank" style="color: #0088cc; font-weight: 700; text-decoration: none;">@igorSurkin</a></span>
+              </div>
             </div>
             <button type="button" class="btn btn-outline btn-sm" id="feedback-copy-email-btn">
               📋 Скопировать email
@@ -4105,10 +4179,13 @@ class GardenApp {
             <button type="button" class="btn btn-outline btn-sm" id="feedback-open-gmail-btn">
               ${tr('feedback_btn_gmail') || '🌐 Открыть в Gmail'}
             </button>
+            <button type="button" class="btn btn-outline btn-sm" id="feedback-send-primary-btn">
+              ${tr('feedback_btn_send_mail') || '✉️ Отправить по Email'}
+            </button>
           </div>
 
-          <button type="button" class="feedback-send-primary-btn" id="feedback-send-primary-btn">
-            ${tr('feedback_btn_send_mail') || '✉️ Отправить автору'} ↗
+          <button type="button" class="feedback-telegram-btn" id="feedback-send-telegram-btn">
+            ${tr('feedback_btn_telegram') || '✈️ Написать в Telegram (@igorSurkin)'}
           </button>
         </div>
       </div>
@@ -4146,6 +4223,20 @@ class GardenApp {
 
       return { subject, body, msg, contact, catText };
     };
+
+    // Кнопка: Отправить в Telegram (@igorSurkin)
+    const sendTelegramBtn = document.getElementById('feedback-send-telegram-btn');
+    if (sendTelegramBtn) {
+      sendTelegramBtn.addEventListener('click', () => {
+        const { body } = getFormattedMessage();
+        navigator.clipboard.writeText(body).then(() => {
+          this.showToast(tr('feedback_toast_telegram') || '✓ Текст скопирован! Открываю Telegram для отправки @igorSurkin...');
+        }).catch(() => {});
+
+        const tgUrl = `https://t.me/igorSurkin?text=${encodeURIComponent(body)}`;
+        window.open(tgUrl, '_blank');
+      });
+    }
 
     // Кнопка: Скопировать email автора
     const copyEmailBtn = document.getElementById('feedback-copy-email-btn');

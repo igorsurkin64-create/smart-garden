@@ -5170,6 +5170,337 @@ a {
   gap: 0.5rem;
 }
 
+/* Telegram кнопка в модальном окне обратной связи */
+.feedback-telegram-btn {
+  background: linear-gradient(135deg, #0088cc 0%, #229ED9 100%) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  padding: 0.75rem 1.4rem;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 3px 10px rgba(0, 136, 204, 0.35);
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.feedback-telegram-btn:hover {
+  background: linear-gradient(135deg, #0077b5 0%, #1d8ec4 100%) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 136, 204, 0.45);
+}
+
+/* Счётчик посещений в тулбаре карты */
+.map-visitor-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.45rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* ==========================================================================
+   Мобильное меню и адаптация под смартфоны (Экран <= 768px)
+   Фокус 100% на плане огорода: скрываем лишнее, выносим второстепенное в меню
+   ========================================================================== */
+
+#mobile-menu-btn {
+  display: none;
+}
+
+#mobile-menu-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Показываем кнопку мобильного меню */
+  #mobile-menu-btn {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.84rem;
+    font-weight: 700;
+  }
+
+  /* Скрываем громоздкие кнопки ПК из шапки */
+  #clear-plan-btn,
+  #reset-demo-btn,
+  #db-modal-btn,
+  #help-modal-btn,
+  #donate-modal-btn,
+  #feedback-modal-btn,
+  #pwa-install-btn,
+  #lang-selector-wrap,
+  #theme-toggle-btn {
+    display: none !important;
+  }
+
+  /* Скрываем навигационные вкладки — на телефоне только План Огорода! */
+  .app-navigation {
+    display: none !important;
+  }
+
+  /* Компактная шапка */
+  .app-header {
+    padding: 0.45rem 0.75rem !important;
+    gap: 0.4rem !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+  }
+
+  .header-left {
+    flex-shrink: 0;
+  }
+
+  .app-logo {
+    gap: 0.4rem !important;
+  }
+
+  .logo-icon-badge {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 1.15rem !important;
+  }
+
+  .app-subtitle {
+    display: none !important;
+  }
+
+  .app-title {
+    font-size: 1.05rem !important;
+    margin: 0 !important;
+  }
+
+  .header-center {
+    order: initial !important;
+    width: auto !important;
+    margin: 0 !important;
+    flex: 1 !important;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .header-center::-webkit-scrollbar {
+    display: none;
+  }
+
+  .seasons-control-wrapper {
+    gap: 0.3rem !important;
+  }
+
+  .seasons-label {
+    display: none !important;
+  }
+
+  .years-bar {
+    gap: 3px !important;
+  }
+
+  .year-btn {
+    padding: 0.32rem 0.5rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  .header-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    flex-shrink: 0;
+  }
+
+  #add-bed-btn {
+    padding: 0.45rem 0.75rem !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+  }
+
+  /* Упрощенный тулбар карты */
+  .map-toolbar {
+    padding: 0.35rem 0.6rem !important;
+    gap: 0.4rem !important;
+  }
+
+  .toolbar-legend,
+  .map-hint {
+    display: none !important;
+  }
+
+  .toolbar-left {
+    gap: 0.4rem !important;
+  }
+
+  .toolbar-pill {
+    padding: 0.2rem 0.45rem !important;
+  }
+
+  .pill-label {
+    display: none !important;
+  }
+
+  .toolbar-select {
+    font-size: 0.82rem !important;
+  }
+
+  .toolbar-toggle-btn {
+    padding: 0.3rem 0.55rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  /* Выдвижная панель грядки как Bottom Sheet (выезжает снизу) */
+  .bed-inspector-drawer {
+    position: fixed !important;
+    top: auto !important;
+    bottom: -100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    max-height: 84vh !important;
+    border-radius: 20px 20px 0 0 !important;
+    border-left: none !important;
+    border-top: 2px solid var(--border-color) !important;
+    box-shadow: 0 -12px 45px rgba(0, 0, 0, 0.35) !important;
+    transition: bottom 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    z-index: 990 !important;
+  }
+
+  .bed-inspector-drawer.open {
+    bottom: 0 !important;
+    right: 0 !important;
+  }
+
+  .bed-inspector-drawer::before {
+    content: '';
+    display: block !important;
+    width: 44px;
+    height: 5px;
+    background: var(--text-muted);
+    opacity: 0.4;
+    border-radius: 999px;
+    margin: 8px auto 0;
+    flex-shrink: 0;
+  }
+
+  /* Шторка мобильного меню */
+  #mobile-menu-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    backdrop-filter: blur(4px);
+  }
+
+  #mobile-menu-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobile-menu-drawer {
+    position: fixed;
+    right: -320px;
+    top: 0;
+    bottom: 0;
+    width: 300px;
+    max-width: 85vw;
+    background: var(--bg-card);
+    z-index: 1001;
+    transition: right 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  #mobile-menu-overlay.active .mobile-menu-drawer {
+    right: 0;
+  }
+
+  .mobile-menu-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-tertiary);
+  }
+
+  .mobile-menu-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .mobile-menu-section {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .mobile-menu-section-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 0.2rem;
+  }
+
+  .mobile-menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    text-align: left;
+    font-size: 0.88rem;
+    color: var(--text-main);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    font-family: inherit;
+  }
+
+  .mobile-menu-item:hover,
+  .mobile-menu-item:active {
+    background: var(--bg-hover);
+  }
+
+  .mobile-menu-footer-stat {
+    padding: 0.85rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    background: var(--bg-tertiary);
+    margin-top: auto;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .m-lang-pill.active {
+    background: var(--primary) !important;
+    color: #fff !important;
+    border-color: var(--primary) !important;
+    font-weight: 700;
+  }
+}
+
 
 
 
