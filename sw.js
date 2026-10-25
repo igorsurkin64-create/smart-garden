@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smart-garden-v2.0';
+const CACHE_NAME = 'smart-garden-v2.1';
 
 const STATIC_ASSETS = [
   './',

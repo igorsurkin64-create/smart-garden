@@ -2831,7 +2831,7 @@ class GardenApp {
     modalContent.innerHTML = `
       <div class="modal-card">
         <div class="modal-header">
-          <h3>💾 ${tr('db_modal_title') || 'Сохранение и перенос плана огорода'}</h3>
+          <h3>${tr('db_modal_title') || '💾 Сохранение и перенос плана огорода'}</h3>
           <button class="modal-close-btn">&times;</button>
         </div>
         <div class="modal-body">
@@ -2844,19 +2844,19 @@ class GardenApp {
           <div class="db-actions-list mt-3">
             <div class="db-action-item">
               <div>
-                <strong>${tr('db_btn_download') || 'Сохранить план в файл'}</strong>
+                <strong>${(tr('db_btn_download') || 'Сохранить план в файл').replace(/^[^\p{L}\p{N}]+/u, '').trim()}</strong>
                 <p class="text-xs text-muted">Скачать файл с вашими грядками на компьютер или телефон. Пригодится, чтобы записи никогда не потерялись.</p>
               </div>
-              <button class="btn btn-primary" id="db-export-btn">📥 ${tr('db_btn_download') || 'Сохранить план в файл'}</button>
+              <button class="btn btn-primary" id="db-export-btn">${tr('db_btn_download') || '📥 Сохранить план в файл'}</button>
             </div>
 
             <div class="db-action-item mt-3">
               <div>
-                <strong>${tr('db_btn_upload') || 'Загрузить план из файла'}</strong>
+                <strong>${(tr('db_btn_upload') || 'Загрузить план из файла').replace(/^[^\p{L}\p{N}]+/u, '').trim()}</strong>
                 <p class="text-xs text-muted">Открыть сохранённый ранее файл с планом огорода на этом или другом устройстве.</p>
               </div>
               <label class="btn btn-outline file-input-label">
-                📤 ${tr('db_btn_upload') || 'Загрузить план из файла'}
+                ${tr('db_btn_upload') || '📤 Загрузить план из файла'}
                 <input type="file" id="db-import-file" accept=".json,application/json,text/plain" style="display: none;">
               </label>
             </div>
