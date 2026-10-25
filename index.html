@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Умный Огород — Планировщик грядок и умный севооборот</title>
+  <meta name="description" content="Интерактивная программа для огородников: 2D-план участка, история посадок по сезонам и годам, научный контроль севооборота, рекомендации предшественников и совместимость культур.">
+  
+  <!-- Современные шрифты -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/x-icon" href="icon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#15803d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Умный Огород">
+  
+  <link rel="stylesheet" href="css/style.css?v=20261025a">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Верхняя панель / Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="app-logo">
+          <div class="logo-icon-badge">
+            <span class="logo-leaf">🌿</span>
+          </div>
+          <div>
+            <h1 class="app-title" data-i18n="app_title">Мой Огород</h1>
+            <span class="app-subtitle" data-i18n="app_subtitle">Планировщик посадок &amp; Севооборот</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Переключатель сезонов / годов -->
+      <div class="header-center">
+        <div class="seasons-control-wrapper">
+          <span class="seasons-label" data-i18n="season_label">📅 Сезон:</span>
+          <div class="years-bar" id="years-bar">
+            <!-- Кнопки годов генерируются динамически -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Действия, языковой селектор и тема -->
+      <div class="header-right">
+        <button class="btn btn-primary" id="add-bed-btn" data-i18n="btn_add_bed" title="Создать новую грядку или теплицу на плане">
+          ➕ Новая грядка
+        </button>
+        <button class="btn btn-outline" id="clear-plan-btn" data-i18n="btn_clear_plan" title="Очистить демонстрационный план и начать строить свой огород">
+          🧹 Очистить план
+        </button>
+        <button class="btn btn-outline" id="reset-demo-btn" data-i18n="btn_demo" title="Загрузить демонстрационный пример грядок">
+          🔄 Демо-пример
+        </button>
+        <button class="btn btn-outline" id="db-modal-btn" data-i18n="btn_backup" title="Резервное копирование и экспорт в файл">
+          💾 Резервная копия
+        </button>
+        <button class="btn btn-outline" id="help-modal-btn" data-i18n="btn_help" data-i18n-title="btn_help_title" title="Инструкция пользователя и руководство">
+          ❓ Инструкция
+        </button>
+        <button class="btn btn-outline donate-header-btn" id="donate-modal-btn" data-i18n="btn_donate" data-i18n-title="btn_donate_title" title="Поддержать автора и развитие проекта">
+          ☕ Поддержать автора
+        </button>
+        <button class="btn btn-outline feedback-header-btn" id="feedback-modal-btn" data-i18n="btn_feedback" data-i18n-title="btn_feedback_title" title="Предложить идею, улучшение или сообщить об ошибке">
+          💡 Идеи и отзывы
+        </button>
+        <button class="btn btn-primary pwa-install-header-btn" id="pwa-install-btn" style="display: none;" data-i18n="btn_pwa_install" data-i18n-title="btn_pwa_install_title" title="Установить программу на компьютер или телефон">
+          📲 Установить
+        </button>
+
+        <!-- Многоязычный переключатель (Language Switcher) -->
+        <div class="lang-selector-wrap" id="lang-selector-wrap">
+          <button class="btn btn-ghost lang-btn" id="lang-menu-btn" title="Выбрать язык / Vali keel / Izvēlēties valodu / Pasirinkti kalbą" aria-haspopup="true" aria-expanded="false">
+            <span class="lang-flag" id="current-lang-flag">🇷🇺</span>
+            <span class="lang-code" id="current-lang-code">RU</span>
+            <span class="lang-chevron">▾</span>
+          </button>
+          <div class="lang-dropdown" id="lang-dropdown" hidden>
+            <button class="lang-option active" data-lang="ru">
+              <span class="opt-flag">🇷🇺</span>
+              <span class="opt-name">Русский</span>
+              <span class="opt-badge">RU</span>
+            </button>
+            <button class="lang-option" data-lang="et">
+              <span class="opt-flag">🇪🇪</span>
+              <span class="opt-name">Eesti</span>
+              <span class="opt-badge">ET</span>
+            </button>
+            <button class="lang-option" data-lang="lv">
+              <span class="opt-flag">🇱🇻</span>
+              <span class="opt-name">Latviešu</span>
+              <span class="opt-badge">LV</span>
+            </button>
+            <button class="lang-option" data-lang="lt">
+              <span class="opt-flag">🇱🇹</span>
+              <span class="opt-name">Lietuvių</span>
+              <span class="opt-badge">LT</span>
+            </button>
+          </div>
+        </div>
+
+        <button class="btn btn-ghost theme-toggle" id="theme-toggle-btn" title="Переключить тему оформления">
+          🌙 Тёмная тема
+        </button>
+      </div>
+    </header>
+
+    <!-- Навигационные вкладки -->
+    <nav class="app-navigation" aria-label="Разделы программы">
+      <div class="nav-tabs-wrapper">
+        <button class="nav-tab active" data-tab="map" id="tab-nav-map">
+          <span class="tab-icon">🗺️</span>
+          <span data-i18n="tab_map">План огорода</span>
+        </button>
+        <button class="nav-tab" data-tab="table" id="tab-nav-table">
+          <span class="tab-icon">📋</span>
+          <span data-i18n="tab_table">Сводка севооборота</span>
+        </button>
+        <button class="nav-tab" data-tab="encyclopedia" id="tab-nav-encyclopedia">
+          <span class="tab-icon">🌿</span>
+          <span data-i18n="tab_encyclopedia">Справочник культур</span>
+        </button>
+        <button class="nav-tab" data-tab="planner" id="tab-nav-planner">
+          <span class="tab-icon">💡</span>
+          <span data-i18n="tab_planner">Правила &amp; Калькулятор</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Основная рабочая область -->
+    <main class="main-content" id="main-content">
+      
+      <!-- 1. Вкладка: Интерактивная карта огорода -->
+      <section class="view-panel view-map active" id="view-map">
+        <div class="map-toolbar">
+          <div class="toolbar-left">
+            <div class="toolbar-pill">
+              <span class="pill-label" data-i18n="filter_label">🔍 Фильтр:</span>
+              <select id="map-filter-select" class="toolbar-select">
+                <option value="all" data-i18n="filter_all">Все грядки</option>
+                <option value="danger" data-i18n="filter_danger">⚠️ Только с нарушениями севооборота</option>
+                <option value="empty" data-i18n="filter_empty">🌱 Только незасеянные грядки</option>
+              </select>
+            </div>
+            
+            <button class="btn btn-sm btn-outline toolbar-toggle-btn" id="toggle-ghost-btn" data-i18n="overlay_prev_year" title="Показать полупрозрачным слоем посадки предшествующего года">
+              👁️ Наложить прошлый год
+            </button>
+          </div>
+
+          <div class="toolbar-legend">
+            <span class="legend-item"><span class="legend-dot dot-optimal"></span> <span data-i18n="legend_perfect">Идеально</span></span>
+            <span class="legend-item"><span class="legend-dot dot-warning"></span> <span data-i18n="legend_warning">Внимание</span></span>
+            <span class="legend-item"><span class="legend-dot dot-danger"></span> <span data-i18n="legend_danger">Нарушение</span></span>
+          </div>
+
+          <div class="toolbar-right">
+            <span class="map-hint" data-i18n="hint_pan">🖐️ Перетаскивайте огород в любую сторону мышью (Pan). Колёсико — масштаб.</span>
+          </div>
+        </div>
+
+        <div class="garden-viewport" id="garden-viewport">
+          <div id="garden-map-container" class="garden-map-container">
+            <!-- Карта и грядки генерируются классом GardenMap -->
+          </div>
+        </div>
+
+        <!-- Выдвижная панель / Инспектор грядки (Bed Inspector) -->
+        <aside class="bed-inspector-drawer" id="bed-inspector-drawer" aria-label="Свойства грядки">
+          <!-- Заполняется динамически при клике по грядке -->
+        </aside>
+      </section>
+
+      <!-- 2. Вкладка: Сводная таблица посадок по годам -->
+      <section class="view-panel view-table" id="view-table" style="display: none;">
+        <div class="panel-header-desc">
+          <h2 data-i18n="summary_title">Сводная таблица севооборота по сезонам</h2>
+          <p data-i18n="summary_subtitle">Сравнение истории посадок 2024, 2025 и плана 2026 года с автоматическим контролем агрономических правил.</p>
+        </div>
+        <div id="table-view-container">
+          <!-- Таблица генерируется динамически -->
+        </div>
+      </section>
+
+      <!-- 3. Вкладка: Справочник культур -->
+      <section class="view-panel view-encyclopedia" id="view-encyclopedia" style="display: none;">
+        <div class="panel-header-desc">
+          <h2 data-i18n="encyclo_title">Энциклопедия огородных культур</h2>
+          <p data-i18n="encyclo_subtitle">Биологические семейства, совместимость, лучшие и плохие предшественники, сроки возврата на грядку.</p>
+        </div>
+        <div id="encyclopedia-container">
+          <!-- Карточки овощей -->
+        </div>
+      </section>
+
+      <!-- 4. Вкладка: Правила севооборота и калькулятор -->
+      <section class="view-panel view-planner" id="view-planner" style="display: none;">
+        <div id="planner-container">
+          <!-- Советник агронома и калькулятор -->
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Универсальное модальное окно -->
+  <div class="modal-overlay" id="general-modal">
+    <div id="modal-dynamic-content"></div>
+  </div>
+
+  <!-- Всплывающие уведомления (Toast) -->
+  <div class="app-toast" id="app-toast"></div>
+
+  <!-- Скрипты приложения -->
+  <script src="js/i18n.js?v=20261018s"></script>
+  <script src="js/crops-data.js?v=20261018s"></script>
+  <script src="js/storage.js?v=20261018s"></script>
+  <script src="js/garden-map.js?v=20261018s"></script>
+  <script src="js/rotation-advisor.js?v=20261018s"></script>
+  <script src="js/app.js?v=20261018s"></script>
+</body>
+</html>

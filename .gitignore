@@ -1,0 +1,12 @@
+# Python / PyInstaller build artifacts
+__pycache__/
+build/
+dist/
+*.pyc
+*.exe
+
+# Local IDE & temp files
+.gemini/
+.vscode/
+.idea/
+
