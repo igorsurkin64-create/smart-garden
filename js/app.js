@@ -4158,10 +4158,10 @@ class GardenApp {
           <!-- Прямые контакты автора (Email и Telegram) -->
           <div class="feedback-author-card">
             <div>
-              <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Прямые контакты автора для связи:</span>
+              <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Прямые контакты и сообщество:</span>
               <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.25rem; font-size: 0.9rem;">
                 <span>📧 <a href="mailto:${authorEmail}" style="color: var(--primary); font-weight: 700;">${authorEmail}</a></span>
-                <span>✈️ <a href="https://t.me/igorSurkin" target="_blank" style="color: #0088cc; font-weight: 700; text-decoration: none;">@igorSurkin</a></span>
+                <span>✈️ <a href="https://t.me/smartgarden_chat" target="_blank" style="color: #0088cc; font-weight: 700; text-decoration: none;">Telegram-чат: @smartgarden_chat</a></span>
               </div>
             </div>
             <button type="button" class="btn btn-outline btn-sm" id="feedback-copy-email-btn">
@@ -4185,7 +4185,7 @@ class GardenApp {
           </div>
 
           <button type="button" class="feedback-telegram-btn" id="feedback-send-telegram-btn">
-            ${tr('feedback_btn_telegram') || '✈️ Написать в Telegram (@igorSurkin)'}
+            ${tr('feedback_btn_telegram') || '✈️ Написать в Telegram-чат (@smartgarden_chat)'}
           </button>
         </div>
       </div>
@@ -4224,16 +4224,16 @@ class GardenApp {
       return { subject, body, msg, contact, catText };
     };
 
-    // Кнопка: Отправить в Telegram (@igorSurkin)
+    // Кнопка: Открыть Telegram-чат (@smartgarden_chat)
     const sendTelegramBtn = document.getElementById('feedback-send-telegram-btn');
     if (sendTelegramBtn) {
       sendTelegramBtn.addEventListener('click', () => {
         const { body } = getFormattedMessage();
         navigator.clipboard.writeText(body).then(() => {
-          this.showToast(tr('feedback_toast_telegram') || '✓ Текст скопирован! Открываю Telegram для отправки @igorSurkin...');
+          this.showToast(tr('feedback_toast_telegram') || '✓ Текст обращения скопирован! Открываю Telegram-чат @smartgarden_chat...');
         }).catch(() => {});
 
-        const tgUrl = `https://t.me/igorSurkin?text=${encodeURIComponent(body)}`;
+        const tgUrl = 'https://t.me/smartgarden_chat';
         window.open(tgUrl, '_blank');
       });
     }
