@@ -22,11 +22,17 @@ class GardenApp {
     this.setupTabNavigation();
     this.setupEventListeners();
     this.setupPwa();
+    this.setupBackupReminder();
     this.renderActiveTab();
 
     // Слушаем изменение данных
     window.addEventListener('garden-data-changed', () => {
       this.refreshCurrentView();
+      // Мягко планируем проверку напоминания после сохранения изменений
+      clearTimeout(this._backupReminderDebounce);
+      this._backupReminderDebounce = setTimeout(() => {
+        this.checkBackupReminder();
+      }, 6000);
     });
 
     // Слушаем смену языка
@@ -2882,7 +2888,11 @@ class GardenApp {
     // Экспорт
     document.getElementById('db-export-btn').addEventListener('click', () => {
       this.storage.exportJson();
-      this.showToast('Файл резервной копии сохранен!');
+      localStorage.setItem('sg_last_backup_time', Date.now().toString());
+      const card = document.getElementById('backup-reminder-card');
+      if (card) card.style.display = 'none';
+      const toastMsg = (window.t ? window.t('backup_saved_toast') : null) || 'Файл резервной копии сохранен!';
+      this.showToast(toastMsg);
     });
 
     // Импорт
@@ -4307,6 +4317,94 @@ class GardenApp {
     this._toastTimeout = setTimeout(() => {
       toast.classList.remove('show');
     }, 3200);
+  }
+
+  // ==========================================================================
+  // Умное напоминание о резервной копии (Smart Backup Reminder)
+  // ==========================================================================
+
+  setupBackupReminder() {
+    const card = document.getElementById('backup-reminder-card');
+    if (!card) return;
+
+    const closeBtn = document.getElementById('backup-reminder-close-btn');
+    const laterBtn = document.getElementById('backup-reminder-later-btn');
+    const downloadBtn = document.getElementById('backup-reminder-download-btn');
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => this.dismissBackupReminder());
+    }
+    if (laterBtn) {
+      laterBtn.addEventListener('click', () => this.dismissBackupReminder());
+    }
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', () => this.downloadBackupFromReminder());
+    }
+
+    // Первый мягкий запуск проверки через 12 секунд после загрузки страницы
+    setTimeout(() => {
+      this.checkBackupReminder();
+    }, 12000);
+  }
+
+  checkBackupReminder() {
+    const card = document.getElementById('backup-reminder-card');
+    if (!card) return;
+
+    // Если карточка уже открыта — не трогаем
+    if (card.style.display !== 'none' && !card.classList.contains('closing')) return;
+
+    // Проверяем наличие плана (не менее 2 грядок в огороде)
+    const beds = this.storage ? this.storage.getBeds() : [];
+    if (!beds || beds.length < 2) return;
+
+    // 7 дней интервал (7 * 24 * 60 * 60 * 1000 = 604800000 ms)
+    const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    const lastBackup = parseInt(localStorage.getItem('sg_last_backup_time') || '0', 10);
+    const lastDismissed = parseInt(localStorage.getItem('sg_backup_reminder_dismissed_time') || '0', 10);
+
+    if (now - lastBackup < SEVEN_DAYS_MS) return;
+    if (now - lastDismissed < SEVEN_DAYS_MS) return;
+
+    // Показываем карточку напоминания
+    card.classList.remove('closing');
+    card.style.display = 'block';
+    if (window.i18n) {
+      window.i18n.applyToDOM();
+    }
+  }
+
+  dismissBackupReminder() {
+    const card = document.getElementById('backup-reminder-card');
+    if (card) {
+      card.classList.add('closing');
+      setTimeout(() => {
+        card.style.display = 'none';
+        card.classList.remove('closing');
+      }, 350);
+    }
+    // Запоминаем время откладывания (7 дней)
+    localStorage.setItem('sg_backup_reminder_dismissed_time', Date.now().toString());
+  }
+
+  downloadBackupFromReminder() {
+    if (this.storage) {
+      this.storage.exportJson();
+    }
+    localStorage.setItem('sg_last_backup_time', Date.now().toString());
+
+    const card = document.getElementById('backup-reminder-card');
+    if (card) {
+      card.classList.add('closing');
+      setTimeout(() => {
+        card.style.display = 'none';
+        card.classList.remove('closing');
+      }, 350);
+    }
+
+    const toastMsg = (window.t ? window.t('backup_saved_toast') : null) || '✓ Резервная копия сохранена на ваше устройство!';
+    this.showToast(toastMsg);
   }
 }
 

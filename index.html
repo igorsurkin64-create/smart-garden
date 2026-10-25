@@ -303,15 +303,40 @@
     <div id="modal-dynamic-content"></div>
   </div>
 
+  <!-- Умное напоминание о резервной копии (Smart Backup Reminder) -->
+  <aside class="backup-reminder-card" id="backup-reminder-card" style="display: none;" role="region" aria-label="Напоминание о резервной копии">
+    <div class="backup-reminder-glow"></div>
+    <button class="backup-reminder-close" id="backup-reminder-close-btn" title="Отложить">&times;</button>
+    <div class="backup-reminder-body">
+      <div class="backup-reminder-icon-box">
+        <span class="backup-reminder-icon">🛡️</span>
+      </div>
+      <div class="backup-reminder-content">
+        <h4 class="backup-reminder-title" data-i18n="backup_reminder_title">Сохраните резервную копию</h4>
+        <p class="backup-reminder-desc" data-i18n="backup_reminder_desc">
+          Все ваши грядки и посадки хранятся в браузере. Скачайте файл (.json), чтобы не потерять свои записи при очистке истории или смене устройства.
+        </p>
+        <div class="backup-reminder-actions">
+          <button class="btn btn-primary btn-sm backup-action-download" id="backup-reminder-download-btn" data-i18n="backup_reminder_download">
+            📥 Скачать копию (.json)
+          </button>
+          <button class="btn btn-outline btn-sm backup-action-later" id="backup-reminder-later-btn" data-i18n="backup_reminder_later">
+            ✕ Позже
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
   <!-- Всплывающие уведомления (Toast) -->
   <div class="app-toast" id="app-toast"></div>
 
   <!-- Скрипты приложения -->
-  <script src="js/i18n.js?v=20261025f"></script>
-  <script src="js/crops-data.js?v=20261025f"></script>
-  <script src="js/storage.js?v=20261025f"></script>
-  <script src="js/garden-map.js?v=20261025f"></script>
-  <script src="js/rotation-advisor.js?v=20261025f"></script>
-  <script src="js/app.js?v=20261025f"></script>
+  <script src="js/i18n.js?v=20261025g"></script>
+  <script src="js/crops-data.js?v=20261025g"></script>
+  <script src="js/storage.js?v=20261025g"></script>
+  <script src="js/garden-map.js?v=20261025g"></script>
+  <script src="js/rotation-advisor.js?v=20261025g"></script>
+  <script src="js/app.js?v=20261025g"></script>
 </body>
 </html>

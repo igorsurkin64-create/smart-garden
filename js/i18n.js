@@ -231,6 +231,13 @@ const UI_TRANSLATIONS = {
     db_btn_upload: "📤 Загрузить из файла (JSON)",
     db_btn_reset: "⚠️ Сбросить к демо-плану",
 
+    // Smart Backup Reminder
+    backup_reminder_title: "Сохраните резервную копию",
+    backup_reminder_desc: "Все ваши грядки и посадки хранятся в браузере. Скачайте файл (.json), чтобы не потерять свои записи при очистке истории или смене устройства.",
+    backup_reminder_download: "📥 Скачать копию (.json)",
+    backup_reminder_later: "✕ Позже",
+    backup_saved_toast: "✓ Резервная копия сохранена на ваше устройство!",
+
     // Toast messages
     toast_saved: "✓ Изменения успешно сохранены!",
     toast_cleared: "План очищен. Добавьте свои грядки!",
@@ -475,6 +482,13 @@ const UI_TRANSLATIONS = {
     db_btn_download: "📥 Laadi alla varukoopia (JSON)",
     db_btn_upload: "📤 Laadi failist (JSON)",
     db_btn_reset: "⚠️ Lähtesta näidisplaanile",
+
+    // Smart Backup Reminder
+    backup_reminder_title: "Salvestage varukoopia",
+    backup_reminder_desc: "Kõik teie peenrad ja istutused on salvestatud brauserisse. Laadige alla fail (.json), et andmed vahemälu puhastamisel või seadme vahetamisel kaotsi ei läheks.",
+    backup_reminder_download: "📥 Laadi alla varukoopia (.json)",
+    backup_reminder_later: "✕ Hiljem",
+    backup_saved_toast: "✓ Varukoopia on edukalt teie seadmesse salvestatud!",
 
     // Toast messages
     toast_saved: "✓ Muudatused edukalt salvestatud!",
@@ -721,6 +735,13 @@ const UI_TRANSLATIONS = {
     db_btn_upload: "📤 Ielādēt no faila (JSON)",
     db_btn_reset: "⚠️ Atiestatīt uz demo plānu",
 
+    // Smart Backup Reminder
+    backup_reminder_title: "Saglabājiet rezerves kopiju",
+    backup_reminder_desc: "Visas jūsu dobes un stādījumi tiek glabāti pārlūkprogrammā. Lejupielādējiet failu (.json), lai nepazaudētu datus, tīrot kešatmiņu vai mainot ierīci.",
+    backup_reminder_download: "📥 Lejupielādēt kopiju (.json)",
+    backup_reminder_later: "✕ Vēlāk",
+    backup_saved_toast: "✓ Rezerves kopija veiksmīgi saglabāta jūsu ierīcē!",
+
     // Toast messages
     toast_saved: "✓ Izmaiņas veiksmīgi saglabātas!",
     toast_cleared: "Plāns ir notīrīts. Pievienojiet savas dobes!",
@@ -965,6 +986,13 @@ const UI_TRANSLATIONS = {
     db_btn_download: "📥 Atsisiųsti atsarginę kopiją (JSON)",
     db_btn_upload: "📤 Įkelti iš failo (JSON)",
     db_btn_reset: "⚠️ Atstatyti demonstracinį planą",
+
+    // Smart Backup Reminder
+    backup_reminder_title: "Išsaugokite atsarginę kopiją",
+    backup_reminder_desc: "Visos jūsų lysvės ir sodinimai saugomi naršyklėje. Atsisiųskite failą (.json), kad neprarastumėte duomenų išvalę talpyklą ar pakeitę įrenginį.",
+    backup_reminder_download: "📥 Atsisiųsti kopiją (.json)",
+    backup_reminder_later: "✕ Vėliau",
+    backup_saved_toast: "✓ Atsarginė kopija sėkmingai išsaugota jūsų įrenginyje!",
 
     // Toast messages
     toast_saved: "✓ Pakeitimai sėkmingai išsaugoti!",
