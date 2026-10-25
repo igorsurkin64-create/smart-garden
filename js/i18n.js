@@ -225,18 +225,18 @@ const UI_TRANSLATIONS = {
     calc_result_title: "Заключение агронома:",
 
     // Backup & DB Modal
-    db_modal_title: "Управление базой данных и резервное копирование",
-    db_modal_desc: "Все ваши данные сохраняются локально на этом компьютере. Здесь вы можете скачать резервную копию или загрузить сохранённый файл на другом компьютере.",
-    db_btn_download: "📥 Скачать резервную копию (JSON)",
-    db_btn_upload: "📤 Загрузить из файла (JSON)",
+    db_modal_title: "💾 Сохранение и перенос плана огорода",
+    db_modal_desc: "Все ваши грядки сохраняются в браузере на этом устройстве. Здесь вы можете сохранить файл с планом для защиты от потери данных или перенести его на другой телефон или компьютер.",
+    db_btn_download: "📥 Сохранить план в файл",
+    db_btn_upload: "📤 Загрузить план из файла",
     db_btn_reset: "⚠️ Сбросить к демо-плану",
 
     // Smart Backup Reminder
-    backup_reminder_title: "Сохраните резервную копию",
-    backup_reminder_desc: "Все ваши грядки и посадки хранятся в браузере. Скачайте файл (.json), чтобы не потерять свои записи при очистке истории или смене устройства.",
-    backup_reminder_download: "📥 Скачать копию (.json)",
-    backup_reminder_later: "✕ Позже",
-    backup_saved_toast: "✓ Резервная копия сохранена на ваше устройство!",
+    backup_reminder_title: "Сохраните ваш план огорода",
+    backup_reminder_desc: "Все ваши грядки и посадки хранятся в браузере. Сохраните файл с планом на свой компьютер или телефон, чтобы записи не пропали при очистке истории или смене устройства.",
+    backup_reminder_download: "📥 Сохранить план в файл",
+    backup_reminder_later: "✕ Напомнить позже",
+    backup_saved_toast: "✓ План огорода успешно сохранён в файл!",
 
     // Toast messages
     toast_saved: "✓ Изменения успешно сохранены!",
@@ -477,18 +477,18 @@ const UI_TRANSLATIONS = {
     calc_result_title: "Agronoomi järeldus:",
 
     // Backup & DB Modal
-    db_modal_title: "Andmebaasi haldamine ja varukoopia",
-    db_modal_desc: "Kõik teie andmed salvestatakse lokaalselt sellesse arvutisse. Siin saate alla laadida varukoopia või laadida salvestatud faili teise arvutisse.",
-    db_btn_download: "📥 Laadi alla varukoopia (JSON)",
-    db_btn_upload: "📤 Laadi failist (JSON)",
+    db_modal_title: "💾 Aiaplaani salvestamine ja ületoomine",
+    db_modal_desc: "Kõik teie peenrad salvestatakse selle seadme brauserisse. Siin saate salvestada faili oma plaaniga andmete kaitsmiseks või teise arvutisse/telefoni ülekandmiseks.",
+    db_btn_download: "📥 Salvesta plaan faili",
+    db_btn_upload: "📤 Laadi plaan failist",
     db_btn_reset: "⚠️ Lähtesta näidisplaanile",
 
     // Smart Backup Reminder
-    backup_reminder_title: "Salvestage varukoopia",
-    backup_reminder_desc: "Kõik teie peenrad ja istutused on salvestatud brauserisse. Laadige alla fail (.json), et andmed vahemälu puhastamisel või seadme vahetamisel kaotsi ei läheks.",
-    backup_reminder_download: "📥 Laadi alla varukoopia (.json)",
-    backup_reminder_later: "✕ Hiljem",
-    backup_saved_toast: "✓ Varukoopia on edukalt teie seadmesse salvestatud!",
+    backup_reminder_title: "Salvestage oma aiaplaan",
+    backup_reminder_desc: "Kõik teie peenrad ja istutused on salvestatud brauserisse. Salvestage plaan faili oma seadmesse, et märkmed vahemälu puhastamisel või telefoni vahetamisel kaotsi ei läheks.",
+    backup_reminder_download: "📥 Salvesta plaan faili",
+    backup_reminder_later: "✕ Tuleta hiljem meelde",
+    backup_saved_toast: "✓ Aiaplaan on edukalt faili salvestatud!",
 
     // Toast messages
     toast_saved: "✓ Muudatused edukalt salvestatud!",
@@ -729,18 +729,18 @@ const UI_TRANSLATIONS = {
     calc_result_title: "Agronoma slēdziens:",
 
     // Backup & DB Modal
-    db_modal_title: "Datu bāzes pārvaldība un dublēšana",
-    db_modal_desc: "Visi jūsu dati tiek glabāti lokāli šajā datorā. Šeit varat lejupielādēt dublējumkopiju vai ielādēt saglabāto failu citā datorā.",
-    db_btn_download: "📥 Lejupielādēt dublējumkopiju (JSON)",
-    db_btn_upload: "📤 Ielādēt no faila (JSON)",
+    db_modal_title: "💾 Dārza plāna saglabāšana un pārsūtīšana",
+    db_modal_desc: "Visas jūsu dobes tiek glabātas šīs ierīces pārlūkprogrammā. Šeit varat saglabāt plāna failu datu aizsardzībai vai pārsūtīšanai uz citu datoru vai tālruni.",
+    db_btn_download: "📥 Saglabāt plānu failā",
+    db_btn_upload: "📤 Ielādēt plānu no faila",
     db_btn_reset: "⚠️ Atiestatīt uz demo plānu",
 
     // Smart Backup Reminder
-    backup_reminder_title: "Saglabājiet rezerves kopiju",
-    backup_reminder_desc: "Visas jūsu dobes un stādījumi tiek glabāti pārlūkprogrammā. Lejupielādējiet failu (.json), lai nepazaudētu datus, tīrot kešatmiņu vai mainot ierīci.",
-    backup_reminder_download: "📥 Lejupielādēt kopiju (.json)",
-    backup_reminder_later: "✕ Vēlāk",
-    backup_saved_toast: "✓ Rezerves kopija veiksmīgi saglabāta jūsu ierīcē!",
+    backup_reminder_title: "Saglabājiet savu dārza plānu",
+    backup_reminder_desc: "Visas jūsu dobes un stādījumi tiek glabāti pārlūkprogrammā. Saglabājiet plāna failu savā ierīcē, lai pieraksti nepazustu, tīrot vēsturi vai mainot tālruni.",
+    backup_reminder_download: "📥 Saglabāt plānu failā",
+    backup_reminder_later: "✕ Atgādināt vēlāk",
+    backup_saved_toast: "✓ Dārza plāns veiksmīgi saglabāts failā!",
 
     // Toast messages
     toast_saved: "✓ Izmaiņas veiksmīgi saglabātas!",
@@ -981,18 +981,18 @@ const UI_TRANSLATIONS = {
     calc_result_title: "Agronomo išvada:",
 
     // Backup & DB Modal
-    db_modal_title: "Duomenų bazės valdymas ir atsarginės kopijos",
-    db_modal_desc: "Visi jūsų duomenys saugomi vietoje šiame kompiuteryje. Čia galite atsisiųsti atsarginę kopiją arba įkelti išsaugotą failą į kitą kompiuterį.",
-    db_btn_download: "📥 Atsisiųsti atsarginę kopiją (JSON)",
-    db_btn_upload: "📤 Įkelti iš failo (JSON)",
+    db_modal_title: "💾 Daržo plano išsaugojimas ir perkėlimas",
+    db_modal_desc: "Visos jūsų lysvės saugomos šio įrenginio naršyklėje. Čia galite išsaugoti plano failą duomenų apsaugai arba perkelti jį į kitą kompiuterį ar telefoną.",
+    db_btn_download: "📥 Išsaugoti planą į failą",
+    db_btn_upload: "📤 Įkelti planą iš failo",
     db_btn_reset: "⚠️ Atstatyti demonstracinį planą",
 
     // Smart Backup Reminder
-    backup_reminder_title: "Išsaugokite atsarginę kopiją",
-    backup_reminder_desc: "Visos jūsų lysvės ir sodinimai saugomi naršyklėje. Atsisiųskite failą (.json), kad neprarastumėte duomenų išvalę talpyklą ar pakeitę įrenginį.",
-    backup_reminder_download: "📥 Atsisiųsti kopiją (.json)",
-    backup_reminder_later: "✕ Vėliau",
-    backup_saved_toast: "✓ Atsarginė kopija sėkmingai išsaugota jūsų įrenginyje!",
+    backup_reminder_title: "Išsaugokite savo daržo planą",
+    backup_reminder_desc: "Visos jūsų lysvės ir sodinimai saugomi naršyklėje. Išsaugokite plano failą savo įrenginyje, kad įrašai nepradingtų išvalius naršyklės istoriją ar pakeitus telefoną.",
+    backup_reminder_download: "📥 Išsaugoti planą į failą",
+    backup_reminder_later: "✕ Priminti vėliau",
+    backup_saved_toast: "✓ Daržo planas sėkmingai išsaugotas į failą!",
 
     // Toast messages
     toast_saved: "✓ Pakeitimai sėkmingai išsaugoti!",

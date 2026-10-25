@@ -970,21 +970,34 @@ class GardenStorage {
 
   exportJson() {
     const jsonStr = JSON.stringify(this.data, null, 2);
-    const blob = new Blob([jsonStr], { type: 'application/json' });
+    // Добавляем маркер UTF-8 BOM (\ufeff), чтобы Windows и текстовые редакторы
+    // гарантированно открывали файл в правильной кодировке с русскими буквами.
+    const blob = new Blob(["\ufeff", jsonStr], { type: 'application/json;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     const dateStr = new Date().toISOString().split('T')[0];
+    const year = this.getActiveYear ? this.getActiveYear() : 2026;
+    const fileName = `Мой_Огород_План_${year}_(${dateStr}).json`;
     a.href = url;
-    a.download = `ogorod-plan-backup-${dateStr}.json`;
+    a.download = fileName;
     document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    // В Google Chrome и Edge удаление URL не должно происходить мгновенно в том же тике,
+    // иначе браузер может оборвать сохранение файла на диск.
+    setTimeout(() => {
+      if (a.parentNode) {
+        document.body.removeChild(a);
+      }
+      URL.revokeObjectURL(url);
+    }, 4000);
+    return fileName;
   }
 
   importJson(jsonString) {
     try {
-      const parsed = JSON.parse(jsonString);
+      // Удаляем возможный маркер UTF-8 BOM в начале строки
+      const cleanString = (typeof jsonString === 'string') ? jsonString.replace(/^\ufeff/, '') : jsonString;
+      const parsed = JSON.parse(cleanString);
       if (!parsed || !Array.isArray(parsed.beds)) {
         throw new Error('Некорректный формат файла плана огорода');
       }

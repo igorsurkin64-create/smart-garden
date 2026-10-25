@@ -2826,38 +2826,44 @@ class GardenApp {
     const data = this.storage.getData();
     const bedCount = data.beds?.length || 0;
     const yearsList = (data.years || []).join(', ');
+    const tr = (k) => (window.t ? window.t(k) : k);
 
     modalContent.innerHTML = `
       <div class="modal-card">
         <div class="modal-header">
-          <h3>💾 База данных огорода и резервные копии</h3>
+          <h3>💾 ${tr('db_modal_title') || 'Сохранение и перенос плана огорода'}</h3>
           <button class="modal-close-btn">&times;</button>
         </div>
         <div class="modal-body">
           <div class="db-stats-box">
-            <div>📊 Всего грядок в базе: <strong>${bedCount}</strong></div>
+            <div>📊 Всего грядок на плане: <strong>${bedCount}</strong></div>
             <div>📅 Сезоны в памяти: <strong>${yearsList}</strong></div>
-            <div>🌱 Статус хранилища: <span class="text-success">Автосохранение в LocalStorage включено</span></div>
+            <div>🌱 Статус хранилища: <span class="text-success">Автосохранение в браузере включено</span></div>
           </div>
 
           <div class="db-actions-list mt-3">
             <div class="db-action-item">
               <div>
-                <strong>Экспорт базы данных (JSON)</strong>
-                <p class="text-xs text-muted">Сохранить файл на компьютер для резервной копии или переноса на другое устройство.</p>
+                <strong>${tr('db_btn_download') || 'Сохранить план в файл'}</strong>
+                <p class="text-xs text-muted">Скачать файл с вашими грядками на компьютер или телефон. Пригодится, чтобы записи никогда не потерялись.</p>
               </div>
-              <button class="btn btn-outline" id="db-export-btn">📥 Скачать JSON</button>
+              <button class="btn btn-primary" id="db-export-btn">📥 ${tr('db_btn_download') || 'Сохранить план в файл'}</button>
             </div>
 
             <div class="db-action-item mt-3">
               <div>
-                <strong>Импорт базы данных</strong>
-                <p class="text-xs text-muted">Загрузить сохранённый ранее файл JSON с планом огорода.</p>
+                <strong>${tr('db_btn_upload') || 'Загрузить план из файла'}</strong>
+                <p class="text-xs text-muted">Открыть сохранённый ранее файл с планом огорода на этом или другом устройстве.</p>
               </div>
               <label class="btn btn-outline file-input-label">
-                📤 Выбрать файл
-                <input type="file" id="db-import-file" accept=".json" style="display: none;">
+                📤 ${tr('db_btn_upload') || 'Загрузить план из файла'}
+                <input type="file" id="db-import-file" accept=".json,application/json,text/plain" style="display: none;">
               </label>
+            </div>
+
+            <div class="db-guide-note mt-3 p-3 bg-tertiary rounded" style="font-size: 0.84rem; line-height: 1.5; border-left: 3px solid var(--primary);">
+              <strong style="display: block; margin-bottom: 0.25rem;">💡 Как это устроено простыми словами:</strong>
+              Все ваши грядки автоматически сохраняются прямо в этом браузере. Но если вы почистите историю или захотите работать на другом телефоне или компьютере — нажмите <strong>«Сохранить план в файл»</strong>. Открывать этот файл двойным кликом в Windows не нужно — когда понадобится продолжить работу, просто нажмите здесь <strong>«Загрузить план из файла»</strong>, и весь ваш огород сразу вернётся!
             </div>
 
             <div class="db-action-item mt-3">
@@ -2887,12 +2893,11 @@ class GardenApp {
 
     // Экспорт
     document.getElementById('db-export-btn').addEventListener('click', () => {
-      this.storage.exportJson();
+      const fileName = this.storage.exportJson();
       localStorage.setItem('sg_last_backup_time', Date.now().toString());
       const card = document.getElementById('backup-reminder-card');
       if (card) card.style.display = 'none';
-      const toastMsg = (window.t ? window.t('backup_saved_toast') : null) || 'Файл резервной копии сохранен!';
-      this.showToast(toastMsg);
+      this.showExportSuccessModal(fileName);
     });
 
     // Импорт
@@ -2907,9 +2912,9 @@ class GardenApp {
         if (res.success) {
           closeModal();
           this.refreshCurrentView();
-          this.showToast('База данных успешно импортирована!');
+          this.showToast('✓ План огорода успешно загружен и восстановлен!');
         } else {
-          alert('Ошибка при импорте файла: ' + res.error);
+          alert('Ошибка при чтении файла: ' + res.error);
         }
       };
       reader.readAsText(file);
@@ -3043,13 +3048,13 @@ class GardenApp {
             },
             {
               icon: '📥',
-              title: 'Экспорт резервной копии (JSON)',
-              desc: 'Через кнопку <strong>«💾 Резервная копия»</strong> скачайте файл плана на свой компьютер или флешку, чтобы обезопасить данные или перенести их на другой ПК.'
+              title: 'Сохранение плана в файл',
+              desc: 'Через кнопку <strong>«💾 Резервная копия»</strong> сохраните файл плана на свой компьютер или телефон, чтобы обезопасить данные или перенести их на другое устройство.'
             },
             {
               icon: '📤',
-              title: 'Импорт и восстановление',
-              desc: 'С помощью кнопки <strong>«📤 Выбрать файл»</strong> вы можете в любой момент загрузить ранее сохранённый файл JSON и мгновенно восстановить всю историю огорода.'
+              title: 'Загрузка и перенос плана',
+              desc: 'С помощью кнопки <strong>«📤 Загрузить план из файла»</strong> вы можете в любой момент открыть сохранённый файл и мгновенно восстановить всю расстановку грядок со всей историей.'
             },
             {
               icon: '🔄',
@@ -4389,8 +4394,9 @@ class GardenApp {
   }
 
   downloadBackupFromReminder() {
+    let fileName = '';
     if (this.storage) {
-      this.storage.exportJson();
+      fileName = this.storage.exportJson();
     }
     localStorage.setItem('sg_last_backup_time', Date.now().toString());
 
@@ -4403,8 +4409,143 @@ class GardenApp {
       }, 350);
     }
 
-    const toastMsg = (window.t ? window.t('backup_saved_toast') : null) || '✓ Резервная копия сохранена на ваше устройство!';
-    this.showToast(toastMsg);
+    this.showExportSuccessModal(fileName);
+  }
+
+  showExportSuccessModal(fileName) {
+    const modal = document.getElementById('general-modal');
+    const modalContent = document.getElementById('modal-dynamic-content');
+    if (!modal || !modalContent) {
+      const toastMsg = (window.t ? window.t('backup_saved_toast') : null) || '✓ План огорода успешно сохранён в файл!';
+      this.showToast(toastMsg);
+      return;
+    }
+
+    const currentLang = (window.i18n && window.i18n.getLanguage()) || 'ru';
+    const displayFile = fileName || 'Мой_Огород_План.json';
+
+    let contentHtml = '';
+    if (currentLang === 'et') {
+      contentHtml = `
+        <div class="modal-card" style="max-width: 480px;">
+          <div class="modal-header">
+            <h3>✅ Aiaplaan edukalt faili salvestatud!</h3>
+            <button class="modal-close-btn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p style="font-size: 0.95rem; line-height: 1.5; margin-bottom: 0.85rem;">
+              Teie peenarde fail laaditi seadmesse kausta <strong>«Allalaadimised» (Downloads)</strong>.
+            </p>
+            <div class="p-3 bg-tertiary rounded" style="font-size: 0.85rem; line-height: 1.5; border-left: 3px solid #10b981; margin-bottom: 1rem;">
+              <strong style="color: var(--text-main);">📁 Fail:</strong> <code>${escapeHtml(displayFile)}</code><br><br>
+              <strong>💡 Kuidas seda faili kasutada:</strong><br>
+              See fail on mõeldud programmi «Nutikas Aed» jaoks. Seda ei pea arvutis otse avama — seal on andmed teie peenarde taastamiseks.
+            </div>
+            <p style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5;">
+              <strong>Kuidas plaani teise arvutisse või telefoni viia?</strong><br>
+              1. Avage programm teises seadmes.<br>
+              2. Vajutage <strong>«💾 Varukoopia»</strong> → <strong>«📤 Laadi plaan failist»</strong>.<br>
+              3. Valige see fail — ja kõik peenrad ilmuvad kohe tagasi!
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" id="export-success-close-btn">Selge, aitäh!</button>
+          </div>
+        </div>
+      `;
+    } else if (currentLang === 'lv') {
+      contentHtml = `
+        <div class="modal-card" style="max-width: 480px;">
+          <div class="modal-header">
+            <h3>✅ Dārza plāns veiksmīgi saglabāts failā!</h3>
+            <button class="modal-close-btn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p style="font-size: 0.95rem; line-height: 1.5; margin-bottom: 0.85rem;">
+              Dobju plāna fails ir lejupielādēts jūsu ierīces mapē <strong>«Lejupielādes» (Downloads)</strong>.
+            </p>
+            <div class="p-3 bg-tertiary rounded" style="font-size: 0.85rem; line-height: 1.5; border-left: 3px solid #10b981; margin-bottom: 1rem;">
+              <strong style="color: var(--text-main);">📁 Fails:</strong> <code>${escapeHtml(displayFile)}</code><br><br>
+              <strong>💡 Kā izmantot šo failu:</strong><br>
+              Šis fails ir paredzēts programmai «Gudrais Dārzs». To nav nepieciešams atvērt datorā — tajā glabājas dati dobju atjaunošanai.
+            </div>
+            <p style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5;">
+              <strong>Kā pārcelt plānu uz citu datoru vai tālruni?</strong><br>
+              1. Atveriet programmu vēlamajā ierīcē.<br>
+              2. Nospiediet <strong>«💾 Dublējumkopija»</strong> → <strong>«📤 Ielādēt plānu no faila»</strong>.<br>
+              3. Izvēlieties šo failu — un visas dobes uzreiz atvērsies!
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" id="export-success-close-btn">Skaidrs, paldies!</button>
+          </div>
+        </div>
+      `;
+    } else if (currentLang === 'lt') {
+      contentHtml = `
+        <div class="modal-card" style="max-width: 480px;">
+          <div class="modal-header">
+            <h3>✅ Daržo planas sėkmingai išsaugotas į failą!</h3>
+            <button class="modal-close-btn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p style="font-size: 0.95rem; line-height: 1.5; margin-bottom: 0.85rem;">
+              Lysvių plano failas atsisiųstas į jūsų įrenginio aplanką <strong>«Atsisiuntimai» (Downloads)</strong>.
+            </p>
+            <div class="p-3 bg-tertiary rounded" style="font-size: 0.85rem; line-height: 1.5; border-left: 3px solid #10b981; margin-bottom: 1rem;">
+              <strong style="color: var(--text-main);">📁 Failas:</strong> <code>${escapeHtml(displayFile)}</code><br><br>
+              <strong>💡 Kaip naudoti šį failą:</strong><br>
+              Šis failas sukurtas programai «Išmanusis Daržas». Jo nereikia atidaryti kompiuteryje — jame saugomi duomenys lysvėms atstatyti.
+            </div>
+            <p style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5;">
+              <strong>Kaip perkelti planą į kitą kompiuterį ar telefoną?</strong><br>
+              1. Atidarykite programą kitame įrenginyje.<br>
+              2. Paspauskite <strong>«💾 Atsarginė kopija»</strong> → <strong>«📤 Įkelti planą iš failo»</strong>.<br>
+              3. Pasirinkite šį failą — ir visos lysvės iškart bus atkurtos!
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" id="export-success-close-btn">Aišku, ačiū!</button>
+          </div>
+        </div>
+      `;
+    } else {
+      contentHtml = `
+        <div class="modal-card" style="max-width: 490px;">
+          <div class="modal-header">
+            <h3>✅ План огорода успешно сохранён в файл!</h3>
+            <button class="modal-close-btn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p style="font-size: 0.95rem; line-height: 1.5; margin-bottom: 0.85rem;">
+              Файл с вашими грядками скачан на устройство в папку <strong>«Загрузки»</strong>.
+            </p>
+            <div class="p-3 bg-tertiary rounded" style="font-size: 0.85rem; line-height: 1.5; border-left: 3px solid #10b981; margin-bottom: 1rem;">
+              <strong style="color: var(--text-main);">📁 Имя файла:</strong> <code style="font-size: 0.88rem; background: var(--bg-primary); padding: 2px 6px; border-radius: 4px;">${escapeHtml(displayFile)}</code><br><br>
+              <strong>💡 Как пользоваться этим файлом:</strong><br>
+              Этот файл создан специально для программы «Умный Огород». Открывать его напрямую через Windows или блокнот не нужно — внутри хранятся данные для расстановки ваших грядок.
+            </div>
+            <p style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+              <strong>Как перенести план на другой компьютер или телефон?</strong><br>
+              1. Откройте сайт программы на нужном устройстве.<br>
+              2. Нажмите <strong>«💾 Резервная копия»</strong> → <strong>«📤 Загрузить план из файла»</strong>.<br>
+              3. Выберите этот файл — и весь ваш огород со всеми грядками сразу появится!
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" id="export-success-close-btn">Понятно, спасибо!</button>
+          </div>
+        </div>
+      `;
+    }
+
+    modalContent.innerHTML = contentHtml;
+    modal.classList.add('active');
+
+    const closeModal = () => modal.classList.remove('active');
+    modalContent.querySelector('.modal-close-btn').addEventListener('click', closeModal);
+    const closeBtn = document.getElementById('export-success-close-btn');
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
   }
 }
 
