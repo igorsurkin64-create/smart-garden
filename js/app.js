@@ -52,13 +52,7 @@ class GardenApp {
   setupTheme() {
     const savedTheme = localStorage.getItem('garden_theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
-    const themeBtn = document.getElementById('theme-toggle-btn');
-    if (themeBtn) {
-      const isDark = savedTheme === 'dark';
-      themeBtn.innerHTML = isDark 
-        ? (window.t ? window.t('theme_light') : '☀️ Светлая тема')
-        : (window.t ? window.t('theme_dark') : '🌙 Тёмная тема');
-    }
+    this.updateThemeButton(savedTheme === 'dark');
   }
 
   toggleTheme() {
@@ -66,11 +60,22 @@ class GardenApp {
     const next = current === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('garden_theme', next);
+    this.updateThemeButton(next === 'dark');
+  }
+
+  updateThemeButton(isDark) {
     const themeBtn = document.getElementById('theme-toggle-btn');
-    if (themeBtn) {
-      themeBtn.innerHTML = next === 'dark'
-        ? (window.t ? window.t('theme_light') : '☀️ Светлая тема')
-        : (window.t ? window.t('theme_dark') : '🌙 Тёмная тема');
+    if (!themeBtn) return;
+    const titleText = isDark 
+      ? (window.t ? window.t('theme_light') : '☀️ Светлая тема')
+      : (window.t ? window.t('theme_dark') : '🌙 Тёмная тема');
+    themeBtn.setAttribute('title', titleText);
+    themeBtn.setAttribute('aria-label', titleText);
+    const iconSpan = themeBtn.querySelector('.theme-icon');
+    if (iconSpan) {
+      iconSpan.textContent = isDark ? '☀️' : '🌙';
+    } else {
+      themeBtn.innerHTML = isDark ? '<span class="theme-icon">☀️</span>' : '<span class="theme-icon">🌙</span>';
     }
   }
 
@@ -144,13 +149,8 @@ class GardenApp {
     if (window.i18n) {
       window.i18n.applyToDOM();
     }
-    const themeBtn = document.getElementById('theme-toggle-btn');
-    if (themeBtn) {
-      const current = document.documentElement.getAttribute('data-theme') || 'light';
-      themeBtn.innerHTML = current === 'dark'
-        ? (window.t ? window.t('theme_light') : '☀️ Светлая тема')
-        : (window.t ? window.t('theme_dark') : '🌙 Тёмная тема');
-    }
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    this.updateThemeButton(current === 'dark');
   }
 
   initGardenMap() {
@@ -1809,8 +1809,101 @@ class GardenApp {
       pwaInstallBtn.addEventListener('click', () => this.promptPwaInstall());
     }
 
+    // Выпадающее меню дополнительных действий
+    this.setupHeaderMenu();
+
+    // Полноэкранный режим карты (Zen Mode)
+    this.setupZenMode();
+
     // Мобильное меню для смартфонов
     this.initMobileMenu();
+  }
+
+  setupHeaderMenu() {
+    const wrap = document.getElementById('header-menu-wrap');
+    const btn = document.getElementById('header-menu-btn');
+    const dropdown = document.getElementById('header-menu-dropdown');
+    if (!wrap || !btn || !dropdown) return;
+
+    const toggle = (force) => {
+      const isCurrentlyHidden = dropdown.hidden;
+      const willShow = force !== undefined ? force : isCurrentlyHidden;
+      dropdown.hidden = !willShow;
+      wrap.classList.toggle('open', willShow);
+      btn.setAttribute('aria-expanded', willShow ? 'true' : 'false');
+    };
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggle();
+    });
+
+    dropdown.addEventListener('click', (e) => {
+      if (e.target.closest('button')) {
+        toggle(false);
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!wrap.contains(e.target)) {
+        toggle(false);
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !dropdown.hidden) {
+        toggle(false);
+      }
+    });
+  }
+
+  setupZenMode() {
+    const zenBtn = document.getElementById('toggle-zen-btn');
+    const appContainer = document.querySelector('.app-container');
+    if (!zenBtn || !appContainer) return;
+
+    const updateZenBtnText = (isZen) => {
+      const icon = zenBtn.querySelector('.zen-btn-icon');
+      const text = zenBtn.querySelector('.zen-btn-text');
+      if (icon) icon.textContent = isZen ? '🗗' : '⛶';
+      if (text) text.textContent = isZen 
+        ? (window.t ? window.t('btn_exit_zen') : 'Свернуть экран')
+        : (window.t ? window.t('btn_zen_mode') : 'Во весь экран');
+      const title = isZen
+        ? (window.t ? window.t('btn_exit_zen') : 'Свернуть полноэкранный режим')
+        : (window.t ? window.t('btn_zen_title') : 'Развернуть карту на весь экран (скрыть верхние меню для максимального поля грядок)');
+      zenBtn.setAttribute('title', title);
+    };
+
+    const toggleZen = (force) => {
+      const isZen = force !== undefined ? force : !appContainer.classList.contains('zen-mode');
+      appContainer.classList.toggle('zen-mode', isZen);
+      zenBtn.classList.toggle('active', isZen);
+      updateZenBtnText(isZen);
+
+      if (isZen) {
+        this.showToast(window.t ? window.t('toast_zen_on') : '⛶ Карта развёрнута на весь экран! Нажмите «Свернуть» или Esc для возврата меню');
+      }
+
+      // Пересчитать масштабирование грядок под максимальный вьюпорт
+      setTimeout(() => {
+        if (this.gardenMap) {
+          this.gardenMap.fitPlotToView(true);
+        }
+      }, 120);
+    };
+
+    zenBtn.addEventListener('click', () => toggleZen());
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && appContainer.classList.contains('zen-mode')) {
+        toggleZen(false);
+      }
+    });
+
+    window.addEventListener('language-changed', () => {
+      updateZenBtnText(appContainer.classList.contains('zen-mode'));
+    });
   }
 
   initMobileMenu() {

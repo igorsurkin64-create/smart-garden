@@ -22,7 +22,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Умный Огород">
   
-  <link rel="stylesheet" href="css/style.css?v=20261025h">
+  <link rel="stylesheet" href="css/style.css?v=20261031a">
 
   <!-- Yandex.Metrika counter -->
   <script type="text/javascript">
@@ -64,37 +64,49 @@
         </div>
       </div>
 
-      <!-- Действия, языковой селектор и тема -->
+      <!-- Действия, выпадающее меню, языковой селектор и тема -->
       <div class="header-right">
-        <!-- Кнопка мобильного меню (активна на экранах смартфонов) -->
+        <!-- Кнопка мобильного меню (для узких экранов смартфонов <= 768px) -->
         <button class="btn btn-outline mobile-menu-btn" id="mobile-menu-btn" aria-label="Меню" title="Все действия и меню">
           ☰ Меню
         </button>
 
-        <button class="btn btn-primary" id="add-bed-btn" data-i18n="btn_add_bed" title="Создать новую грядку или теплицу на плане">
+        <!-- Главные действия: Новая грядка и Сохранение плана -->
+        <button class="btn btn-primary btn-add-bed-main" id="add-bed-btn" data-i18n="btn_add_bed" title="Создать новую грядку или теплицу на плане">
           ➕ Новая грядка
         </button>
-        <button class="btn btn-outline" id="clear-plan-btn" data-i18n="btn_clear_plan" title="Очистить демонстрационный план и начать строить свой огород">
-          🧹 Очистить план
-        </button>
-        <button class="btn btn-outline" id="reset-demo-btn" data-i18n="btn_demo" title="Загрузить демонстрационный пример грядок">
-          🔄 Демо-пример
-        </button>
-        <button class="btn btn-outline" id="db-modal-btn" data-i18n="btn_backup" title="Резервное копирование и экспорт в файл">
+        <button class="btn btn-outline btn-backup-main" id="db-modal-btn" data-i18n="btn_backup" title="Резервное копирование и экспорт в файл">
           💾 Резервная копия
         </button>
-        <button class="btn btn-outline" id="help-modal-btn" data-i18n="btn_help" data-i18n-title="btn_help_title" title="Инструкция пользователя и руководство">
-          ❓ Инструкция
-        </button>
-        <button class="btn btn-outline donate-header-btn" id="donate-modal-btn" data-i18n="btn_donate" data-i18n-title="btn_donate_title" title="Поддержать автора и развитие проекта">
-          ☕ Поддержать автора
-        </button>
-        <button class="btn btn-outline feedback-header-btn" id="feedback-modal-btn" data-i18n="btn_feedback" data-i18n-title="btn_feedback_title" title="Предложить идею, улучшение или сообщить об ошибке">
-          💡 Идеи и отзывы
-        </button>
-        <button class="btn btn-outline pwa-install-header-btn" id="pwa-install-btn" data-i18n="btn_pwa_install" data-i18n-title="btn_pwa_install_title" title="Установить программу на компьютер или телефон">
-          📲 Установить
-        </button>
+
+        <!-- Выпадающее меню дополнительных действий (для ПК и ноутбуков) -->
+        <div class="header-menu-wrap" id="header-menu-wrap">
+          <button class="btn btn-outline header-menu-btn" id="header-menu-btn" title="Дополнительные действия и меню" aria-haspopup="true" aria-expanded="false">
+            <span data-i18n="btn_more_menu">⚙️ Меню</span>
+            <span class="menu-chevron">▾</span>
+          </button>
+          <div class="header-menu-dropdown" id="header-menu-dropdown" hidden>
+            <button class="header-dropdown-item" id="reset-demo-btn" data-i18n="btn_demo">
+              <span>🔄 Демо-пример</span>
+            </button>
+            <button class="header-dropdown-item item-danger" id="clear-plan-btn" data-i18n="btn_clear_plan">
+              <span>🧹 Очистить весь план</span>
+            </button>
+            <div class="header-dropdown-divider"></div>
+            <button class="header-dropdown-item" id="help-modal-btn" data-i18n="btn_help" data-i18n-title="btn_help_title">
+              <span>❓ Инструкция пользователя</span>
+            </button>
+            <button class="header-dropdown-item item-feedback" id="feedback-modal-btn" data-i18n="btn_feedback" data-i18n-title="btn_feedback_title">
+              <span>💡 Идеи и отзывы (Telegram)</span>
+            </button>
+            <button class="header-dropdown-item item-donate" id="donate-modal-btn" data-i18n="btn_donate" data-i18n-title="btn_donate_title">
+              <span>☕ Поддержать автора</span>
+            </button>
+            <button class="header-dropdown-item item-install" id="pwa-install-btn" data-i18n="btn_pwa_install" data-i18n-title="btn_pwa_install_title">
+              <span>📲 Установить на устройство</span>
+            </button>
+          </div>
+        </div>
 
         <!-- Многоязычный переключатель (Language Switcher) -->
         <div class="lang-selector-wrap" id="lang-selector-wrap">
@@ -127,8 +139,9 @@
           </div>
         </div>
 
-        <button class="btn btn-ghost theme-toggle" id="theme-toggle-btn" title="Переключить тему оформления">
-          🌙 Тёмная тема
+        <!-- Компактная кнопка переключения темы -->
+        <button class="btn btn-ghost theme-toggle-compact" id="theme-toggle-btn" title="Переключить тему оформления (Светлая / Тёмная)" aria-label="Тема оформления">
+          <span class="theme-icon" id="theme-icon">🌙</span>
         </button>
       </div>
     </header>
@@ -183,7 +196,14 @@
           </div>
 
           <div class="toolbar-right">
-            <span class="map-hint" data-i18n="hint_pan">🖐️ Перетаскивайте огород в любую сторону мышью (Pan). Колёсико — масштаб.</span>
+            <span class="map-hint" data-i18n="hint_pan">🖐️ Перетаскивайте огород мышью (Pan). Колёсико — масштаб.</span>
+            
+            <!-- Кнопка разворачивания карты на весь экран (Zen Mode) -->
+            <button class="btn btn-sm btn-outline toolbar-zen-btn" id="toggle-zen-btn" data-i18n-title="btn_zen_title" title="Развернуть карту на весь экран (скрыть верхние меню для максимального поля грядок)">
+              <span class="zen-btn-icon">⛶</span>
+              <span class="zen-btn-text" data-i18n="btn_zen_mode">Во весь экран</span>
+            </button>
+
             <div class="map-visitor-badge" title="Яндекс.Метрика: просмотры, визиты и уникальные посетители за сегодня">
               <a href="https://metrika.yandex.ru/stat/?id=113788019&amp;from=informer" target="_blank" rel="nofollow" style="display: flex; align-items: center; text-decoration: none;">
                 <img src="https://images.weserv.nl/?url=informer.yandex.ru/informer/113788019/3_1_FFFFFFFF_EFEFEFFF_0_pageviews"
@@ -342,11 +362,11 @@
   <div class="app-toast" id="app-toast"></div>
 
   <!-- Скрипты приложения -->
-  <script src="js/i18n.js?v=20261025l"></script>
-  <script src="js/crops-data.js?v=20261025l"></script>
-  <script src="js/storage.js?v=20261025l"></script>
-  <script src="js/garden-map.js?v=20261025l"></script>
-  <script src="js/rotation-advisor.js?v=20261025l"></script>
-  <script src="js/app.js?v=20261025l"></script>
+  <script src="js/i18n.js?v=20261031a"></script>
+  <script src="js/crops-data.js?v=20261031a"></script>
+  <script src="js/storage.js?v=20261031a"></script>
+  <script src="js/garden-map.js?v=20261031a"></script>
+  <script src="js/rotation-advisor.js?v=20261031a"></script>
+  <script src="js/app.js?v=20261031a"></script>
 </body>
 </html>
