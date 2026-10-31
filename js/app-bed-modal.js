@@ -681,9 +681,9 @@
           const cxM = (vw / 2 - this.gardenMap.panX) / (this.gardenMap.meterPixels * this.gardenMap.zoom);
           const cyM = (vh / 2 - this.gardenMap.panY) / (this.gardenMap.meterPixels * this.gardenMap.zoom);
           
-          if (cxM >= 0 && cyM >= 0 && cxM < 50 && cyM < 50) {
-            x = Math.max(1.0, Math.round((cxM - width / 2) * 2) / 2);
-            y = Math.max(1.0, Math.round((cyM - height / 2) * 2) / 2);
+          if (cxM >= -40 && cyM >= -40 && cxM < 100 && cyM < 100) {
+            x = Math.round((cxM - width / 2) * 2) / 2;
+            y = Math.round((cyM - height / 2) * 2) / 2;
           } else {
             const bbox = this.gardenMap.calculateBedsBoundingBox(beds);
             x = bbox.minX;
@@ -780,8 +780,8 @@
             orientation: selectedOrientation,
             sectionsCount,
             sections,
-            x: Math.max(1, Math.round(x * 2) / 2),
-            y: Math.max(1, Math.round(y * 2) / 2),
+            x: Math.round(x * 2) / 2,
+            y: Math.round(y * 2) / 2,
             history: {}
           };
           

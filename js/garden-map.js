@@ -1107,8 +1107,9 @@ class GardenMap {
 
       targetX = Math.round(targetX / this.gridSnap) * this.gridSnap;
       targetY = Math.round(targetY / this.gridSnap) * this.gridSnap;
-      targetX = Math.max(0.5, targetX);
-      targetY = Math.max(0.5, targetY);
+      // Разрешаем свободное перемещение по всей координатной сетке огорода (-50м ... +100м)
+      targetX = Math.max(-50, Math.min(100, targetX));
+      targetY = Math.max(-50, Math.min(100, targetY));
 
       this._dragPendingX = targetX;
       this._dragPendingY = targetY;
@@ -1159,14 +1160,14 @@ class GardenMap {
       if (this.dragBedState.hasMoved) {
         let newX = (this._dragPendingX !== undefined && this._dragPendingX !== null)
           ? this._dragPendingX
-          : (bedEl ? parseFloat((parseFloat(bedEl.style.left) / this.meterPixels).toFixed(2)) : 0.5);
+          : (bedEl ? parseFloat((parseFloat(bedEl.style.left) / this.meterPixels).toFixed(2)) : 0);
         let newY = (this._dragPendingY !== undefined && this._dragPendingY !== null)
           ? this._dragPendingY
-          : (bedEl ? parseFloat((parseFloat(bedEl.style.top) / this.meterPixels).toFixed(2)) : 0.5);
+          : (bedEl ? parseFloat((parseFloat(bedEl.style.top) / this.meterPixels).toFixed(2)) : 0);
 
         // Предотвращаем утаскивание грядки за пределы рабочей зоны
-        newX = Math.max(0.5, newX);
-        newY = Math.max(0.5, newY);
+        newX = Math.max(-50, Math.min(100, newX));
+        newY = Math.max(-50, Math.min(100, newY));
 
         if (bedEl) {
           bedEl.style.left = `${newX * this.meterPixels}px`;
