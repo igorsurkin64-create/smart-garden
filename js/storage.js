@@ -496,23 +496,23 @@ class GardenStorage {
             ? ['Левая грядка', 'Центральная грядка', 'Правая грядка']
             : ['Рядок 1 (Левый)', 'Рядок 2 (Центр)', 'Рядок 3 (Правый)'];
           
-          if (/прав/i.test(bed.sections[1].name)) {
+          if (!bed.sections[1].name || /прав|right|lab|parem|dešin/i.test(bed.sections[1].name)) {
             bed.sections[1].name = defaultNames3[1];
           }
-          if (/прав/i.test(bed.sections[0].name)) {
+          if (!bed.sections[0].name || /прав|right|lab|parem|dešin/i.test(bed.sections[0].name)) {
             bed.sections[0].name = defaultNames3[0];
           }
-          if (/центр|лев/i.test(bed.sections[2].name)) {
+          if (!bed.sections[2].name || /центр|лев|center|kesk|centr|left|vasak|kair/i.test(bed.sections[2].name)) {
             bed.sections[2].name = defaultNames3[2];
           }
         } else if (bed.sections.length === 2) {
           const defaultNames2 = isGh
             ? ['Левая грядка', 'Правая грядка']
             : ['Рядок 1 (Левый)', 'Рядок 2 (Правый)'];
-          if (/прав/i.test(bed.sections[0].name)) {
+          if (!bed.sections[0].name || /прав|right|lab|parem|dešin/i.test(bed.sections[0].name)) {
             bed.sections[0].name = defaultNames2[0];
           }
-          if (/лев/i.test(bed.sections[1].name)) {
+          if (!bed.sections[1].name || /лев|left|vasak|kair/i.test(bed.sections[1].name)) {
             bed.sections[1].name = defaultNames2[1];
           }
         }

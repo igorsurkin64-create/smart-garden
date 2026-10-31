@@ -511,30 +511,41 @@
     const offsetY = minY - padding;
 
     let svgBedsHtml = '';
-    beds.forEach((b) => {
+    beds.forEach((b, idx) => {
       const bx = (b.x || 0) * M_TO_PX - offsetX;
       const by = (b.y || 0) * M_TO_PX - offsetY;
       const bw = Math.max(0.5, b.width || 1) * M_TO_PX;
       const bh = Math.max(0.5, b.height || 1) * M_TO_PX;
       const isGh = b.type === 'greenhouse';
-      const strokeCol = isGh ? '#0284c7' : '#059669';
-      const fillCol = isGh ? '#f0f9ff' : '#f0fdf4';
+      const isRaised = b.type === 'raised';
+      const strokeCol = isGh ? '#0284c7' : (isRaised ? '#92400e' : '#059669');
+      const fillCol = isGh ? '#f0f9ff' : (isRaised ? '#fffbeb' : '#f0fdf4');
+      const clipId = `bed-clip-${b.id || idx}`;
 
-      let label = `${b.name}`;
+      let label = `№${idx + 1} ${b.name}`;
       const planting = b.history?.[activeYear];
       const crop = planting?.cropId ? getCropById(planting.cropId) : null;
       if (crop) label += ` (${crop.emoji || ''} ${getCropName(crop, currentLang)})`;
 
       svgBedsHtml += `
+        <defs>
+          <clipPath id="${clipId}">
+            <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="3" />
+          </clipPath>
+        </defs>
         <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="3" fill="${fillCol}" stroke="${strokeCol}" stroke-width="1.5" />
       `;
 
       // Если у грядки есть секции, рисуем линии разделения
       if (b.sections && b.sections.length > 1) {
         const secCount = b.sections.length;
-        const isHoriz = (b.orientation || 'horizontal') === 'horizontal';
+        const isGhHorizontal = b.orientation !== 'vertical' && (b.width || 4) >= (b.height || 1.2);
+        let isInternalHorizontal = isGhHorizontal;
+        if (b.sectionsLayout === 'transverse') {
+          isInternalHorizontal = !isGhHorizontal;
+        }
         for (let s = 1; s < secCount; s++) {
-          if (isHoriz) {
+          if (isInternalHorizontal) {
             const lineY = by + (bh / secCount) * s;
             svgBedsHtml += `<line x1="${bx}" y1="${lineY}" x2="${bx + bw}" y2="${lineY}" stroke="${strokeCol}" stroke-dasharray="2,2" stroke-width="1" />`;
           } else {
@@ -545,8 +556,22 @@
       }
 
       svgBedsHtml += `
-        <text x="${bx + 4}" y="${by + 12}" font-size="8.5" font-weight="bold" fill="#111827">${escapeHtml(label)}</text>
-        <text x="${bx + 4}" y="${by + 22}" font-size="7.5" fill="#6b7280">${b.width}×${b.height}м</text>
+        <g clip-path="url(#${clipId})">
+      `;
+      if (bw < 50) {
+        // Узкая вертикальная грядка
+        svgBedsHtml += `
+          <text x="${bx + bw / 2}" y="${by + 11}" text-anchor="middle" font-size="8" font-weight="bold" fill="${strokeCol}">№${idx + 1}</text>
+          <text x="${bx + bw / 2}" y="${by + 21}" text-anchor="middle" font-size="6.5" fill="#6b7280">${b.width}×${b.height}м</text>
+        `;
+      } else {
+        svgBedsHtml += `
+          <text x="${bx + 4}" y="${by + 11}" font-size="8" font-weight="bold" fill="#111827">${escapeHtml(label)}</text>
+          <text x="${bx + 4}" y="${by + 21}" font-size="7" fill="#6b7280">${b.width}×${b.height}м</text>
+        `;
+      }
+      svgBedsHtml += `
+        </g>
       `;
     });
 
