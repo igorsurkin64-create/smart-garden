@@ -6672,9 +6672,17 @@ html, body {
 .modal-install-card {
   max-width: 650px;
   width: 95%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-install-card .modal-body {
+  overflow-y: auto;
+  max-height: calc(90vh - 130px);
 }
 
 .install-guide-box {
