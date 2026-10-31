@@ -1518,18 +1518,25 @@
           `🌐 <b>Язык:</b> ${langCode}\n\n` +
           `💬 <b>Сообщение:</b>\n${safeMsg}`;
 
-        // Бот токен закодирован в base64 от автоматических поисковых ботов
-        const botKey = atob('ODg3MTgxNDY1MTpBQUdvUUF5amlGS0czdjdOWGZ0MDlyN1pHTTZnSklfc1Rtbw==');
-        const tgApiUrl = `https://api.telegram.org/bot${botKey}/sendMessage`;
+        // Отправка через безопасный серверный прокси Google Apps Script (без токена в браузере)
+        // Вставьте сюда URL развёрнутого веб-приложения Google Apps Script (https://script.google.com/macros/s/.../exec)
+        const FEEDBACK_SCRIPT_URL = window.SMART_GARDEN_FEEDBACK_URL || '';
 
         try {
-          const resp = await fetch(tgApiUrl, {
+          if (!FEEDBACK_SCRIPT_URL) {
+            throw new Error('Feedback webhook URL is not configured yet');
+          }
+
+          // Используем text/plain, чтобы браузер не делал CORS preflight (OPTIONS), который Google Apps Script не поддерживает
+          const resp = await fetch(FEEDBACK_SCRIPT_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
-              chat_id: '@smartgarden_chat',
-              text: tgHtml,
-              parse_mode: 'HTML'
+              category: catText,
+              contact: safeContact,
+              lang: langCode,
+              message: msg,
+              html: tgHtml
             })
           });
 
@@ -1544,7 +1551,7 @@
             }, 1400);
             return;
           } else {
-            throw new Error(resData?.description || 'Telegram API error');
+            throw new Error(resData?.description || 'Feedback script error');
           }
         } catch (err) {
           console.warn('Telegram direct send fallback:', err);
