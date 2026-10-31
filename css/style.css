@@ -6673,9 +6673,38 @@ html, body {
 .modal-feedback-card {
   max-width: 620px;
   width: 95%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.modal-feedback-card .modal-header {
+  flex-shrink: 0;
+}
+
+.modal-feedback-card .modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-feedback-card .modal-footer,
+.feedback-modal-footer {
+  flex-shrink: 0;
+  padding: 0.9rem 1.5rem 1.1rem 1.5rem;
+  background: var(--bg-tertiary);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
 }
 
 .feedback-category-pills {
@@ -6799,23 +6828,66 @@ html, body {
   background: linear-gradient(135deg, #0088cc 0%, #229ED9 100%) !important;
   color: #fff !important;
   font-weight: 700 !important;
-  padding: 0.75rem 1.4rem;
+  padding: 0.8rem 1.4rem;
   border-radius: var(--radius-md);
   border: none;
   cursor: pointer;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.5rem;
-  box-shadow: 0 3px 10px rgba(0, 136, 204, 0.35);
+  justify-content: center;
+  gap: 0.6rem;
+  box-shadow: 0 4px 12px rgba(0, 136, 204, 0.4);
   transition: all 0.2s ease;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   text-decoration: none;
+  width: 100%;
 }
 
 .feedback-telegram-btn:hover {
   background: linear-gradient(135deg, #0077b5 0%, #1d8ec4 100%) !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(0, 136, 204, 0.45);
+  box-shadow: 0 6px 18px rgba(0, 136, 204, 0.5);
+}
+
+.feedback-footer-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.feedback-secondary-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.feedback-secondary-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 520px) {
+  .feedback-footer-secondary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+  .feedback-secondary-buttons {
+    width: 100%;
+    justify-content: stretch;
+  }
+  .feedback-secondary-buttons .btn {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.78rem;
+  }
 }
 
 /* Счётчик посещений в тулбаре карты (Яндекс.Метрика информер) */

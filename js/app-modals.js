@@ -1144,7 +1144,7 @@
           <button class="modal-close-btn">&times;</button>
         </div>
 
-        <div class="modal-body" style="padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 1.15rem;">
+        <div class="modal-body feedback-modal-body">
           
           <!-- Выбор категории обращения -->
           <div>
@@ -1206,22 +1206,26 @@
 
         </div>
 
-        <div class="modal-footer" style="padding: 1rem 1.5rem; background: var(--bg-tertiary); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-            <button type="button" class="btn btn-outline btn-sm" id="feedback-copy-text-btn">
-              ${tr('feedback_btn_copy') || '📋 Скопировать текст'}
-            </button>
-            <button type="button" class="btn btn-outline btn-sm" id="feedback-open-gmail-btn">
-              ${tr('feedback_btn_gmail') || '🌐 Открыть в Gmail'}
-            </button>
-            <button type="button" class="btn btn-outline btn-sm" id="feedback-send-primary-btn">
-              ${tr('feedback_btn_send_mail') || '✉️ Отправить по Email'}
-            </button>
-          </div>
-
+        <div class="modal-footer feedback-modal-footer">
           <button type="button" class="feedback-telegram-btn" id="feedback-send-telegram-btn">
-            ${tr('feedback_btn_telegram') || '✈️ Написать в Telegram-чат (@smartgarden_chat)'}
+            <span>🚀</span>
+            <span>${tr('feedback_btn_telegram') || 'Отправить прямо в Telegram-чат (@smartgarden_chat)'}</span>
           </button>
+
+          <div class="feedback-footer-secondary">
+            <span class="feedback-secondary-label">Или отправить по почте:</span>
+            <div class="feedback-secondary-buttons">
+              <button type="button" class="btn btn-outline btn-sm" id="feedback-send-primary-btn" title="Открыть почтовую программу">
+                ${tr('feedback_btn_send_mail') || '✉️ Отправить автору'}
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" id="feedback-open-gmail-btn" title="Открыть в веб-версии Gmail">
+                ${tr('feedback_btn_gmail') || '🌐 Открыть в Gmail'}
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" id="feedback-copy-text-btn" title="Скопировать текст сообщения">
+                ${tr('feedback_btn_copy') || '📋 Скопировать текст'}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     `;
