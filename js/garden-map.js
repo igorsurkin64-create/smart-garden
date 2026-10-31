@@ -677,8 +677,10 @@ class GardenMap {
             if (!secShortName) secShortName = `${secIdx + 1}`;
 
             const cleanCropName = currentCropName ? currentCropName.replace(/\s*\(.*?\)/g, '').trim() : '';
+            const secPlanting = sec.history?.[activeYear] || null;
+            const plantingPattern = secPlanting?.plantingPattern || (holes.length > 15 ? 'zigzag' : 'single');
             const holeSummary = (holes.length > 0 && typeof summarizeHolePlantings === 'function')
-              ? summarizeHolePlantings(holes, currentCrop, currentLang)
+              ? summarizeHolePlantings(holes, currentCrop, currentLang, plantingPattern)
               : null;
 
             if (isInternalHorizontal) {
@@ -702,17 +704,37 @@ class GardenMap {
                           <div class="gh-crop-heading-row">
                             <strong class="gh-crop-name">${escapeHtml(cleanCropName)}</strong>
                             ${holeSummary && holeSummary.varieties.length > 0 ? `
-                              <!-- Вариант 1: Компактная цветная мини-лента лунок -->
-                              <div class="gh-holes-micro-strip" data-bed-id="${bed.id}" data-section-id="${sec.id}" title="Схема лунок: ${holeSummary.plantedCount} из ${holeSummary.totalHoles} высажено (нажмите для списка сортов)">
-                                ${holeSummary.holes.map(h => `
-                                  <span class="gh-micro-hole ${h.isPlanted ? 'is-planted' : 'is-empty'}"
-                                        style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
-                                        title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}"></span>
-                                `).join('')}
+                              <!-- Вариант 1: Компактная цветная мини-лента лунок со схемой посадки -->
+                              <div class="gh-holes-micro-strip pattern-${holeSummary.pattern}" data-bed-id="${bed.id}" data-section-id="${sec.id}" title="Схема посадки: ${holeSummary.patternName} • ${holeSummary.plantedCount} из ${holeSummary.totalHoles} высажено (нажмите для подробностей)">
+                                ${holeSummary.pattern === 'single' ? `
+                                  <div class="gh-holes-micro-row row-1">
+                                    ${holeSummary.row1Holes.map(h => `
+                                      <span class="gh-micro-hole ${h.isPlanted ? 'is-planted' : 'is-empty'}"
+                                            style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
+                                            title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}"></span>
+                                    `).join('')}
+                                  </div>
+                                ` : `
+                                  <div class="gh-holes-micro-row row-1">
+                                    ${holeSummary.row1Holes.map(h => `
+                                      <span class="gh-micro-hole ${h.isPlanted ? 'is-planted' : 'is-empty'}"
+                                            style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
+                                            title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}"></span>
+                                    `).join('')}
+                                  </div>
+                                  <div class="gh-holes-micro-row row-2 ${holeSummary.pattern === 'zigzag' ? 'is-zigzag' : ''}">
+                                    ${holeSummary.row2Holes.map(h => `
+                                      <span class="gh-micro-hole ${h.isPlanted ? 'is-planted' : 'is-empty'}"
+                                            style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
+                                            title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}"></span>
+                                    `).join('')}
+                                  </div>
+                                `}
                               </div>
 
-                              <!-- Вариант 2: Кнопка выпадающего списка сортов -->
-                              <button type="button" class="gh-varieties-dropdown-btn" data-bed-id="${bed.id}" data-section-id="${sec.id}" title="Показать список сортов">
+                              <!-- Вариант 2: Кнопка выпадающего списка сортов со схемой -->
+                              <button type="button" class="gh-varieties-dropdown-btn" data-bed-id="${bed.id}" data-section-id="${sec.id}" title="Схема: ${holeSummary.patternName}. Нажмите для просмотра сортов">
+                                <span class="gh-btn-pattern-icon" title="Схема: ${holeSummary.patternName}">${holeSummary.patternIcon}</span>
                                 <span class="gh-btn-var-dot" style="background-color: ${holeSummary.varieties[0]?.color || '#10b981'};"></span>
                                 <span class="gh-btn-var-label">
                                   ${holeSummary.varieties.length === 1
@@ -781,22 +803,42 @@ class GardenMap {
                         <div class="gh-v-crop-title" title="${escapeHtml(currentCropName)}">${escapeHtml(cleanCropName)}</div>
                         
                         ${holeSummary && holeSummary.varieties.length > 0 ? `
-                          <!-- Вариант 1: Компактная цветная мини-лента лунок -->
-                          <div class="gh-holes-micro-strip is-vertical" data-bed-id="${bed.id}" data-section-id="${sec.id}" title="Схема лунок: ${holeSummary.plantedCount} из ${holeSummary.totalHoles} высажено (нажмите для списка сортов)">
-                            ${holeSummary.holes.map(h => `
-                              <span class="gh-micro-hole ${h.isPlanted ? 'is-planted' : 'is-empty'}"
-                                    style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
-                                    title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}"></span>
-                            `).join('')}
+                          <!-- Вариант 1: Компактная цветная мини-лента лунок со схемой -->
+                          <div class="gh-holes-micro-strip is-vertical pattern-${holeSummary.pattern}" data-bed-id="${bed.id}" data-section-id="${sec.id}" title="Схема посадки: ${holeSummary.patternName} • ${holeSummary.plantedCount} из ${holeSummary.totalHoles} высажено">
+                            ${holeSummary.pattern === 'single' ? `
+                              <div class="gh-holes-micro-row row-1">
+                                ${holeSummary.row1Holes.map(h => `
+                                  <span class="gh-micro-hole ${h.isPlanted ? 'is-planted' : 'is-empty'}"
+                                        style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
+                                        title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}"></span>
+                                `).join('')}
+                              </div>
+                            ` : `
+                              <div class="gh-holes-micro-row row-1">
+                                ${holeSummary.row1Holes.map(h => `
+                                  <span class="gh-micro-hole ${h.isPlanted ? 'is-planted' : 'is-empty'}"
+                                        style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
+                                        title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}"></span>
+                                `).join('')}
+                              </div>
+                              <div class="gh-holes-micro-row row-2 ${holeSummary.pattern === 'zigzag' ? 'is-zigzag' : ''}">
+                                ${holeSummary.row2Holes.map(h => `
+                                  <span class="gh-micro-hole ${h.isPlanted ? 'is-planted' : 'is-empty'}"
+                                        style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
+                                        title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}"></span>
+                                `).join('')}
+                              </div>
+                            `}
                           </div>
 
-                          <!-- Вариант 2: Кнопка выпадающего списка сортов -->
-                          <button type="button" class="gh-varieties-dropdown-btn is-compact" data-bed-id="${bed.id}" data-section-id="${sec.id}" title="Показать список сортов">
+                          <!-- Вариант 2: Кнопка выпадающего списка сортов со схемой -->
+                          <button type="button" class="gh-varieties-dropdown-btn is-compact" data-bed-id="${bed.id}" data-section-id="${sec.id}" title="Схема: ${holeSummary.patternName}">
+                            <span class="gh-btn-pattern-icon">${holeSummary.patternIcon}</span>
                             <span class="gh-btn-var-dot" style="background-color: ${holeSummary.varieties[0]?.color || '#10b981'};"></span>
                             <span class="gh-btn-var-label">
                               ${holeSummary.varieties.length === 1 
                                 ? escapeHtml(holeSummary.varieties[0].variety)
-                                : `${holeSummary.varieties.length} ${holeSummary.varieties.length < 5 ? 'сорта' : 'сортов'}`}
+                                : `${holeSummary.varieties.length} сорт.`}
                             </span>
                             <span class="gh-btn-arrow">▾</span>
                           </button>
@@ -884,8 +926,9 @@ class GardenMap {
     const grownInText = tr('grown_in_year', { year: prevYear }) || `В ${prevYear} г. росло:`;
 
     const cleanCropName = currentCropName ? currentCropName.replace(/\s*\(.*?\)/g, '').trim() : '';
+    const plantingPattern = currentPlanting?.plantingPattern || (holes.length > 15 ? 'zigzag' : 'single');
     const holeSummary = (holes.length > 0 && typeof summarizeHolePlantings === 'function')
-      ? summarizeHolePlantings(holes, currentCrop, currentLang)
+      ? summarizeHolePlantings(holes, currentCrop, currentLang, plantingPattern)
       : null;
 
     const rotationEval = currentPlanting?.cropId
@@ -972,17 +1015,37 @@ class GardenMap {
                 <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
                   <strong class="crop-name">${escapeHtml(cleanCropName)}</strong>
                   ${holeSummary && holeSummary.varieties.length > 0 ? `
-                    <!-- Вариант 1: Компактная цветная мини-лента лунок -->
-                    <div class="gh-holes-micro-strip" data-bed-id="${bed.id}" title="Схема лунок: ${holeSummary.plantedCount} из ${holeSummary.totalHoles} высажено (нажмите для списка сортов)">
-                      ${holeSummary.holes.map(h => `
-                        <span class="gh-micro-hole ${h.isPlanted ? 'is-planted' : 'is-empty'}"
-                              style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
-                              title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}"></span>
-                      `).join('')}
+                    <!-- Вариант 1: Компактная цветная мини-лента лунок со схемой посадки -->
+                    <div class="gh-holes-micro-strip pattern-${holeSummary.pattern}" data-bed-id="${bed.id}" title="Схема посадки: ${holeSummary.patternName} • ${holeSummary.plantedCount} из ${holeSummary.totalHoles} высажено (нажмите для подробностей)">
+                      ${holeSummary.pattern === 'single' ? `
+                        <div class="gh-holes-micro-row row-1">
+                          ${holeSummary.row1Holes.map(h => `
+                            <span class="gh-micro-hole ${h.isPlanted ? 'is-planted' : 'is-empty'}"
+                                  style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
+                                  title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}"></span>
+                          `).join('')}
+                        </div>
+                      ` : `
+                        <div class="gh-holes-micro-row row-1">
+                          ${holeSummary.row1Holes.map(h => `
+                            <span class="gh-micro-hole ${h.isPlanted ? 'is-planted' : 'is-empty'}"
+                                  style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
+                                  title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}"></span>
+                          `).join('')}
+                        </div>
+                        <div class="gh-holes-micro-row row-2 ${holeSummary.pattern === 'zigzag' ? 'is-zigzag' : ''}">
+                          ${holeSummary.row2Holes.map(h => `
+                            <span class="gh-micro-hole ${h.isPlanted ? 'is-planted' : 'is-empty'}"
+                                  style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
+                                  title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}"></span>
+                          `).join('')}
+                        </div>
+                      `}
                     </div>
 
-                    <!-- Вариант 2: Кнопка выпадающего списка сортов -->
-                    <button type="button" class="gh-varieties-dropdown-btn" data-bed-id="${bed.id}" title="Показать список сортов">
+                    <!-- Вариант 2: Кнопка выпадающего списка сортов со схемой -->
+                    <button type="button" class="gh-varieties-dropdown-btn" data-bed-id="${bed.id}" title="Схема: ${holeSummary.patternName}. Нажмите для просмотра сортов">
+                      <span class="gh-btn-pattern-icon" title="Схема: ${holeSummary.patternName}">${holeSummary.patternIcon}</span>
                       <span class="gh-btn-var-dot" style="background-color: ${holeSummary.varieties[0]?.color || '#10b981'};"></span>
                       <span class="gh-btn-var-label">
                         ${holeSummary.varieties.length === 1 
@@ -1499,7 +1562,8 @@ class GardenMap {
     const cropId = planting?.cropId || holes.find(h => h && h.cropId)?.cropId || 'tomato';
     const crop = getCropById(cropId);
     const cropName = crop ? (typeof getCropName === 'function' ? getCropName(crop, this.currentLang) : crop.name) : 'Культура';
-    const holeSummary = (typeof summarizeHolePlantings === 'function') ? summarizeHolePlantings(holes, crop, this.currentLang) : null;
+    const pattern = planting?.plantingPattern || (holes.length > 15 ? 'zigzag' : 'single');
+    const holeSummary = (typeof summarizeHolePlantings === 'function') ? summarizeHolePlantings(holes, crop, this.currentLang, pattern) : null;
     if (!holeSummary) return;
 
     const popover = document.createElement('div');
@@ -1516,6 +1580,53 @@ class GardenMap {
           </div>
         </div>
         <button type="button" class="gvp-close-btn" title="Закрыть">✕</button>
+      </div>
+
+      <!-- Бейдж схемы посадки -->
+      <div class="gvp-pattern-strip">
+        <span class="gvp-pattern-pill" title="Тип размещения лунок">
+          ${holeSummary.patternIcon} Схема: <strong>${holeSummary.patternName}</strong>
+        </span>
+        <span class="gvp-stat-pill">🌱 ${holeSummary.plantedCount}/${holeSummary.totalHoles} шт</span>
+      </div>
+
+      <!-- Наглядная 2D мини-схема лунок в поповере -->
+      <div class="gvp-board-wrap">
+        <div class="gvp-board ${holeSummary.pattern === 'zigzag' ? 'is-zigzag' : (holeSummary.pattern === 'single' ? 'is-single' : 'is-double')}">
+          ${holeSummary.pattern === 'single' ? `
+            <div class="gvp-board-row">
+              <span class="gvp-board-label">Ряд:</span>
+              <div class="gvp-board-cells">
+                ${holeSummary.row1Holes.map(h => `
+                  <span class="gvp-board-cell ${h.isPlanted ? 'is-planted' : 'is-empty'}"
+                        style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
+                        title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}">${h.index}</span>
+                `).join('')}
+              </div>
+            </div>
+          ` : `
+            <div class="gvp-board-row">
+              <span class="gvp-board-label">Ряд 1:</span>
+              <div class="gvp-board-cells">
+                ${holeSummary.row1Holes.map(h => `
+                  <span class="gvp-board-cell ${h.isPlanted ? 'is-planted' : 'is-empty'}"
+                        style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
+                        title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}">${h.index}</span>
+                `).join('')}
+              </div>
+            </div>
+            <div class="gvp-board-row">
+              <span class="gvp-board-label">Ряд 2:</span>
+              <div class="gvp-board-cells ${holeSummary.pattern === 'zigzag' ? 'zigzag-offset' : ''}">
+                ${holeSummary.row2Holes.map(h => `
+                  <span class="gvp-board-cell ${h.isPlanted ? 'is-planted' : 'is-empty'}"
+                        style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
+                        title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}">${h.index}</span>
+                `).join('')}
+              </div>
+            </div>
+          `}
+        </div>
       </div>
 
       <div class="gvp-bar">

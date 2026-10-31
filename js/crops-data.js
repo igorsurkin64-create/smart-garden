@@ -819,8 +819,12 @@ if (typeof window !== 'undefined') {
  * Умная сводка посадки по лункам:
  * группирует лунки по сортам/культурам, формирует понятные диапазоны (напр. "№1–5 (5 шт)")
  */
-function summarizeHolePlantings(holes = [], defaultCrop = null, lang = 'ru') {
+function summarizeHolePlantings(holes = [], defaultCrop = null, lang = 'ru', pattern = 'zigzag') {
   if (!Array.isArray(holes) || holes.length === 0) return null;
+
+  // Нормализуем схему посадки: 'zigzag', 'double_parallel', 'single'
+  let effPattern = pattern || 'zigzag';
+  if (effPattern === 'double') effPattern = 'double_parallel';
 
   // Привязываем оригинальный 1-based номер лунки на случай, если h.index не был проставлен
   const indexedHoles = holes.map((h, i) => {
@@ -928,13 +932,34 @@ function summarizeHolePlantings(holes = [], defaultCrop = null, lang = 'ru') {
     };
   });
 
+  const patternIcon = effPattern === 'double_parallel' ? '═' : (effPattern === 'single' ? '─' : '⚡');
+  const patternName = effPattern === 'double_parallel'
+    ? 'В 2 ряда (ровно)'
+    : (effPattern === 'single' ? 'В 1 ряд' : 'В 2 ряда (шахматка)');
+
+  const row1Holes = [];
+  const row2Holes = [];
+  if (effPattern === 'single') {
+    row1Holes.push(...holeMap);
+  } else {
+    holeMap.forEach((h, idx) => {
+      if (idx % 2 === 0) row1Holes.push(h);
+      else row2Holes.push(h);
+    });
+  }
+
   return {
     totalHoles: holes.length,
     plantedCount: totalPlanted,
     emptyCount: holes.length - totalPlanted,
     emptyRangeText,
+    pattern: effPattern,
+    patternIcon,
+    patternName,
     varieties,
-    holes: holeMap
+    holes: holeMap,
+    row1Holes,
+    row2Holes
   };
 }
 
