@@ -166,6 +166,7 @@ class GardenMap {
     this.viewportEl.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
     window.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
     window.addEventListener('touchend', (e) => this.handleTouchEnd(e));
+    window.addEventListener('touchcancel', (e) => this.handleTouchEnd(e));
 
     window.addEventListener('resize', () => {
       this.centerPlotInView();
@@ -1142,14 +1143,21 @@ class GardenMap {
       }
 
       if (this.dragBedState.hasMoved) {
-        const leftPx = parseFloat(bedEl.style.left);
-        const topPx = parseFloat(bedEl.style.top);
-        let newX = parseFloat((leftPx / this.meterPixels).toFixed(2));
-        let newY = parseFloat((topPx / this.meterPixels).toFixed(2));
+        let newX = (this._dragPendingX !== undefined && this._dragPendingX !== null)
+          ? this._dragPendingX
+          : (bedEl ? parseFloat((parseFloat(bedEl.style.left) / this.meterPixels).toFixed(2)) : 0.5);
+        let newY = (this._dragPendingY !== undefined && this._dragPendingY !== null)
+          ? this._dragPendingY
+          : (bedEl ? parseFloat((parseFloat(bedEl.style.top) / this.meterPixels).toFixed(2)) : 0.5);
 
         // Предотвращаем утаскивание грядки за пределы рабочей зоны
         newX = Math.max(0.5, newX);
         newY = Math.max(0.5, newY);
+
+        if (bedEl) {
+          bedEl.style.left = `${newX * this.meterPixels}px`;
+          bedEl.style.top = `${newY * this.meterPixels}px`;
+        }
 
         const bed = this.storage.getBedById(this.dragBedState.bedId);
         if (bed) {
@@ -1161,6 +1169,8 @@ class GardenMap {
 
       this.dragBedState.isDragging = false;
       this.dragBedState.bedId = null;
+      this._dragPendingX = null;
+      this._dragPendingY = null;
     }
 
     if (this.panState.isPanning) {

@@ -1847,8 +1847,9 @@ class GardenApp {
     bindMobileAction('m-autoplan-btn', () => this.openAutoPlanModal());
     bindMobileAction('m-calendar-btn', () => this.openSeasonCalendarModal());
     bindMobileAction('m-print-btn', () => this.printGardenPlan());
+    bindMobileAction('m-water-btn', () => this.openGardenWaterModal());
     bindMobileAction('m-backup-btn', () => this.openDbModal());
-    bindMobileAction('m-demo-btn', () => this.loadDemoPlan());
+    bindMobileAction('m-demo-btn', () => this.confirmResetDemo());
     bindMobileAction('m-clear-btn', () => this.confirmClearPlan());
     bindMobileAction('m-feedback-btn', () => this.openFeedbackModal());
     bindMobileAction('m-install-btn', () => this.promptPwaInstall());
@@ -1939,6 +1940,10 @@ class GardenApp {
       this.gardenMap.centerPlotInView();
     }
     this.showToast('План очищен! Теперь расставьте свои грядки 🌱');
+  }
+
+  loadDemoPlan() {
+    this.confirmResetDemo();
   }
 
   confirmResetDemo() {

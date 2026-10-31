@@ -1138,13 +1138,17 @@ class GardenPhotoStorage {
       return photoObj;
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       try {
         const tx = db.transaction('photos', 'readwrite');
         const store = tx.objectStore('photos');
         const req = store.add(photoObj);
         req.onsuccess = () => resolve(photoObj);
-        req.onerror = (err) => reject(err);
+        req.onerror = (err) => {
+          console.warn('IndexedDB add error, falling back to memory:', err);
+          this.memoryFallback.set(id, photoObj);
+          resolve(photoObj);
+        };
       } catch (err) {
         this.memoryFallback.set(id, photoObj);
         resolve(photoObj);
@@ -1153,15 +1157,16 @@ class GardenPhotoStorage {
   }
 
   async getPhotosByBed(bedId, year = null) {
+    const memoryPhotos = [];
+    this.memoryFallback.forEach(p => {
+      if (p.bedId === bedId && (year === null || p.year === parseInt(year, 10))) {
+        memoryPhotos.push(p);
+      }
+    });
+
     const db = await this.open();
     if (!db) {
-      const results = [];
-      this.memoryFallback.forEach(p => {
-        if (p.bedId === bedId && (year === null || p.year === parseInt(year, 10))) {
-          results.push(p);
-        }
-      });
-      return results.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      return memoryPhotos.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     }
 
     return new Promise((resolve) => {
@@ -1176,12 +1181,17 @@ class GardenPhotoStorage {
             const targetY = parseInt(year, 10);
             list = list.filter(p => p.year === targetY);
           }
+          // Объединяем с фото из fallback памяти, исключая дубликаты ID
+          const existingIds = new Set(list.map(p => p.id));
+          memoryPhotos.forEach(mp => {
+            if (!existingIds.has(mp.id)) list.push(mp);
+          });
           list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
           resolve(list);
         };
-        req.onerror = () => resolve([]);
+        req.onerror = () => resolve(memoryPhotos);
       } catch (e) {
-        resolve([]);
+        resolve(memoryPhotos);
       }
     });
   }

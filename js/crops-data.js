@@ -1521,7 +1521,20 @@ const CROP_WATER_NORMS = {
  * Расчет нормы полива для отдельной грядки
  */
 function calculateBedWaterNorm(cropId, areaM2 = 4, isGreenhouse = false, weather = 'normal') {
-  const norm = (cropId && CROP_WATER_NORMS[cropId]) ? CROP_WATER_NORMS[cropId] : {
+  if (!cropId) {
+    return {
+      weeklyLiters: 0,
+      weeklyBuckets10L: '0.0',
+      singleWateringLiters: 0,
+      frequencyDays: 'не требуется',
+      temperature: '—',
+      method: 'грядка пустует',
+      tipsRu: 'Культура не высажена, полив не требуется.',
+      baseLitersM2: 0
+    };
+  }
+
+  const norm = CROP_WATER_NORMS[cropId] || {
     weeklyLitersM2: 14,
     frequencyDays: '2 раза в неделю',
     temperature: 'теплая отстоянная',

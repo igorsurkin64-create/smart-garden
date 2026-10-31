@@ -302,6 +302,14 @@
     const modal = document.getElementById('general-modal');
     if (!modal) return;
 
+    let modalContent = document.getElementById('modal-dynamic-content');
+    if (!modalContent) {
+      modalContent = document.createElement('div');
+      modalContent.id = 'modal-dynamic-content';
+      modal.innerHTML = '';
+      modal.appendChild(modalContent);
+    }
+
     const data = this.storage.getData();
     const activeYear = this.storage.getActiveYear();
     const currentLang = window.i18n ? window.i18n.getLanguage() : 'ru';
@@ -312,7 +320,7 @@
     const render = () => {
       const stats = calculateTotalGardenWater(beds, activeYear, currentWeather);
 
-      modal.innerHTML = `
+      modalContent.innerHTML = `
         <div class="modal-content" style="max-width: 760px; max-height: 90vh; display: flex; flex-direction: column;">
           <div class="modal-header">
             <h3 style="display: flex; align-items: center; gap: 8px;">💧 Калькулятор полива огорода (${activeYear} г.)</h3>
@@ -389,10 +397,10 @@
         </div>
       `;
 
-      modal.querySelector('.modal-close-btn').onclick = () => modal.classList.remove('active');
-      modal.querySelector('#water-modal-close-btn').onclick = () => modal.classList.remove('active');
+      modalContent.querySelector('.modal-close-btn').onclick = () => modal.classList.remove('active');
+      modalContent.querySelector('#water-modal-close-btn').onclick = () => modal.classList.remove('active');
 
-      modal.querySelectorAll('.btn-weather-pill').forEach(wBtn => {
+      modalContent.querySelectorAll('.btn-weather-pill').forEach(wBtn => {
         wBtn.onclick = () => {
           currentWeather = wBtn.getAttribute('data-weather');
           render();
@@ -408,7 +416,15 @@
     const modal = document.getElementById('general-modal');
     if (!modal) return;
 
-    modal.innerHTML = `
+    let modalContent = document.getElementById('modal-dynamic-content');
+    if (!modalContent) {
+      modalContent = document.createElement('div');
+      modalContent.id = 'modal-dynamic-content';
+      modal.innerHTML = '';
+      modal.appendChild(modalContent);
+    }
+
+    modalContent.innerHTML = `
       <div class="modal-content" style="max-width: 520px; border-top: 5px solid #ef4444;">
         <div class="modal-header">
           <h3 style="color: #ef4444; display: flex; align-items: center; gap: 8px;">⚠️ Память браузера переполнена!</h3>
@@ -431,9 +447,9 @@
     `;
 
     modal.classList.add('active');
-    modal.querySelector('.modal-close-btn').onclick = () => modal.classList.remove('active');
-    modal.querySelector('#storage-full-close-btn').onclick = () => modal.classList.remove('active');
-    modal.querySelector('#storage-full-download-btn').onclick = () => {
+    modalContent.querySelector('.modal-close-btn').onclick = () => modal.classList.remove('active');
+    modalContent.querySelector('#storage-full-close-btn').onclick = () => modal.classList.remove('active');
+    modalContent.querySelector('#storage-full-download-btn').onclick = () => {
       this.storage.exportJson();
       modal.classList.remove('active');
       this.showToast('✓ Резервная копия успешно сохранена в файл!');
