@@ -1121,8 +1121,12 @@ class GardenMap {
       if (this.dragBedState.hasMoved) {
         const leftPx = parseFloat(bedEl.style.left);
         const topPx = parseFloat(bedEl.style.top);
-        const newX = parseFloat((leftPx / this.meterPixels).toFixed(2));
-        const newY = parseFloat((topPx / this.meterPixels).toFixed(2));
+        let newX = parseFloat((leftPx / this.meterPixels).toFixed(2));
+        let newY = parseFloat((topPx / this.meterPixels).toFixed(2));
+
+        // Предотвращаем утаскивание грядки за пределы рабочей зоны
+        newX = Math.max(0.5, newX);
+        newY = Math.max(0.5, newY);
 
         const bed = this.storage.getBedById(this.dragBedState.bedId);
         if (bed) {

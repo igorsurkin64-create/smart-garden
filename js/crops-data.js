@@ -205,7 +205,7 @@ const CROPS_DATABASE = [
     nutrientDemand: 'high', // high | medium | low | enrich
     nutrientLabel: 'Высокая (калий, фосфор)',
     rootDepth: 'Глубокая (до 1-1.5 м)',
-    goodPredecessors: ['cucumber', 'cabbage', 'beans', 'peas', 'onion', 'garlic', 'zucchini', 'green_manure_phacelia'],
+    goodPredecessors: ['cucumber', 'cabbage_white', 'beans', 'peas', 'onion', 'garlic', 'zucchini', 'green_manure_phacelia'],
     badPredecessors: ['tomato', 'potato', 'pepper', 'eggplant'],
     goodNeighbors: ['basil', 'onion', 'garlic', 'carrot', 'marigold', 'parsley'],
     badNeighbors: ['fennel', 'dill', 'potato', 'cabbage_white'],
@@ -227,7 +227,7 @@ const CROPS_DATABASE = [
     nutrientDemand: 'high',
     nutrientLabel: 'Очень высокая (органика, азот)',
     rootDepth: 'Поверхностная (20-30 см)',
-    goodPredecessors: ['peas', 'beans', 'cabbage', 'onion', 'garlic', 'tomato', 'green_manure_phacelia'],
+    goodPredecessors: ['peas', 'beans', 'cabbage_white', 'onion', 'garlic', 'tomato', 'green_manure_phacelia'],
     badPredecessors: ['cucumber', 'zucchini', 'pumpkin'],
     goodNeighbors: ['corn', 'beans', 'peas', 'dill', 'radish', 'sunflower'],
     badNeighbors: ['potato', 'aromatic_herbs'],
@@ -249,7 +249,7 @@ const CROPS_DATABASE = [
     nutrientDemand: 'high',
     nutrientLabel: 'Высокая (фосфор, калий)',
     rootDepth: 'Средняя (30-40 см)',
-    goodPredecessors: ['cucumber', 'cabbage', 'beans', 'peas', 'onion', 'garlic', 'carrot', 'green_manure_phacelia'],
+    goodPredecessors: ['cucumber', 'cabbage_white', 'beans', 'peas', 'onion', 'garlic', 'carrot', 'green_manure_phacelia'],
     badPredecessors: ['pepper', 'tomato', 'eggplant', 'potato'],
     goodNeighbors: ['basil', 'marigold', 'onion', 'carrots', 'parsley'],
     badNeighbors: ['fennel', 'kohlrabi', 'beans_pole'],
@@ -271,7 +271,7 @@ const CROPS_DATABASE = [
     nutrientDemand: 'high',
     nutrientLabel: 'Очень высокая',
     rootDepth: 'Средняя (40-50 см)',
-    goodPredecessors: ['cucumber', 'cabbage', 'beans', 'peas', 'onion', 'garlic', 'green_manure_phacelia'],
+    goodPredecessors: ['cucumber', 'cabbage_white', 'beans', 'peas', 'onion', 'garlic', 'green_manure_phacelia'],
     badPredecessors: ['eggplant', 'tomato', 'potato', 'pepper'],
     goodNeighbors: ['beans', 'basil', 'marigold', 'thyme'],
     badNeighbors: ['fennel', 'potato', 'tomato'],
@@ -293,9 +293,9 @@ const CROPS_DATABASE = [
     nutrientDemand: 'high',
     nutrientLabel: 'Высокая (калий, органика)',
     rootDepth: 'Средняя (40-50 см)',
-    goodPredecessors: ['cabbage', 'beans', 'peas', 'cucumber', 'beet', 'green_manure_rye', 'green_manure_mustard'],
+    goodPredecessors: ['cabbage_white', 'beans', 'peas', 'cucumber', 'beet', 'green_manure_phacelia', 'green_manure_mustard'],
     badPredecessors: ['potato', 'tomato', 'eggplant', 'pepper'],
-    goodNeighbors: ['beans', 'corn', 'cabbage', 'marigold', 'horseradish'],
+    goodNeighbors: ['beans', 'corn', 'cabbage_white', 'marigold', 'horseradish'],
     badNeighbors: ['tomato', 'cucumber', 'sunflower', 'pumpkin', 'raspberry'],
     sowingPeriod: 'Май (клубни)',
     harvestPeriod: 'Август - Сентябрь',
@@ -317,7 +317,7 @@ const CROPS_DATABASE = [
     nutrientDemand: 'high',
     nutrientLabel: 'Очень высокая (азот, кальций)',
     rootDepth: 'Глубокая (до 1 м)',
-    goodPredecessors: ['peas', 'beans', 'cucumber', 'onion', 'garlic', 'potato_early', 'carrot'],
+    goodPredecessors: ['peas', 'beans', 'cucumber', 'onion', 'garlic', 'potato', 'carrot'],
     badPredecessors: ['cabbage_white', 'broccoli', 'radish', 'green_manure_mustard'],
     goodNeighbors: ['dill', 'celery', 'mint', 'sage', 'marigold', 'onion', 'beet'],
     badNeighbors: ['strawberry', 'tomato', 'fennel'],
@@ -385,7 +385,7 @@ const CROPS_DATABASE = [
     nutrientDemand: 'medium',
     nutrientLabel: 'Средняя (калий, фосфор)',
     rootDepth: 'Глубокая (до 60-80 см)',
-    goodPredecessors: ['cucumber', 'tomato', 'onion', 'garlic', 'cabbage', 'potato_early', 'peas'],
+    goodPredecessors: ['cucumber', 'tomato', 'onion', 'garlic', 'cabbage_white', 'potato', 'peas'],
     badPredecessors: ['carrot', 'parsley', 'dill', 'celery'],
     goodNeighbors: ['onion', 'garlic', 'radish', 'lettuce', 'peas', 'rosemary'],
     badNeighbors: ['dill', 'fennel', 'anise'],
@@ -407,7 +407,7 @@ const CROPS_DATABASE = [
     nutrientDemand: 'low',
     nutrientLabel: 'Низкая / Средняя',
     rootDepth: 'Поверхностная (15-20 см)',
-    goodPredecessors: ['cucumber', 'cabbage', 'beans', 'potato'],
+    goodPredecessors: ['cucumber', 'cabbage_white', 'beans', 'potato'],
     badPredecessors: ['carrot', 'parsley', 'celery'],
     goodNeighbors: ['cucumber', 'cabbage_white', 'broccoli', 'onion'],
     badNeighbors: ['carrot', 'tomato', 'fennel'],
@@ -429,7 +429,7 @@ const CROPS_DATABASE = [
     nutrientDemand: 'high',
     nutrientLabel: 'Высокая (органика, влага)',
     rootDepth: 'Средняя',
-    goodPredecessors: ['cucumber', 'cabbage', 'beans', 'tomato'],
+    goodPredecessors: ['cucumber', 'cabbage_white', 'beans', 'tomato'],
     badPredecessors: ['carrot', 'parsley', 'celery'],
     goodNeighbors: ['cabbage_white', 'tomato', 'leek', 'beans'],
     badNeighbors: ['carrot', 'potato', 'corn'],
@@ -453,7 +453,7 @@ const CROPS_DATABASE = [
     nutrientDemand: 'medium',
     nutrientLabel: 'Средняя (азот в начале, калий в конце)',
     rootDepth: 'Мелкая (15-20 см)',
-    goodPredecessors: ['cucumber', 'zucchini', 'cabbage', 'tomato', 'peas', 'beans', 'potato_early'],
+    goodPredecessors: ['cucumber', 'zucchini', 'cabbage_white', 'tomato', 'peas', 'beans', 'potato'],
     badPredecessors: ['onion', 'garlic', 'leek'],
     goodNeighbors: ['carrot', 'beet', 'strawberry', 'tomato', 'lettuce'],
     badNeighbors: ['peas', 'beans', 'sage'],
@@ -475,7 +475,7 @@ const CROPS_DATABASE = [
     nutrientDemand: 'medium',
     nutrientLabel: 'Средняя (калий, фосфор)',
     rootDepth: 'Мелкая (15-25 см)',
-    goodPredecessors: ['cucumber', 'zucchini', 'cabbage', 'beans', 'pumpkin', 'green_manure_phacelia'],
+    goodPredecessors: ['cucumber', 'zucchini', 'cabbage_white', 'beans', 'pumpkin', 'green_manure_phacelia'],
     badPredecessors: ['garlic', 'onion', 'potato'],
     goodNeighbors: ['strawberry', 'carrot', 'tomato', 'beet', 'rose'],
     badNeighbors: ['peas', 'beans', 'cabbage_white'],
@@ -499,7 +499,7 @@ const CROPS_DATABASE = [
     nutrientDemand: 'high',
     nutrientLabel: 'Высокая (перегной, компост)',
     rootDepth: 'Средняя (40-60 см)',
-    goodPredecessors: ['peas', 'beans', 'onion', 'garlic', 'cabbage', 'carrot', 'beet'],
+    goodPredecessors: ['peas', 'beans', 'onion', 'garlic', 'cabbage_white', 'carrot', 'beet'],
     badPredecessors: ['zucchini', 'cucumber', 'pumpkin'],
     goodNeighbors: ['corn', 'beans', 'nasturtium', 'marigold', 'radish'],
     badNeighbors: ['potato'],
@@ -521,7 +521,7 @@ const CROPS_DATABASE = [
     nutrientDemand: 'high',
     nutrientLabel: 'Очень высокая (органика)',
     rootDepth: 'Глубокая (до 1.5 м)',
-    goodPredecessors: ['beans', 'peas', 'onion', 'cabbage', 'corn', 'green_manure_rye'],
+    goodPredecessors: ['beans', 'peas', 'onion', 'cabbage_white', 'corn', 'green_manure_phacelia'],
     badPredecessors: ['pumpkin', 'cucumber', 'zucchini'],
     goodNeighbors: ['corn', 'beans', 'sunflower', 'marigold'],
     badNeighbors: ['potato'],
@@ -545,7 +545,7 @@ const CROPS_DATABASE = [
     nutrientDemand: 'enrich',
     nutrientLabel: 'Обогатитель почвы (Азотофиксатор)',
     rootDepth: 'Глубокая (до 1 м)',
-    goodPredecessors: ['cucumber', 'tomato', 'potato', 'cabbage', 'pumpkin', 'carrot'],
+    goodPredecessors: ['cucumber', 'tomato', 'potato', 'cabbage_white', 'pumpkin', 'carrot'],
     badPredecessors: ['peas', 'beans'],
     goodNeighbors: ['carrot', 'radish', 'cucumber', 'corn', 'turnip'],
     badNeighbors: ['onion', 'garlic', 'fennel'],
@@ -567,7 +567,7 @@ const CROPS_DATABASE = [
     nutrientDemand: 'enrich',
     nutrientLabel: 'Обогатитель почвы (Азотофиксатор)',
     rootDepth: 'Средняя (до 80 см)',
-    goodPredecessors: ['cucumber', 'tomato', 'cabbage', 'potato', 'zucchini'],
+    goodPredecessors: ['cucumber', 'tomato', 'cabbage_white', 'potato', 'zucchini'],
     badPredecessors: ['beans', 'peas'],
     goodNeighbors: ['cucumber', 'corn', 'potato', 'eggplant', 'strawberry'],
     badNeighbors: ['onion', 'garlic', 'fennel', 'sunflower'],
@@ -591,7 +591,7 @@ const CROPS_DATABASE = [
     nutrientDemand: 'medium',
     nutrientLabel: 'Средняя (калий, бор, натрий)',
     rootDepth: 'Глубокая (до 1-1.5 м)',
-    goodPredecessors: ['cucumber', 'tomato', 'onion', 'garlic', 'cabbage', 'peas', 'zucchini'],
+    goodPredecessors: ['cucumber', 'tomato', 'onion', 'garlic', 'cabbage_white', 'peas', 'zucchini'],
     badPredecessors: ['beet', 'spinach', 'chard'],
     goodNeighbors: ['onion', 'cabbage_white', 'lettuce', 'radish', 'bush_beans'],
     badNeighbors: ['mustard', 'pole_beans', 'corn'],
@@ -719,15 +719,26 @@ const CROPS_DATABASE = [
   }
 ];
 
+const CROP_ID_ALIASES = {
+  'cabbage': 'cabbage_white',
+  'potato_early': 'potato',
+  'green_manure_rye': 'green_manure_phacelia',
+  'parsley': 'dill',
+  'spinach': 'lettuce',
+  'chard': 'beet',
+  'leek': 'onion'
+};
+
 /**
- * Получить культуру по ID
+ * Получить культуру по ID с автоматической поддержкой синонимов и алиасов
  */
 function getCropById(cropId) {
   if (!cropId) return null;
-  const found = CROPS_DATABASE.find(c => c.id === cropId);
+  const canonicalId = CROP_ID_ALIASES[cropId] || cropId;
+  const found = CROPS_DATABASE.find(c => c.id === canonicalId);
   if (found) return found;
   if (typeof window !== 'undefined' && window.app && window.app.storage) {
-    const custom = window.app.storage.getCustomCrops().find(c => c.id === cropId);
+    const custom = window.app.storage.getCustomCrops().find(c => c.id === canonicalId || c.id === cropId);
     if (custom) {
       if (!CROPS_DATABASE.some(c => c.id === custom.id)) {
         CROPS_DATABASE.push(custom);

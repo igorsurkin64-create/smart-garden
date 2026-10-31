@@ -160,6 +160,7 @@ const UI_TRANSLATIONS = {
     empty_tip: "💡 Совет: Любую созданную грядку можно свободно перетаскивать мышью по участку, поворачивать кнопкой ↻ на 90°, дублировать кнопкой ❐ и мгновенно удалять кнопкой 🗑️.",
 
     // Bed card tools
+    tool_toggle_layout: "Переключить ориентацию грядок в теплице (вдоль / поперёк)",
     tool_rotate: "Повернуть грядку на 90°",
     tool_clone: "Дублировать грядку",
     tool_delete: "Удалить грядку с плана",
@@ -258,6 +259,7 @@ const UI_TRANSLATIONS = {
     backup_reminder_download: "📥 Сохранить план в файл",
     backup_reminder_later: "✕ Напомнить позже",
     backup_saved_toast: "✓ План огорода успешно сохранён в файл!",
+    toast_storage_error: "⚠️ Ошибка сохранения: хранилище браузера переполнено! Сделайте резервную копию плана.",
 
     // Toast messages
     toast_saved: "✓ Изменения успешно сохранены!",
@@ -433,6 +435,7 @@ const UI_TRANSLATIONS = {
     empty_tip: "💡 Nõuanne: Iga loodud peenart saab hiirega vabalt liigutada, pöörata nupuga ↻ 90°, dubleerida nupuga ❐ ja kustutada nupuga 🗑️.",
 
     // Bed card tools
+    tool_toggle_layout: "Vaheta peenarde suunda: piki või risti",
     tool_rotate: "Pööra peenart 90°",
     tool_clone: "Dubleeri peenart",
     tool_delete: "Kustuta peenar plaanilt",
@@ -531,6 +534,7 @@ const UI_TRANSLATIONS = {
     backup_reminder_download: "📥 Salvesta plaan faili",
     backup_reminder_later: "✕ Tuleta hiljem meelde",
     backup_saved_toast: "✓ Aiaplaan on edukalt faili salvestatud!",
+    toast_storage_error: "⚠️ Salvestamise viga: brauseri mälu on täis! Tehke aiaplaanist varukoopia.",
 
     // Toast messages
     toast_saved: "✓ Muudatused edukalt salvestatud!",
@@ -706,6 +710,7 @@ const UI_TRANSLATIONS = {
     empty_tip: "💡 Padoms: Jebkuru izveidoto dobi var brīvi pārvietot ar peli, pagriezt ar pogu ↻ par 90°, dublēt ar pogu ❐ un dzēst ar pogu 🗑️.",
 
     // Bed card tools
+    tool_toggle_layout: "Pārslēgt rindu virzienu: gareniski vai šķērsām",
     tool_rotate: "Pagriezt dobi par 90°",
     tool_clone: "Dublēt dobi",
     tool_delete: "Dzēst dobi no plāna",
@@ -804,6 +809,7 @@ const UI_TRANSLATIONS = {
     backup_reminder_download: "📥 Saglabāt plānu failā",
     backup_reminder_later: "✕ Atgādināt vēlāk",
     backup_saved_toast: "✓ Dārza plāns veiksmīgi saglabāts failā!",
+    toast_storage_error: "⚠️ Saglabāšanas kļūda: pārlūka atmiņa ir pilna! Izveidojiet dārza plāna dublējumkopiju.",
 
     // Toast messages
     toast_saved: "✓ Izmaiņas veiksmīgi saglabātas!",
@@ -979,6 +985,7 @@ const UI_TRANSLATIONS = {
     empty_tip: "💡 Patarimas: Bet kurią sukurtą lysvę galima laisvai perkelti pele, pasukti mygtuku ↻ 90° kampu, dubliuoti mygtuku ❐ ir ištrinti mygtuku 🗑️.",
 
     // Bed card tools
+    tool_toggle_layout: "Perjungti lysvių kryptį: išilgai arba skersai",
     tool_rotate: "Pasukti lysvę 90°",
     tool_clone: "Dubliuoti lysvę",
     tool_delete: "Pašalinti lysvę iš plano",
@@ -1077,6 +1084,7 @@ const UI_TRANSLATIONS = {
     backup_reminder_download: "📥 Išsaugoti planą į failą",
     backup_reminder_later: "✕ Priminti vėliau",
     backup_saved_toast: "✓ Daržo planas sėkmingai išsaugotas į failą!",
+    toast_storage_error: "⚠️ Išsaugojimo klaida: naršyklės atmintis pilna! Sukurkite daržo plano atsarginę kopiją.",
 
     // Toast messages
     toast_saved: "✓ Pakeitimai sėkmingai išsaugoti!",

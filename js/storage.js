@@ -494,9 +494,8 @@ class GardenStorage {
       if (typeof bed.height !== 'number') bed.height = 1.2;
     });
 
-    // Устраняем наложение грядок друг на друга по вертикали (чтобы ярлычки не перекрывали грядки выше)
-    this.resolveOverlaps(data.beds);
-
+    // Координаты грядок сохраняются строго в соответствии с выбором пользователя.
+    // Автоматическая расстановка дорожек выполняется только по явной кнопке пользователя.
     return data;
   }
 
@@ -658,7 +657,11 @@ class GardenStorage {
       window.dispatchEvent(new CustomEvent('garden-data-changed', { detail: this.data }));
       return true;
     } catch (e) {
-      console.error('Ошибка сохранения данных:', e);
+      console.error('Ошибка сохранения данных в LocalStorage:', e);
+      if (typeof window !== 'undefined' && window.app && typeof window.app.showToast === 'function') {
+        const quotaMsg = (typeof window.t === 'function') ? window.t('toast_storage_error') : null;
+        window.app.showToast(quotaMsg || '⚠️ Ошибка сохранения: хранилище браузера переполнено! Сделайте резервную копию.', 'error');
+      }
       return false;
     }
   }
@@ -720,8 +723,15 @@ class GardenStorage {
     const clone = JSON.parse(JSON.stringify(sourceBed));
     clone.id = 'bed-' + Date.now();
     clone.name = sourceBed.name + ' (Копия)';
-    clone.x = sourceBed.x + 0.8;
-    clone.y = sourceBed.y + sourceBed.height + 0.6;
+    clone.x = Math.round((sourceBed.x + 0.8) * 10) / 10;
+    clone.y = Math.round((sourceBed.y + sourceBed.height + 0.6) * 10) / 10;
+
+    if (clone.sections && clone.sections.length > 0) {
+      clone.sections = clone.sections.map((sec, idx) => ({
+        ...sec,
+        id: `sec-${Date.now()}-${idx + 1}`
+      }));
+    }
 
     this.data.beds.push(clone);
     this.saveData();
