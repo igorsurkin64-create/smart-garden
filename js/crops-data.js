@@ -920,6 +920,423 @@ function recommendCropsForBed(history = []) {
   return recommendations;
 }
 
+/**
+ * Агрономические нормы высадки (рассада, семена, клубни) на 1 кв.м площади
+ */
+const CROP_PLANTING_STANDARDS = {
+  tomato: { perSqM: 3.5, spacing: '50 × 60 см', unitType: 'seedling', unitRu: 'кустов рассады', unitEt: 'istikut', unitLv: 'stādu', unitLt: 'daigų', hintRu: 'Схема 50×60 см (~3-4 куста на 1 м²)' },
+  cucumber: { perSqM: 3.5, spacing: '40 × 60 см', unitType: 'plants', unitRu: 'растений', unitEt: 'taime', unitLv: 'augu', unitLt: 'augalų', hintRu: 'Схема 40×60 см (~3-4 растения на 1 м²)' },
+  pepper: { perSqM: 4.5, spacing: '40 × 50 см', unitType: 'seedling', unitRu: 'кустов рассады', unitEt: 'istikut', unitLv: 'stādu', unitLt: 'daigų', hintRu: 'Схема 40×50 см (~4-5 кустов на 1 м²)' },
+  eggplant: { perSqM: 4, spacing: '45 × 50 см', unitType: 'seedling', unitRu: 'кустов рассады', unitEt: 'istikut', unitLv: 'stādu', unitLt: 'daigų', hintRu: 'Схема 45×50 см (~4 куста на 1 м²)' },
+  potato: { perSqM: 5.5, spacing: '30 × 70 см', unitType: 'tubers', unitRu: 'клубней (~400-500 г)', unitEt: 'mugulat (~400 g)', unitLv: 'bumbuļu (~400 g)', unitLt: 'gumbų (~400 g)', hintRu: 'Схема 30×70 см (~5-6 клубней на 1 м²)' },
+  cabbage_white: { perSqM: 3.5, spacing: '50 × 50 см', unitType: 'seedling', unitRu: 'кочанов рассады', unitEt: 'istikut', unitLv: 'stādu', unitLt: 'daigų', hintRu: 'Схема 50×50 см (~3-4 кочана на 1 м²)' },
+  broccoli: { perSqM: 4, spacing: '45 × 50 см', unitType: 'seedling', unitRu: 'растений рассады', unitEt: 'istikut', unitLv: 'stādu', unitLt: 'daigų', hintRu: 'Схема 45×50 см (~4 растения на 1 м²)' },
+  radish: { perSqM: 80, spacing: '5 × 15 см', unitType: 'seeds', unitRu: 'корнеплодов (~2-3 г семян)', unitEt: 'juurvilja (~2-3 g)', unitLv: 'sakņu (~2-3 g)', unitLt: 'šakniavaisių (~2-3 g)', hintRu: 'Схема 5×15 см (~80 шт. или 2-3 г семян на м²)' },
+  carrot: { perSqM: 80, spacing: '4 × 20 см', unitType: 'seeds', unitRu: 'корнеплодов (~1.5 г семян)', unitEt: 'porgandit (~1.5 g)', unitLv: 'burkānu (~1.5 g)', unitLt: 'morkų (~1.5 g)', hintRu: 'Схема 4×20 см (~80 корнеплодов или 1-1.5 г семян на м²)' },
+  dill: { perSqM: 2.5, spacing: 'сплошной', unitType: 'grams', unitRu: 'г семян (~150 растений)', unitEt: 'g seemneid', unitLv: 'g sēklu', unitLt: 'g sėklų', hintRu: 'Норма высева: 2-3 г семян на 1 м²' },
+  celery: { perSqM: 7, spacing: '30 × 35 см', unitType: 'seedling', unitRu: 'растений рассады', unitEt: 'istikut', unitLv: 'stādu', unitLt: 'daigų', hintRu: 'Схема 30×35 см (~6-8 растений на 1 м²)' },
+  onion: { perSqM: 45, spacing: '8 × 20 см', unitType: 'bulbs', unitRu: 'луковиц севка (~600-700 г)', unitEt: 'tippsibulat (~600 g)', unitLv: 'sīksīpolu (~600 g)', unitLt: 'sodinukų (~600 g)', hintRu: 'Схема 8×20 см (~40-50 шт. севка на 1 м²)' },
+  garlic: { perSqM: 35, spacing: '10 × 20 см', unitType: 'cloves', unitRu: 'зубчиков (~180-200 г)', unitEt: 'küünt (~200 g)', unitLv: 'daiviņu (~200 g)', unitLt: 'skiltelių (~200 g)', hintRu: 'Схема 10×20 см (~30-40 зубчиков на 1 м²)' },
+  zucchini: { perSqM: 1, spacing: '80 × 80 см', unitType: 'plants', unitRu: 'кустов', unitEt: 'taime', unitLv: 'ceru', unitLt: 'krūmų', hintRu: 'Схема 80×80 см (1 куст на 1 м²)' },
+  pumpkin: { perSqM: 0.6, spacing: '120 × 120 см', unitType: 'plants', unitRu: 'кустов', unitEt: 'taime', unitLv: 'ceru', unitLt: 'krūmų', hintRu: 'Схема 120×120 см (1 куст на 1.5-2 м²)' },
+  peas: { perSqM: 55, spacing: '5 × 20 см', unitType: 'seeds', unitRu: 'горошин (~20-25 г)', unitEt: 'hernetera (~20 g)', unitLv: 'zirņu (~20 g)', unitLt: 'žirnių (~20 g)', hintRu: 'Схема 5×20 см (~50-60 семян на 1 м²)' },
+  beans: { perSqM: 35, spacing: '10 × 25 см', unitType: 'seeds', unitRu: 'фасолин (~25-30 г)', unitEt: 'uba (~25 g)', unitLv: 'pupiņu (~25 g)', unitLt: 'pupelių (~25 g)', hintRu: 'Схема 10×25 см (~30-40 семян на 1 м²)' },
+  beet: { perSqM: 35, spacing: '8 × 25 см', unitType: 'seeds', unitRu: 'корнеплодов (~2-3 г семян)', unitEt: 'peeti (~2-3 g)', unitLv: 'biešu (~2-3 g)', unitLt: 'burokėlių (~2-3 g)', hintRu: 'Схема 8×25 см (~30-40 растений на 1 м²)' },
+  strawberry: { perSqM: 4.5, spacing: '30 × 60 см', unitType: 'plants', unitRu: 'кустов клубники/земляники', unitEt: 'taime', unitLv: 'ceru', unitLt: 'krūmų', hintRu: 'Схема 30×60 см (~4-5 кустов на 1 м²)' },
+  lettuce: { perSqM: 16, spacing: '20 × 25 см', unitType: 'plants', unitRu: 'растений салата', unitEt: 'salatitaime', unitLv: 'salātu stādu', unitLt: 'salotų daigų', hintRu: 'Схема 20×25 см (~15-20 растений на 1 м²)' },
+  green_manure_phacelia: { perSqM: 3, spacing: 'сплошной', unitType: 'grams', unitRu: 'г семян фацелии', unitEt: 'g seemneid', unitLv: 'g sēklu', unitLt: 'g sėklų', hintRu: 'Норма высева: 2.5-3.5 г на 1 м²' },
+  green_manure_mustard: { perSqM: 4, spacing: 'сплошной', unitType: 'grams', unitRu: 'г семян горчицы', unitEt: 'g seemneid', unitLv: 'g sēklu', unitLt: 'g sėklų', hintRu: 'Норма высева: 3.5-4.5 г на 1 м²' }
+};
+
+/**
+ * Рассчитать вместимость грядки (рассада, семена) исходя из площади
+ * @param {string} cropId
+ * @param {number} areaSqM
+ * @param {string} lang
+ * @returns {Object|null}
+ */
+function calculateCropCapacity(cropId, areaSqM, lang = 'ru') {
+  if (!cropId || !areaSqM || areaSqM <= 0) return null;
+  const std = CROP_PLANTING_STANDARDS[cropId];
+  if (!std) return null;
+
+  const rawQty = areaSqM * std.perSqM;
+  const qty = std.perSqM < 1 ? Math.max(1, Math.round(rawQty)) : Math.round(rawQty);
+  
+  let unit = std.unitRu;
+  if (lang === 'et') unit = std.unitEt;
+  else if (lang === 'lv') unit = std.unitLv;
+  else if (lang === 'lt') unit = std.unitLt;
+
+  return {
+    areaSqM: parseFloat(areaSqM.toFixed(2)),
+    quantity: qty,
+    unit: unit,
+    spacing: std.spacing,
+    hint: std.hintRu
+  };
+}
+
+/**
+ * Проверка совместимости растений-соседей (добрососедство / компаньоны)
+ * @param {string} cropId
+ * @param {Array<string>} neighborCropIds
+ * @param {string} lang
+ * @returns {Object|null}
+ */
+function evaluateCompanionPlanting(cropId, neighborCropIds = [], lang = 'ru') {
+  const crop = getCropById(cropId);
+  if (!crop) return null;
+
+  const good = crop.goodNeighbors || [];
+  const bad = crop.badNeighbors || [];
+
+  const validNeighbors = neighborCropIds.filter(id => id && id !== cropId);
+  const friendly = validNeighbors.filter(id => good.includes(id));
+  const antagonistic = validNeighbors.filter(id => bad.includes(id));
+
+  // Получаем объекты хороших и нежелательных соседей для отображения подсказок
+  const allGoodCrops = good.map(id => getCropById(id)).filter(Boolean);
+  const allBadCrops = bad.map(id => getCropById(id)).filter(Boolean);
+
+  let status = 'neutral'; // 'positive' | 'negative' | 'neutral'
+  let alertMessage = null;
+
+  if (antagonistic.length > 0) {
+    status = 'negative';
+    const badNames = antagonistic.map(id => getCropName(getCropById(id), lang)).join(', ');
+    alertMessage = lang === 'et' ? `⚠️ Ebasoovitav naabrus: ${badNames} pärsib taime kasvu!` :
+                   lang === 'lv' ? `⚠️ Nevēlama kaimiņattiecība: ${badNames} nomāc auga augšanu!` :
+                   lang === 'lt' ? `⚠️ Nepageidaujama kaimynystė: ${badNames} slopina augimą!` :
+                   `⚠️ Нежелательное соседство: «${badNames}» угнетает рост «${getCropName(crop, lang)}»!`;
+  } else if (friendly.length > 0) {
+    status = 'positive';
+    const goodNames = friendly.map(id => getCropName(getCropById(id), lang)).join(', ');
+    alertMessage = lang === 'et' ? `💚 Suurepärane naabrus: ${goodNames} kaitseb kahjurite eest!` :
+                   lang === 'lv' ? `💚 Lieliska kaimiņattiecība: ${goodNames} aizsargā pret kaitēkļiem!` :
+                   lang === 'lt' ? `💚 Puiki kaimynystė: ${goodNames} apsaugo nuo kenkėjų!` :
+                   `💚 Отличное добрососедство: «${goodNames}» взаимно защищают и стимулируют урожай!`;
+  }
+
+  return {
+    crop,
+    status,
+    alertMessage,
+    friendlyIds: friendly,
+    antagonisticIds: antagonistic,
+    allGoodCrops,
+    allBadCrops
+  };
+}
+
+/**
+ * График сезонных агрономических работ по месяцам (Февраль - Октябрь)
+ */
+const CROP_CALENDAR_TIMELINE = {
+  tomato: [
+    { month: 3, stage: 'seedling', labelRu: 'Посев семян на рассаду дома', icon: '🪴' },
+    { month: 5, stage: 'greenhouse', labelRu: 'Высадка рассады в теплицу / под укрытие', icon: '🏡' },
+    { month: 6, stage: 'ground', labelRu: 'Пасынкование, подвязка, мульчирование', icon: '🌿' },
+    { month: 7, stage: 'harvest', labelRu: 'Сбор первых зрелых плодов', icon: '🧺' },
+    { month: 8, stage: 'harvest', labelRu: 'Массовый сбор урожая и заготовки', icon: '🧺' }
+  ],
+  cucumber: [
+    { month: 4, stage: 'seedling', labelRu: 'Посев на рассаду (или в торфяные горшочки)', icon: '🪴' },
+    { month: 5, stage: 'greenhouse', labelRu: 'Высадка в теплицу или на тёплую гряду', icon: '🏡' },
+    { month: 6, stage: 'harvest', labelRu: 'Начало плодоношения, сбор огурцов', icon: '🧺' },
+    { month: 7, stage: 'harvest', labelRu: 'Пик урожая, полив только тёплой водой', icon: '🧺' },
+    { month: 8, stage: 'harvest', labelRu: 'Сбор урожая и засолка', icon: '🧺' }
+  ],
+  pepper: [
+    { month: 2, stage: 'seedling', labelRu: 'Ранний посев семян на рассаду', icon: '🪴' },
+    { month: 3, stage: 'seedling', labelRu: 'Пикировка сеянцев перца', icon: '🪴' },
+    { month: 5, stage: 'greenhouse', labelRu: 'Высадка рассады в теплицу', icon: '🏡' },
+    { month: 7, stage: 'harvest', labelRu: 'Сбор первых перцев (техническая спелость)', icon: '🧺' },
+    { month: 8, stage: 'harvest', labelRu: 'Массовый сбор биологически зрелых плодов', icon: '🧺' }
+  ],
+  eggplant: [
+    { month: 2, stage: 'seedling', labelRu: 'Посев баклажанов на рассаду', icon: '🪴' },
+    { month: 5, stage: 'greenhouse', labelRu: 'Высадка в теплицу или плёночное укрытие', icon: '🏡' },
+    { month: 7, stage: 'harvest', labelRu: 'Сбор плодов баклажана', icon: '🧺' },
+    { month: 8, stage: 'harvest', labelRu: 'Сбор урожая', icon: '🧺' }
+  ],
+  potato: [
+    { month: 4, stage: 'seedling', labelRu: 'Яровизация и проращивание клубней на свету', icon: '☀️' },
+    { month: 5, stage: 'ground', labelRu: 'Посадка картофеля в прогретую почву (+8..10°C)', icon: '🌱' },
+    { month: 6, stage: 'ground', labelRu: 'Окучивание рядов и защита от вредителей', icon: '🚜' },
+    { month: 7, stage: 'harvest', labelRu: 'Подкоп молодого картофеля к столу', icon: '🧺' },
+    { month: 8, stage: 'harvest', labelRu: 'Массовая копка картофеля и просушка клубней', icon: '🧺' }
+  ],
+  cabbage_white: [
+    { month: 3, stage: 'seedling', labelRu: 'Посев ранней и среднеспелой капусты на рассаду', icon: '🪴' },
+    { month: 5, stage: 'ground', labelRu: 'Высадка рассады в грунт, защита от блошки', icon: '🌱' },
+    { month: 7, stage: 'harvest', labelRu: 'Сбор кочанов ранней капусты', icon: '🧺' },
+    { month: 9, stage: 'harvest', labelRu: 'Уборка поздней капусты для длительного хранения', icon: '🧺' }
+  ],
+  broccoli: [
+    { month: 4, stage: 'seedling', labelRu: 'Посев брокколи на рассаду', icon: '🪴' },
+    { month: 5, stage: 'ground', labelRu: 'Высадка рассады в открытый грунт', icon: '🌱' },
+    { month: 7, stage: 'harvest', labelRu: 'Срезка центральных головок брокколи', icon: '🧺' },
+    { month: 8, stage: 'harvest', labelRu: 'Сбор урожая с боковых побегов', icon: '🧺' }
+  ],
+  radish: [
+    { month: 4, stage: 'ground', labelRu: 'Ранний посев семян редиса в парник или открытый грунт', icon: '🌱' },
+    { month: 5, stage: 'harvest', labelRu: 'Сбор первого весеннего редиса', icon: '🧺' },
+    { month: 8, stage: 'ground', labelRu: 'Повторный осенний посев редиса на короткий световой день', icon: '🌱' },
+    { month: 9, stage: 'harvest', labelRu: 'Сбор осеннего сочного редиса', icon: '🧺' }
+  ],
+  carrot: [
+    { month: 4, stage: 'ground', labelRu: 'Посев семян моркови во влажную почву', icon: '🌱' },
+    { month: 5, stage: 'ground', labelRu: 'Прореживание всходов и рыхление междурядий', icon: '🌿' },
+    { month: 7, stage: 'harvest', labelRu: 'Выборочная уборка на пучок', icon: '🧺' },
+    { month: 9, stage: 'harvest', labelRu: 'Генеральная уборка моркови на зимнее хранение', icon: '🧺' }
+  ],
+  dill: [
+    { month: 4, stage: 'ground', labelRu: 'Первый весенний посев укропа в открытый грунт', icon: '🌱' },
+    { month: 5, stage: 'harvest', labelRu: 'Срезка свежей зелени, конвейерный подсев', icon: '🧺' },
+    { month: 6, stage: 'harvest', labelRu: 'Сбор пряных зонтиков укропа для консервирования', icon: '🧺' }
+  ],
+  celery: [
+    { month: 2, stage: 'seedling', labelRu: 'Посев семян корневого сельдерея на рассаду', icon: '🪴' },
+    { month: 5, stage: 'ground', labelRu: 'Высадка рассады в открытый грунт', icon: '🌱' },
+    { month: 9, stage: 'harvest', labelRu: 'Уборка крупных корнеплодов сельдерея', icon: '🧺' }
+  ],
+  onion: [
+    { month: 4, stage: 'ground', labelRu: 'Подготовка почвы и посадка севка в борозды', icon: '🌱' },
+    { month: 5, stage: 'ground', labelRu: 'Полив и рыхление междурядий', icon: '💧' },
+    { month: 7, stage: 'harvest', labelRu: 'Прекращение полива, полегание и подсушивание пера', icon: '☀️' },
+    { month: 8, stage: 'harvest', labelRu: 'Уборка лука-репки и просушка на солнце/чердаке', icon: '🧺' }
+  ],
+  garlic: [
+    { month: 4, stage: 'ground', labelRu: 'Посадка ярового чеснока / азотная подкормка озимого', icon: '🌱' },
+    { month: 6, stage: 'ground', labelRu: 'Выламывание стрелок озимого чеснока (на заготовки)', icon: '✂️' },
+    { month: 7, stage: 'harvest', labelRu: 'Уборка озимого чеснока при растрескивании сигнального чехлика', icon: '🧺' },
+    { month: 9, stage: 'ground', labelRu: 'Посадка зубчиков озимого чеснока под зиму', icon: '🍂' }
+  ],
+  zucchini: [
+    { month: 5, stage: 'ground', labelRu: 'Посев семян в теплую почву или высадка рассады', icon: '🌱' },
+    { month: 6, stage: 'harvest', labelRu: 'Сбор первых молодых цукини и кабачков', icon: '🧺' },
+    { month: 7, stage: 'harvest', labelRu: 'Регулярный сбор урожая каждые 3-4 дня для стимуляции новых завязей', icon: '🧺' },
+    { month: 8, stage: 'harvest', labelRu: 'Сбор вызревших плодов с твердой корой на хранение', icon: '🧺' }
+  ],
+  pumpkin: [
+    { month: 5, stage: 'ground', labelRu: 'Посадка тыквы на компостную грядку или солнечное место', icon: '🌱' },
+    { month: 6, stage: 'ground', labelRu: 'Прищипывание плетей для формирования крупных тыкв', icon: '🌿' },
+    { month: 9, stage: 'harvest', labelRu: 'Срезка тыкв с плодоножкой до наступления заморозков', icon: '🧺' }
+  ],
+  peas: [
+    { month: 4, stage: 'ground', labelRu: 'Ранний посев замоченных семян гороха в грунт', icon: '🌱' },
+    { month: 5, stage: 'ground', labelRu: 'Установка шпалер или сетки-опоры для плетей', icon: '🎋' },
+    { month: 6, stage: 'harvest', labelRu: 'Сбор сладких стручков сахарного и лущильного горошка', icon: '🧺' },
+    { month: 7, stage: 'harvest', labelRu: 'Срезка ботвы, корни оставляем в почве для насыщения азотом', icon: '♻️' }
+  ],
+  beans: [
+    { month: 5, stage: 'ground', labelRu: 'Посев фасоли в прогретую почву (не менее +12..14°C)', icon: '🌱' },
+    { month: 7, stage: 'harvest', labelRu: 'Сбор молодой нежной спаржевой фасоли', icon: '🧺' },
+    { month: 8, stage: 'harvest', labelRu: 'Сбор и лущение сухих стручков зерновой фасоли', icon: '🧺' }
+  ],
+  beet: [
+    { month: 5, stage: 'ground', labelRu: 'Посев семян свёклы во влажный прогретый грунт', icon: '🌱' },
+    { month: 6, stage: 'ground', labelRu: 'Прореживание всходов на расстояние 8-10 см', icon: '🌿' },
+    { month: 8, stage: 'harvest', labelRu: 'Выборочный сбор свёклы для летних блюд', icon: '🧺' },
+    { month: 9, stage: 'harvest', labelRu: 'Уборка корнеплодов свёклы до заморозков', icon: '🧺' }
+  ],
+  strawberry: [
+    { month: 4, stage: 'ground', labelRu: 'Весенняя очистка от сухих листьев и рыхление', icon: '🧹' },
+    { month: 5, stage: 'ground', labelRu: 'Обильное цветение, мульчирование соломой или хвоей', icon: '🌸' },
+    { month: 6, stage: 'harvest', labelRu: 'Сбор сладких ягод клубники и земляники', icon: '🍓' },
+    { month: 7, stage: 'harvest', labelRu: 'Обрезка усов и старых листьев, подкормка фосфором и калием', icon: '✂️' },
+    { month: 8, stage: 'ground', labelRu: 'Посадка укоренённых розеток на новые грядки', icon: '🌱' }
+  ],
+  lettuce: [
+    { month: 4, stage: 'ground', labelRu: 'Весенний посев листового салата в грунт', icon: '🌱' },
+    { month: 5, stage: 'harvest', labelRu: 'Срезка свежих листьев, повторный посев новой партии', icon: '🧺' },
+    { month: 6, stage: 'harvest', labelRu: 'Сбор салата', icon: '🧺' }
+  ],
+  green_manure_phacelia: [
+    { month: 5, stage: 'ground', labelRu: 'Весенний посев фацелии для оздоровления почвы', icon: '🌱' },
+    { month: 6, stage: 'ground', labelRu: 'Цветение медоноса, скашивание до образования семян', icon: '🌸' },
+    { month: 8, stage: 'ground', labelRu: 'Осенний посев сидерата после сбора основного урожая', icon: '🌱' },
+    { month: 9, stage: 'ground', labelRu: 'Заделка зелёной массы в верхний слой почвы', icon: '🍂' }
+  ],
+  green_manure_mustard: [
+    { month: 4, stage: 'ground', labelRu: 'Ранний посев белой горчицы для очищения почвы от грибков', icon: '🌱' },
+    { month: 8, stage: 'ground', labelRu: 'Посев горчицы после уборки картофеля и томатов', icon: '🌱' },
+    { month: 9, stage: 'ground', labelRu: 'Скашивание и заделка в грунт против проволочника и парши', icon: '🍂' }
+  ]
+};
+
+/**
+ * Собрать календарные события сезона на основе фактически посаженных культур
+ * @param {number} activeYear
+ * @param {Array<Object>} beds
+ * @param {string} lang
+ * @returns {Array<Object>}
+ */
+function getSeasonalCalendarEvents(activeYear, beds = [], lang = 'ru') {
+  const monthNames = {
+    2: { ru: 'Февраль', et: 'Veebruar', lv: 'Februāris', lt: 'Vasaris' },
+    3: { ru: 'Март', et: 'Märts', lv: 'Marts', lt: 'Kovas' },
+    4: { ru: 'Апрель', et: 'Aprill', lv: 'Aprīlis', lt: 'Balandis' },
+    5: { ru: 'Май', et: 'Mai', lv: 'Maijs', lt: 'Gegužė' },
+    6: { ru: 'Июнь', et: 'Juuni', lv: 'Jūnijs', lt: 'Birželis' },
+    7: { ru: 'Июль', et: 'Juuli', lv: 'Jūlijs', lt: 'Liepa' },
+    8: { ru: 'Август', et: 'August', lv: 'Augusts', lt: 'Rugpjūtis' },
+    9: { ru: 'Сентябрь', et: 'September', lv: 'Septembris', lt: 'Rugsėjis' },
+    10: { ru: 'Октябрь', et: 'Oktoober', lv: 'Oktobris', lt: 'Spalis' }
+  };
+
+  const plantedItems = [];
+  beds.forEach(bed => {
+    if (bed.sections && bed.sections.length > 0) {
+      bed.sections.forEach(sec => {
+        const cropId = sec.history?.[activeYear]?.cropId;
+        if (cropId && cropId !== 'fallow') {
+          plantedItems.push({
+            bed,
+            section: sec,
+            cropId,
+            variety: sec.history[activeYear].variety || '',
+            name: `${bed.name} (${sec.name})`
+          });
+        }
+      });
+    } else {
+      const cropId = bed.history?.[activeYear]?.cropId;
+      if (cropId && cropId !== 'fallow') {
+        plantedItems.push({
+          bed,
+          section: null,
+          cropId,
+          variety: bed.history[activeYear].variety || '',
+          name: bed.name
+        });
+      }
+    }
+  });
+
+  const monthsMap = {};
+  for (let m = 2; m <= 10; m++) {
+    monthsMap[m] = {
+      monthNumber: m,
+      monthName: monthNames[m]?.[lang] || monthNames[m]?.ru || `Месяц ${m}`,
+      events: []
+    };
+  }
+
+  plantedItems.forEach(item => {
+    const crop = getCropById(item.cropId);
+    if (!crop) return;
+    const timeline = CROP_CALENDAR_TIMELINE[item.cropId] || [];
+    
+    timeline.forEach(evt => {
+      if (monthsMap[evt.month]) {
+        monthsMap[evt.month].events.push({
+          cropId: item.cropId,
+          cropName: getCropName(crop, lang),
+          cropEmoji: crop.emoji || '🌱',
+          variety: item.variety,
+          bedName: item.name,
+          bedType: item.bed.type,
+          stage: evt.stage, // 'seedling' | 'greenhouse' | 'ground' | 'harvest'
+          action: evt.labelRu,
+          icon: evt.icon || '🌱'
+        });
+      }
+    });
+  });
+
+  return Object.values(monthsMap).filter(m => m.events.length > 0);
+}
+
+/**
+ * Алгоритм автоматического подбора оптимального севооборота в 1 клик
+ * @param {Array<Object>} beds - список грядок огорода
+ * @param {Array<string>} requestedCropIds - список запрашиваемых культур
+ * @param {number} activeYear
+ * @returns {Array<Object>}
+ */
+function solveCropRotationAssignment(beds, requestedCropIds = [], activeYear = 2026) {
+  const targets = [];
+  beds.forEach(bed => {
+    if (bed.sections && bed.sections.length > 0) {
+      bed.sections.forEach(sec => {
+        targets.push({ bed, section: sec, id: `${bed.id}:${sec.id}`, name: `${bed.name} (${sec.name})` });
+      });
+    } else {
+      targets.push({ bed, section: null, id: bed.id, name: bed.name });
+    }
+  });
+
+  if (targets.length === 0 || requestedCropIds.length === 0) {
+    return [];
+  }
+
+  // Сортируем культуры: сначала более требовательные к севообороту
+  const sortedCrops = [...requestedCropIds].sort((a, b) => {
+    const cA = getCropById(a);
+    const cB = getCropById(b);
+    return (cB?.badPredecessors?.length || 0) - (cA?.badPredecessors?.length || 0);
+  });
+
+  const assignments = [];
+  const usedTargets = new Set();
+
+  for (const cropId of sortedCrops) {
+    let bestTarget = null;
+    let bestScore = -999999;
+    let bestEval = null;
+
+    for (const target of targets) {
+      if (usedTargets.has(target.id)) continue;
+
+      const history = [];
+      const src = target.section || target.bed;
+      if (src.history) {
+        for (let y = activeYear - 1; y >= activeYear - 4; y--) {
+          if (src.history[y]?.cropId) {
+            history.push({ year: y, cropId: src.history[y].cropId });
+          }
+        }
+      }
+
+      const ev = evaluateCropRotation(cropId, history);
+      let s = ev.score;
+
+      // Штрафы и бонусы
+      if (ev.status === 'danger') s -= 2000;
+      else if (ev.status === 'warning') s -= 60;
+      else if (ev.status === 'optimal') s += 100;
+
+      // Бонус за соответствие теплице / открытому грунту
+      if (target.bed.type === 'greenhouse') {
+        if (['tomato', 'cucumber', 'pepper', 'eggplant'].includes(cropId)) s += 80;
+        if (['potato', 'pumpkin', 'zucchini', 'cabbage_white'].includes(cropId)) s -= 120;
+      } else {
+        if (['potato', 'carrot', 'beet', 'onion', 'garlic', 'cabbage_white', 'zucchini', 'pumpkin'].includes(cropId)) s += 30;
+      }
+
+      if (s > bestScore) {
+        bestScore = s;
+        bestTarget = target;
+        bestEval = ev;
+      }
+    }
+
+    if (bestTarget) {
+      usedTargets.add(bestTarget.id);
+      assignments.push({
+        target: bestTarget,
+        cropId,
+        evaluation: bestEval,
+        score: bestScore
+      });
+    }
+  }
+
+  return assignments;
+}
+
 if (typeof window !== 'undefined') {
   window.CROP_FAMILIES = CROP_FAMILIES;
   window.CROPS_DATABASE = CROPS_DATABASE;
@@ -931,4 +1348,10 @@ if (typeof window !== 'undefined') {
   window.recommendCropsForBed = recommendCropsForBed;
   window.getCropSvg = getCropSvg;
   window.CROP_SVG_ICONS = CROP_SVG_ICONS;
+  window.CROP_PLANTING_STANDARDS = CROP_PLANTING_STANDARDS;
+  window.calculateCropCapacity = calculateCropCapacity;
+  window.evaluateCompanionPlanting = evaluateCompanionPlanting;
+  window.CROP_CALENDAR_TIMELINE = CROP_CALENDAR_TIMELINE;
+  window.getSeasonalCalendarEvents = getSeasonalCalendarEvents;
+  window.solveCropRotationAssignment = solveCropRotationAssignment;
 }
