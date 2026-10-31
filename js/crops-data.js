@@ -1443,15 +1443,61 @@ function getSeasonalCalendarEvents(activeYear, beds = [], lang = 'ru') {
  * @param {number} activeYear
  * @returns {Array<Object>}
  */
-function solveCropRotationAssignment(beds, requestedCropIds = [], activeYear = 2026) {
+function solveCropRotationAssignment(beds, requestedCropIds = [], activeYear = 2026, options = {}) {
+  const onlyEmpty = Boolean(options.onlyEmpty);
   const targets = [];
+  const prevTemplatesByCrop = new Map();
+  const prevYear = activeYear - 1;
+
+  const extractEffectiveCropId = (plantingObj) => {
+    if (!plantingObj) return null;
+    if (plantingObj.cropId) return plantingObj.cropId;
+    if (Array.isArray(plantingObj.holes)) {
+      const hWithCrop = plantingObj.holes.find(h => h && h.cropId);
+      if (hWithCrop) return hWithCrop.cropId;
+    }
+    return null;
+  };
+
   beds.forEach(bed => {
+    const bName = (typeof window !== 'undefined' && window.i18n && window.i18n.getBedName) ? window.i18n.getBedName(bed) : bed.name;
     if (bed.sections && bed.sections.length > 0) {
       bed.sections.forEach(sec => {
-        targets.push({ bed, section: sec, id: `${bed.id}:${sec.id}`, name: `${bed.name} (${sec.name})` });
+        const prevPlanting = sec.history?.[prevYear];
+        const prevCid = extractEffectiveCropId(prevPlanting);
+        if (prevCid && prevCid !== 'fallow') {
+          if (!prevTemplatesByCrop.has(prevCid)) prevTemplatesByCrop.set(prevCid, []);
+          prevTemplatesByCrop.get(prevCid).push({
+            variety: prevPlanting?.variety || '',
+            holes: Array.isArray(prevPlanting?.holes) ? JSON.parse(JSON.stringify(prevPlanting.holes)) : null,
+            holePattern: prevPlanting?.holePattern || prevPlanting?.plantingPattern || 'zigzag'
+          });
+        }
+
+        const currPlanting = sec.history?.[activeYear];
+        const currCid = extractEffectiveCropId(currPlanting);
+        if (onlyEmpty && currCid && currCid !== 'fallow') return;
+
+        const secName = (typeof window !== 'undefined' && window.i18n && window.i18n.getSectionName) ? window.i18n.getSectionName(sec.name) : sec.name;
+        targets.push({ bed, section: sec, id: `${bed.id}:${sec.id}`, name: `${bName} (${secName})` });
       });
     } else {
-      targets.push({ bed, section: null, id: bed.id, name: bed.name });
+      const prevPlanting = bed.history?.[prevYear];
+      const prevCid = extractEffectiveCropId(prevPlanting);
+      if (prevCid && prevCid !== 'fallow') {
+        if (!prevTemplatesByCrop.has(prevCid)) prevTemplatesByCrop.set(prevCid, []);
+        prevTemplatesByCrop.get(prevCid).push({
+          variety: prevPlanting?.variety || '',
+          holes: Array.isArray(prevPlanting?.holes) ? JSON.parse(JSON.stringify(prevPlanting.holes)) : null,
+          holePattern: prevPlanting?.holePattern || prevPlanting?.plantingPattern || 'zigzag'
+        });
+      }
+
+      const currPlanting = bed.history?.[activeYear];
+      const currCid = extractEffectiveCropId(currPlanting);
+      if (onlyEmpty && currCid && currCid !== 'fallow') return;
+
+      targets.push({ bed, section: null, id: bed.id, name: bName });
     }
   });
 
@@ -1459,8 +1505,12 @@ function solveCropRotationAssignment(beds, requestedCropIds = [], activeYear = 2
     return [];
   }
 
-  // Сортируем культуры: сначала более требовательные к севообороту
+  // Сортируем культуры: сначала более требовательные к севообороту и тепличные
+  const greenhousePriority = new Set(['tomato', 'cucumber', 'pepper', 'eggplant']);
   const sortedCrops = [...requestedCropIds].sort((a, b) => {
+    const ghA = greenhousePriority.has(a) ? 1 : 0;
+    const ghB = greenhousePriority.has(b) ? 1 : 0;
+    if (ghA !== ghB) return ghB - ghA;
     const cA = getCropById(a);
     const cB = getCropById(b);
     return (cB?.badPredecessors?.length || 0) - (cA?.badPredecessors?.length || 0);
@@ -1481,8 +1531,9 @@ function solveCropRotationAssignment(beds, requestedCropIds = [], activeYear = 2
       const src = target.section || target.bed;
       if (src.history) {
         for (let y = activeYear - 1; y >= activeYear - 4; y--) {
-          if (src.history[y]?.cropId) {
-            history.push({ year: y, cropId: src.history[y].cropId });
+          const histCid = extractEffectiveCropId(src.history[y]);
+          if (histCid) {
+            history.push({ year: y, cropId: histCid });
           }
         }
       }
@@ -1490,17 +1541,31 @@ function solveCropRotationAssignment(beds, requestedCropIds = [], activeYear = 2
       const ev = evaluateCropRotation(cropId, history);
       let s = ev.score;
 
-      // Штрафы и бонусы
+      // Штрафы и бонусы севооборота
       if (ev.status === 'danger') s -= 2000;
       else if (ev.status === 'warning') s -= 60;
       else if (ev.status === 'optimal') s += 100;
 
-      // Бонус за соответствие теплице / открытому грунту
+      // Бонус за соответствие теплице / открытому грунту и ягоднику
       if (target.bed.type === 'greenhouse') {
-        if (['tomato', 'cucumber', 'pepper', 'eggplant'].includes(cropId)) s += 80;
-        if (['potato', 'pumpkin', 'zucchini', 'cabbage_white'].includes(cropId)) s -= 120;
+        if (['tomato', 'cucumber', 'pepper', 'eggplant'].includes(cropId)) s += 95;
+        if (['potato', 'pumpkin', 'zucchini', 'cabbage_white'].includes(cropId)) s -= 150;
+      } else if (target.bed.type === 'berry') {
+        if (cropId === 'strawberry') s += 150;
       } else {
         if (['potato', 'carrot', 'beet', 'onion', 'garlic', 'cabbage_white', 'zucchini', 'pumpkin'].includes(cropId)) s += 30;
+      }
+
+      // Учёт соседства внутри одной теплицы / разделённой грядки
+      if (target.section && target.bed.sections) {
+        const sameBedAssignedCrops = assignments
+          .filter(a => a.target.bed.id === target.bed.id)
+          .map(a => a.cropId);
+        if (sameBedAssignedCrops.length > 0 && typeof evaluateCompanionPlanting === 'function') {
+          const comp = evaluateCompanionPlanting(cropId, sameBedAssignedCrops);
+          if (comp.status === 'good') s += 35;
+          else if (comp.status === 'bad') s -= 45;
+        }
       }
 
       if (s > bestScore) {
@@ -1512,11 +1577,14 @@ function solveCropRotationAssignment(beds, requestedCropIds = [], activeYear = 2
 
     if (bestTarget) {
       usedTargets.add(bestTarget.id);
+      const templates = prevTemplatesByCrop.get(cropId);
+      const template = (templates && templates.length > 0) ? templates.shift() : null;
       assignments.push({
         target: bestTarget,
         cropId,
         evaluation: bestEval,
-        score: bestScore
+        score: bestScore,
+        template
       });
     }
   }
