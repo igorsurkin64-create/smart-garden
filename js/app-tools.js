@@ -791,24 +791,30 @@
       modal.appendChild(modalContent);
     }
 
+    const allCrops = (typeof window !== 'undefined' && window.CROPS_DATABASE) ? window.CROPS_DATABASE : [];
+    const currentLang = window.i18n ? window.i18n.getLanguage() : 'ru';
+
     const hole = holes[holeIndex] || { index: holeIndex + 1, cropId: null, variety: '', note: '' };
     const target = (bed.sections && bed.sections.length > 0 && activeSection) ? activeSection : bed;
     const planting = target.history?.[activeYear] || {};
-    const effectiveCropId = hole.cropId || planting.cropId || 'tomato';
+    let currentCropId = hole.cropId || planting.cropId || 'tomato';
 
     let currentPhotoUrl = null;
 
     const renderModal = async () => {
       // Ищем фото сорта в каталоге
       if (hole.variety && window.photoStorage) {
-        const v = await window.photoStorage.getVarietyByName(effectiveCropId, hole.variety);
+        const v = await window.photoStorage.getVarietyByName(currentCropId, hole.variety);
         if (v && v.photoUrl) currentPhotoUrl = v.photoUrl;
       }
 
       let varietySuggestions = [];
       if (window.photoStorage) {
-        varietySuggestions = await window.photoStorage.getVarieties(effectiveCropId);
+        varietySuggestions = await window.photoStorage.getVarieties(currentCropId);
       }
+
+      const cropObj = getCropById(currentCropId);
+      const popVars = cropObj?.popularVarieties || [];
 
       modalContent.innerHTML = `
         <div class="modal-card modal-content" style="max-width: 480px;">
@@ -822,9 +828,9 @@
             <div class="form-group mb-3">
               <label class="form-sublabel" style="font-weight: 700;">Культура (растение):</label>
               <select id="hole-crop-select" class="form-input">
-                ${Object.values(CROPS_DATA).map(c => `
-                  <option value="${c.id}" ${(hole.cropId || effectiveCropId) === c.id ? 'selected' : ''}>
-                    ${c.emoji} ${escapeHtml(c.name)}
+                ${allCrops.filter(c => c.id !== 'fallow').map(c => `
+                  <option value="${c.id}" ${currentCropId === c.id ? 'selected' : ''}>
+                    ${c.emoji} ${escapeHtml(getCropName(c, currentLang))}
                   </option>
                 `).join('')}
               </select>
@@ -834,8 +840,19 @@
               <label class="form-sublabel" style="font-weight: 700;">Сорт или гибрид:</label>
               <input type="text" id="hole-variety-input" class="form-input" list="hole-variety-datalist" placeholder="Например: Бычье сердце, Кураж F1..." value="${escapeHtml(hole.variety || '')}">
               <datalist id="hole-variety-datalist">
+                ${popVars.map(v => `<option value="${escapeHtml(v)}">`).join('')}
                 ${varietySuggestions.map(v => `<option value="${escapeHtml(v.name)}">`).join('')}
               </datalist>
+              ${popVars.length > 0 ? `
+                <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; align-items: center;">
+                  <span style="font-size: 0.7rem; color: var(--text-muted);">Популярные:</span>
+                  ${popVars.slice(0, 6).map(v => `
+                    <button type="button" class="btn-text hole-pop-var-chip" data-var="${escapeHtml(v)}" style="font-size: 0.72rem; padding: 2px 6px; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer;">
+                      + ${escapeHtml(v)}
+                    </button>
+                  `).join('')}
+                </div>
+              ` : ''}
             </div>
 
             <!-- Фотография сорта -->
@@ -875,6 +892,25 @@
 
       modalContent.querySelector('.modal-close-btn').onclick = () => modal.classList.remove('active');
       modalContent.querySelector('#hole-modal-cancel-btn').onclick = () => modal.classList.remove('active');
+
+      const cropSelect = modalContent.querySelector('#hole-crop-select');
+      if (cropSelect) {
+        cropSelect.onchange = () => {
+          currentCropId = cropSelect.value;
+          hole.cropId = cropSelect.value;
+          currentPhotoUrl = null;
+          renderModal();
+        };
+      }
+
+      modalContent.querySelectorAll('.hole-pop-var-chip').forEach(chip => {
+        chip.onclick = () => {
+          const varInput = modalContent.querySelector('#hole-variety-input');
+          if (varInput) {
+            varInput.value = chip.getAttribute('data-var');
+          }
+        };
+      });
 
       const photoInput = modalContent.querySelector('#hole-photo-file-input');
       if (photoInput) {
@@ -949,6 +985,9 @@
     let newCropId = (initialCropId && initialCropId !== 'all') ? initialCropId : 'tomato';
     let newPhotoUrl = null;
 
+    const allCrops = (typeof window !== 'undefined' && window.CROPS_DATABASE) ? window.CROPS_DATABASE : [];
+    const currentLang = window.i18n ? window.i18n.getLanguage() : 'ru';
+
     const render = async () => {
       let varieties = [];
       if (window.photoStorage) {
@@ -980,8 +1019,8 @@
                 <div class="form-group mb-2">
                   <label class="form-sublabel" style="font-weight: 700; font-size: 0.8rem;">Культура (растение):</label>
                   <select id="new-variety-crop" class="form-input">
-                    ${Object.values(CROPS_DATA).map(c => `
-                      <option value="${c.id}" ${newCropId === c.id ? 'selected' : ''}>${c.emoji} ${escapeHtml(c.name)}</option>
+                    ${allCrops.filter(c => c.id !== 'fallow').map(c => `
+                      <option value="${c.id}" ${newCropId === c.id ? 'selected' : ''}>${c.emoji} ${escapeHtml(getCropName(c, currentLang))}</option>
                     `).join('')}
                   </select>
                 </div>
