@@ -816,6 +816,85 @@ if (typeof window !== 'undefined') {
 }
 
 /**
+ * Умная сводка посадки по лункам:
+ * группирует лунки по сортам/культурам, формирует понятные диапазоны (напр. "№1–5 (5 шт)")
+ */
+function summarizeHolePlantings(holes = [], defaultCrop = null, lang = 'ru') {
+  if (!Array.isArray(holes) || holes.length === 0) return null;
+  const plantedHoles = holes.filter(h => h && ((h.variety && h.variety.trim()) || h.cropId));
+  if (plantedHoles.length === 0) return null;
+
+  const groups = new Map();
+  holes.forEach((h, idx) => {
+    if (!h) return;
+    const vName = (h.variety || '').trim();
+    const cId = h.cropId || defaultCrop?.id || null;
+    if (!vName && !cId) return; // пустая лунка
+
+    const key = `${cId || ''}:::${vName || ''}`;
+    if (!groups.has(key)) {
+      const cropObj = cId ? getCropById(cId) : defaultCrop;
+      groups.set(key, {
+        cropId: cId,
+        crop: cropObj,
+        variety: vName,
+        holeIndices: [],
+        count: 0
+      });
+    }
+    const g = groups.get(key);
+    g.holeIndices.push(h.index || (idx + 1));
+    g.count++;
+  });
+
+  const formatRanges = (indices) => {
+    if (!indices || indices.length === 0) return '';
+    if (indices.length === 1) return `лунка №${indices[0]}`;
+    const sorted = [...indices].sort((a, b) => a - b);
+    const ranges = [];
+    let start = sorted[0];
+    let prev = start;
+    for (let i = 1; i < sorted.length; i++) {
+      if (sorted[i] === prev + 1) {
+        prev = sorted[i];
+      } else {
+        ranges.push(start === prev ? `№${start}` : `№${start}–${prev}`);
+        start = sorted[i];
+        prev = start;
+      }
+    }
+    ranges.push(start === prev ? `№${start}` : `№${start}–${prev}`);
+    return ranges.join(', ');
+  };
+
+  const varieties = [];
+  groups.forEach(g => {
+    const varTitle = g.variety || (g.crop ? (typeof getCropName === 'function' ? getCropName(g.crop, lang) : g.crop.name) : 'Посадка');
+    varieties.push({
+      cropId: g.cropId,
+      crop: g.crop,
+      cropEmoji: g.crop?.emoji || '🌱',
+      variety: varTitle,
+      count: g.count,
+      rangeText: formatRanges(g.holeIndices),
+      indices: g.holeIndices,
+      color: (typeof getVarietyColor === 'function' ? getVarietyColor(g.variety || g.cropId) : '#059669')
+    });
+  });
+
+  return {
+    totalHoles: holes.length,
+    plantedCount: plantedHoles.length,
+    emptyCount: holes.length - plantedHoles.length,
+    varieties
+  };
+}
+
+if (typeof window !== 'undefined') {
+  window.summarizeHolePlantings = summarizeHolePlantings;
+}
+
+/**
  * Оценить севооборот для посадки культуры на грядку с известной историей
  * @param {string} newCropId - ID новой культуры для посадки
  * @param {Array<{year: number, cropId: string}>} history - История посадок прошлых лет (отсортированная по убыванию года)

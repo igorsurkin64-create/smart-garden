@@ -636,6 +636,11 @@ class GardenMap {
             }
             if (!secShortName) secShortName = `${secIdx + 1}`;
 
+            const cleanCropName = currentCropName ? currentCropName.replace(/\s*\(.*?\)/g, '').trim() : '';
+            const holeSummary = (holes.length > 0 && typeof summarizeHolePlantings === 'function')
+              ? summarizeHolePlantings(holes, currentCrop, currentLang)
+              : null;
+
             if (isInternalHorizontal) {
               // Горизонтальные полосы/рядки
               return `
@@ -652,30 +657,21 @@ class GardenMap {
                         <div class="gh-crop-icon">${cropSvg}</div>
                         <div class="gh-crop-info-wrap">
                           <div class="gh-crop-heading-row">
-                            <strong class="gh-crop-name">${escapeHtml(currentCropName)}</strong>
-                            ${displayVariety ? `<span class="gh-crop-var" title="${escapeHtml(displayVariety)}">(${escapeHtml(displayVariety)})</span>` : ''}
-                            ${holes.length > 0 ? `<span class="gh-holes-chip-count" title="${holes.length} лунок (${holesPlantedCount} занято)">🌱 ${holes.length} лунок</span>` : ''}
+                            <strong class="gh-crop-name">${escapeHtml(cleanCropName)}</strong>
+                            ${holeSummary && holeSummary.varieties.length > 0 ? `
+                              <div class="gh-h-varieties-wrap">
+                                ${holeSummary.varieties.map(v => `
+                                  <span class="gh-h-var-badge" style="border-left-color: ${v.color};" title="Сорт: ${escapeHtml(v.variety)}, ${escapeHtml(v.rangeText)}">
+                                    <span class="gh-v-var-dot" style="background-color: ${v.color};"></span>
+                                    <strong>${escapeHtml(v.variety)}</strong>: ${escapeHtml(v.rangeText)} (${v.count} шт)
+                                  </span>
+                                `).join('')}
+                              </div>
+                              <span class="gh-holes-chip-count">🌱 ${holeSummary.plantedCount} куст.</span>
+                            ` : (displayVariety ? `
+                              <span class="gh-crop-var" title="${escapeHtml(displayVariety)}">(${escapeHtml(displayVariety)})</span>
+                            ` : '')}
                           </div>
-                          ${holes.length > 0 ? `
-                            <div class="gh-mini-holes-strip" title="Схема посадки по лункам">
-                              ${holes.slice(0, 18).map(h => {
-                                const hCrop = h.cropId ? getCropById(h.cropId) : currentCrop;
-                                const hVar = (h.variety || '').trim();
-                                const isPlanted = Boolean(hVar || h.cropId);
-                                const vColor = (typeof getVarietyColor === 'function' ? getVarietyColor(hVar) : '#059669');
-                                const hCropName = hCrop ? (typeof getCropName === 'function' ? getCropName(hCrop, currentLang) : hCrop.name) : '';
-                                const tip = isPlanted 
-                                  ? `Лунка №${h.index}: ${hVar || 'Куст'}${hCropName ? ` (${hCropName})` : ''}` 
-                                  : `Лунка №${h.index}: свободна`;
-                                return `
-                                  <span class="gh-mini-hole-dot ${isPlanted ? 'planted' : 'empty'}" 
-                                        style="${isPlanted ? `background-color: ${vColor}; border-color: ${vColor};` : ''}"
-                                        title="${escapeHtml(tip)}">${h.index}</span>
-                                `;
-                              }).join('')}
-                              ${holes.length > 18 ? `<span class="gh-mini-hole-more">+${holes.length - 18}</span>` : ''}
-                            </div>
-                          ` : ''}
                         </div>
                       ` : `
                         <div class="gh-h-cta-btn" title="${escapeHtml(freeText)}">
@@ -723,30 +719,35 @@ class GardenMap {
                     <span class="gh-v-name-pill" title="${escapeHtml(secLocName)}">${escapeHtml(secShortName || `${secIdx + 1}`)}</span>
                   </div>
 
-                  <!-- Центр: Кнопка посадки или овощ -->
+                  <!-- Центр: Кнопка посадки или овощ с понятными сортами -->
                   <div class="gh-v-body">
                     ${currentCrop ? `
                       <div class="gh-v-crop-card">
                         <div class="gh-v-crop-avatar" title="${escapeHtml(currentCropName)}">${cropSvg}</div>
-                        <span class="gh-v-crop-label" title="${escapeHtml(currentCropName)}">${escapeHtml(currentCropName)}</span>
-                        ${displayVariety ? `<span class="gh-v-variety-label" title="${escapeHtml(displayVariety)}">${escapeHtml(displayVariety)}</span>` : ''}
-                        ${holes.length > 0 ? `
-                          <div class="gh-v-mini-holes-wrap" title="${holes.length} лунок (${holesPlantedCount} занято)">
-                            <span class="gh-holes-chip-count">🌱 ${holes.length} л.</span>
-                            <div class="gh-mini-holes-strip pattern-compact">
-                              ${holes.slice(0, 10).map(h => {
-                                const hCrop = h.cropId ? getCropById(h.cropId) : currentCrop;
-                                const hVar = (h.variety || '').trim();
-                                const isPlanted = Boolean(hVar || h.cropId);
-                                const vColor = (typeof getVarietyColor === 'function' ? getVarietyColor(hVar) : '#059669');
-                                const hCropName = hCrop ? (typeof getCropName === 'function' ? getCropName(hCrop, currentLang) : hCrop.name) : '';
-                                const tip = isPlanted ? `Лунка №${h.index}: ${hVar || 'Куст'}${hCropName ? ` (${hCropName})` : ''}` : `Лунка №${h.index}: свободна`;
-                                return `<span class="gh-mini-hole-dot ${isPlanted ? 'planted' : 'empty'}" style="${isPlanted ? `background-color: ${vColor}; border-color: ${vColor};` : ''}" title="${escapeHtml(tip)}">${h.index}</span>`;
-                              }).join('')}
-                              ${holes.length > 10 ? `<span class="gh-mini-hole-more">+${holes.length - 10}</span>` : ''}
-                            </div>
+                        <div class="gh-v-crop-title" title="${escapeHtml(currentCropName)}">${escapeHtml(cleanCropName)}</div>
+                        
+                        ${holeSummary && holeSummary.varieties.length > 0 ? `
+                          <div class="gh-v-varieties-box">
+                            ${holeSummary.varieties.map(v => `
+                              <div class="gh-v-var-card" style="border-left-color: ${v.color};" title="Сорт: ${escapeHtml(v.variety)}, ${escapeHtml(v.rangeText)} (${v.count} шт)">
+                                <div class="gh-v-var-top">
+                                  <span class="gh-v-var-dot" style="background-color: ${v.color};"></span>
+                                  <strong class="gh-v-var-title">${escapeHtml(v.variety)}</strong>
+                                </div>
+                                <div class="gh-v-var-meta">
+                                  <span class="gh-v-var-range">${escapeHtml(v.rangeText)}</span>
+                                  <span class="gh-v-var-qty">${v.count} шт</span>
+                                </div>
+                              </div>
+                            `).join('')}
                           </div>
-                        ` : ''}
+                          <div class="gh-v-summary-pill">
+                            🌱 ${holeSummary.plantedCount} куст${holeSummary.plantedCount === 1 ? '' : (holeSummary.plantedCount < 5 ? 'а' : 'ов')}
+                            ${holeSummary.emptyCount > 0 ? `<span class="gh-v-empty-sub"> (${holeSummary.emptyCount} св.)</span>` : ''}
+                          </div>
+                        ` : (displayVariety ? `
+                          <span class="gh-v-variety-label" title="${escapeHtml(displayVariety)}">${escapeHtml(displayVariety)}</span>
+                        ` : '')}
                       </div>
                     ` : `
                       <div class="gh-v-cta-btn" title="${escapeHtml(freeText)}">
@@ -822,6 +823,11 @@ class GardenMap {
     const prevCropName = prevCrop ? (typeof getCropName === 'function' ? getCropName(prevCrop, currentLang) : prevCrop.name) : '';
     const unplantedText = tr('unplanted') || (currentLang === 'et' ? 'Istutamata' : currentLang === 'lv' ? 'Neapstādīta' : currentLang === 'lt' ? 'Neapsodinta' : 'Не засеяно');
     const grownInText = tr('grown_in_year', { year: prevYear }) || `В ${prevYear} г. росло:`;
+
+    const cleanCropName = currentCropName ? currentCropName.replace(/\s*\(.*?\)/g, '').trim() : '';
+    const holeSummary = (holes.length > 0 && typeof summarizeHolePlantings === 'function')
+      ? summarizeHolePlantings(holes, currentCrop, currentLang)
+      : null;
 
     const rotationEval = currentPlanting?.cropId
       ? evaluateCropRotation(currentPlanting.cropId, history)
@@ -903,25 +909,20 @@ class GardenMap {
             <div class="bed-crop-lead">
               <div class="crop-svg-avatar">${cropSvgIcon}</div>
               <div class="crop-text-block">
-                <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
-                  <strong class="crop-name">${escapeHtml(currentCropName)}</strong>
-                  ${displayVariety ? `<span class="crop-variety">${escapeHtml(displayVariety)}</span>` : ''}
-                  ${holes.length > 0 ? `<span class="gh-holes-chip-count" title="${holes.length} лунок (${holesPlantedCount} занято)">🌱 ${holes.length} лунок</span>` : ''}
+                <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
+                  <strong class="crop-name">${escapeHtml(cleanCropName)}</strong>
+                  ${holeSummary && holeSummary.varieties.length > 0 ? `
+                    ${holeSummary.varieties.map(v => `
+                      <span class="gh-h-var-badge" style="border-left-color: ${v.color};" title="Сорт: ${escapeHtml(v.variety)}, ${escapeHtml(v.rangeText)}">
+                        <span class="gh-v-var-dot" style="background-color: ${v.color};"></span>
+                        <strong>${escapeHtml(v.variety)}</strong>: ${escapeHtml(v.rangeText)} (${v.count} шт)
+                      </span>
+                    `).join('')}
+                    <span class="gh-holes-chip-count">🌱 ${holeSummary.plantedCount} куст.</span>
+                  ` : (displayVariety ? `
+                    <span class="crop-variety">${escapeHtml(displayVariety)}</span>
+                  ` : '')}
                 </div>
-                ${holes.length > 0 ? `
-                  <div class="gh-mini-holes-strip" title="Схема посадки по лункам">
-                    ${holes.slice(0, 16).map(h => {
-                      const hCrop = h.cropId ? getCropById(h.cropId) : currentCrop;
-                      const hVar = (h.variety || '').trim();
-                      const isPlanted = Boolean(hVar || h.cropId);
-                      const vColor = (typeof getVarietyColor === 'function' ? getVarietyColor(hVar) : '#059669');
-                      const hCropName = hCrop ? (typeof getCropName === 'function' ? getCropName(hCrop, currentLang) : hCrop.name) : '';
-                      const tip = isPlanted ? `Лунка №${h.index}: ${hVar || 'Куст'}${hCropName ? ` (${hCropName})` : ''}` : `Лунка №${h.index}: свободна`;
-                      return `<span class="gh-mini-hole-dot ${isPlanted ? 'planted' : 'empty'}" style="${isPlanted ? `background-color: ${vColor}; border-color: ${vColor};` : ''}" title="${escapeHtml(tip)}">${h.index}</span>`;
-                    }).join('')}
-                    ${holes.length > 16 ? `<span class="gh-mini-hole-more">+${holes.length - 16}</span>` : ''}
-                  </div>
-                ` : ''}
               </div>
             </div>
           ` : `

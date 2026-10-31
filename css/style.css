@@ -1838,42 +1838,167 @@ html, body {
   display: block;
 }
 
-.gh-v-crop-label {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  transform: rotate(180deg);
-  font-size: 0.88rem;
+.gh-v-crop-label,
+.gh-v-crop-title {
+  font-size: 0.92rem;
   font-weight: 800;
-  color: #000000;
-  max-height: 90px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  letter-spacing: 0.3px;
-  line-height: 1.1;
-  margin: 3px 0;
+  color: #0f172a;
+  text-align: center;
+  line-height: 1.15;
+  margin: 1px 0 2px 0;
+  white-space: normal;
+  word-break: break-word;
 }
 
-[data-theme="dark"] .gh-v-crop-label {
-  color: #ffffff;
+[data-theme="dark"] .gh-v-crop-label,
+[data-theme="dark"] .gh-v-crop-title {
+  color: #f8fafc;
 }
 
 .gh-v-variety-label {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  transform: rotate(180deg);
   font-size: 0.76rem;
   font-weight: 700;
-  color: #1e293b;
-  max-height: 60px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  line-height: 1.1;
+  color: #475569;
+  text-align: center;
+  line-height: 1.2;
+  margin: 1px 0;
+  white-space: normal;
+  word-break: break-word;
 }
 
 [data-theme="dark"] .gh-v-variety-label {
   color: #cbd5e1;
+}
+
+/* Компактные карточки сортов для вертикального рядка */
+.gh-v-varieties-box {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  margin: 2px 0;
+}
+
+.gh-v-var-card {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 3.5px solid #10b981;
+  border-radius: 4px;
+  padding: 2px 5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  text-align: left;
+}
+
+[data-theme="dark"] .gh-v-var-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.gh-v-var-top {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.gh-v-var-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.gh-v-var-title {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-theme="dark"] .gh-v-var-title {
+  color: #f8fafc;
+}
+
+.gh-v-var-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+[data-theme="dark"] .gh-v-var-meta {
+  color: #94a3b8;
+}
+
+.gh-v-var-range {
+  font-weight: 700;
+  color: #0369a1;
+}
+
+[data-theme="dark"] .gh-v-var-range {
+  color: #38bdf8;
+}
+
+.gh-v-summary-pill {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #065f46;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 2px 6px;
+  border-radius: 10px;
+  text-align: center;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+[data-theme="dark"] .gh-v-summary-pill {
+  color: #6ee7b7;
+  background: rgba(6, 95, 70, 0.4);
+  border-color: #047857;
+}
+
+.gh-v-empty-sub {
+  color: #64748b;
+  font-weight: 500;
+}
+
+[data-theme="dark"] .gh-v-empty-sub {
+  color: #94a3b8;
+}
+
+/* Компактные бейджи сортов для горизонтальных грядок */
+.gh-h-varieties-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.gh-h-var-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 3.5px solid #10b981;
+  padding: 1px 6px;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .gh-h-var-badge {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
 }
 
 /* Низ вертикальной грядки */
