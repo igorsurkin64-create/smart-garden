@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smart-garden-v2.5';
+const CACHE_NAME = 'smart-garden-v2.6';
 
 const STATIC_ASSETS = [
   './',
@@ -44,9 +44,8 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch: Stale-while-revalidate for dynamic, Cache-first for static assets
+// Fetch: Network-First strategy so users ALWAYS get the latest published code immediately!
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
@@ -55,27 +54,20 @@ self.addEventListener('fetch', (event) => {
   if (!url.protocol.startsWith('http') || url.hostname.includes('yandex.ru')) return;
 
   event.respondWith(
-    caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
-      // Return cached response if found
-      const fetchPromise = fetch(event.request).then((networkResponse) => {
-        // If valid response, update cache in background
-        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-        }
-        return networkResponse;
-      }).catch(() => {
-        // Network failed (offline)
-        // If requesting a page/document, fallback to cached index.html
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html', { ignoreSearch: true }) || cachedResponse;
-        }
-        return cachedResponse;
-      });
-
-      return cachedResponse || fetchPromise;
+    fetch(event.request).then((networkResponse) => {
+      if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+        const responseToCache = networkResponse.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, responseToCache);
+        });
+      }
+      return networkResponse;
+    }).catch(() => {
+      // Offline fallback: return cached version
+      if (event.request.mode === 'navigate') {
+        return caches.match('./index.html', { ignoreSearch: true });
+      }
+      return caches.match(event.request, { ignoreSearch: true });
     })
   );
 });

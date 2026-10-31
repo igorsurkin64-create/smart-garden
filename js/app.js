@@ -829,11 +829,19 @@ class GardenApp {
          currentLang === 'lt' ? `Sodinimas ${activeYear} metams:` :
          `Посадка на ${activeYear} год:`);
 
+    const cropSelectLabel = currentLang === 'et' ? 'Kultuur (taim):' :
+                            currentLang === 'lv' ? 'Kultūra (augs):' :
+                            currentLang === 'lt' ? 'Augalas (daržovė):' :
+                            'Культура (растение):';
     const comboboxPh = window.t ? window.t('inspector_combobox_placeholder') : 'Начните вводить...';
     const varietyLabel = window.t ? window.t('inspector_variety_label') : 'Сорт или гибрид (необязательно):';
     const notesLabel = window.t ? window.t('inspector_notes_label') : 'Заметка к посадке (необязательно):';
     const varietyPh = window.t ? window.t('inspector_variety_placeholder') : 'Сорт или гибрид...';
     const notesPh = window.t ? window.t('inspector_notes_placeholder') : 'Заметка к посадке...';
+    const noteHelpText = currentLang === 'et' ? 'Isiklikud märkmed: külvikuupäevad, kastmine, hooldus (valikuline)' :
+                         currentLang === 'lv' ? 'Personīgās piezīmes: sēšanas datumi, laistīšana, kopšana (neobligāti)' :
+                         currentLang === 'lt' ? 'Asmeniniai užrašai: sėjos datos, laistymas, priežiūra (nebūtina)' :
+                         'Личные пометки: даты посева, полив, схема (необязательно)';
     const savePlantingBtnText = currentLang === 'et' ? `💾 Salvesta ${activeYear}. a külv` :
                                currentLang === 'lv' ? `💾 Saglabāt ${activeYear}. g. stādījumu` :
                                currentLang === 'lt' ? `💾 Išsaugoti ${activeYear} m. sodinimą` :
@@ -880,7 +888,7 @@ class GardenApp {
           </h2>
           <span class="text-xs text-muted">${dimText}</span>
         </div>
-        <button class="close-inspector-btn" id="close-inspector-btn">&times;</button>
+        <button class="close-inspector-btn" id="close-inspector-btn" title="Закрыть панель (Esc)" aria-label="Закрыть">&times;</button>
       </div>
 
       <div class="inspector-body">
@@ -973,39 +981,50 @@ class GardenApp {
           <label class="section-label">
             ${plantingLabel}
           </label>
-          <div class="crop-combobox-wrap" id="crop-combobox-wrap">
-            <input type="hidden" id="inspector-crop-select" value="${currentPlanting.cropId || ''}">
-            
-            <div class="combobox-field" id="crop-combobox-field">
-              <span class="combobox-lead-icon" id="combobox-selected-icon">
-                ${currentCrop ? getCropSvg(currentCrop.id) : '<span style="font-size: 1.15rem;">🌱</span>'}
-              </span>
-              <input type="text"
-                     id="inspector-crop-combobox-input"
-                     class="combobox-input"
-                     placeholder="${comboboxPh}"
-                     autocomplete="off"
-                     value="${currentCrop ? escapeHtml(getCropName(currentCrop, currentLang)) : ''}">
-              <button type="button" class="combobox-clear-btn ${currentCrop ? 'visible' : ''}" id="combobox-clear-btn" title="✕">✕</button>
-              <button type="button" class="combobox-toggle-btn" id="combobox-toggle-btn" title="▾">▾</button>
-            </div>
 
-            <div class="crop-combobox-dropdown" id="crop-combobox-dropdown" style="display: none;">
-              <!-- Элементы списка генерируются через setupCropCombobox -->
+          <div class="form-group">
+            <label class="form-sublabel" style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">
+              🌱 ${cropSelectLabel}
+            </label>
+            <div class="crop-combobox-wrap" id="crop-combobox-wrap">
+              <input type="hidden" id="inspector-crop-select" value="${currentPlanting.cropId || ''}">
+              
+              <div class="combobox-field" id="crop-combobox-field">
+                <span class="combobox-lead-icon" id="combobox-selected-icon">
+                  ${currentCrop ? getCropSvg(currentCrop.id) : '<span style="font-size: 1.15rem;">🌱</span>'}
+                </span>
+                <input type="text"
+                       id="inspector-crop-combobox-input"
+                       class="combobox-input"
+                       placeholder="${comboboxPh}"
+                       autocomplete="off"
+                       value="${currentCrop ? escapeHtml(getCropName(currentCrop, currentLang)) : ''}">
+                <button type="button" class="combobox-clear-btn ${currentCrop ? 'visible' : ''}" id="combobox-clear-btn" title="✕">✕</button>
+                <button type="button" class="combobox-toggle-btn" id="combobox-toggle-btn" title="▾">▾</button>
+              </div>
+
+              <div class="crop-combobox-dropdown" id="crop-combobox-dropdown" style="display: none;">
+                <!-- Элементы списка генерируются через setupCropCombobox -->
+              </div>
             </div>
           </div>
 
-          <div class="form-group mt-2">
-            <label class="form-sublabel" for="inspector-variety-input">${varietyLabel}</label>
+          <div class="form-group mt-3">
+            <label class="form-sublabel" for="inspector-variety-input" style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">
+              🏷️ ${varietyLabel}
+            </label>
             <input type="text" id="inspector-variety-input" class="form-input" placeholder="${varietyPh}" value="${escapeHtml(currentPlanting.variety || '')}">
           </div>
 
-          <div class="form-group mt-2">
-            <label class="form-sublabel" for="inspector-note-input">${notesLabel}</label>
+          <div class="form-group mt-3">
+            <label class="form-sublabel" for="inspector-note-input" style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">
+              📝 ${notesLabel}
+            </label>
             <input type="text" id="inspector-note-input" class="form-input" placeholder="${notesPh}" value="${escapeHtml(currentPlanting.note || '')}">
+            <small class="text-xs text-muted" style="display: block; margin-top: 3px;">${noteHelpText}</small>
           </div>
 
-          <button class="btn btn-primary btn-block mt-2" id="inspector-save-planting-btn">
+          <button class="btn btn-primary btn-block mt-3" id="inspector-save-planting-btn">
             ${savePlantingBtnText}
           </button>
         </div>
@@ -1903,8 +1922,18 @@ class GardenApp {
     zenBtn.addEventListener('click', () => toggleZen());
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && appContainer.classList.contains('zen-mode')) {
-        toggleZen(false);
+      if (e.key === 'Escape') {
+        const drawer = document.getElementById('bed-inspector-drawer');
+        if (drawer && drawer.classList.contains('open')) {
+          this.closeBedInspector();
+          if (this.gardenMap) {
+            this.gardenMap.selectBed(null, null);
+          }
+          return;
+        }
+        if (appContainer.classList.contains('zen-mode')) {
+          toggleZen(false);
+        }
       }
     });
 
