@@ -586,7 +586,7 @@
       </div>
 
       <div class="print-map-schematic">
-        <svg viewBox="0 0 ${svgW} ${svgH}" width="100%" height="130" style="display:block; max-height: 130px;">
+        <svg viewBox="0 0 ${svgW} ${svgH}" width="100%" height="110" style="display:block; max-height: 110px;">
           ${svgBedsHtml}
         </svg>
       </div>
@@ -631,9 +631,14 @@
         <div class="print-note-line"></div>
         <div class="print-note-line"></div>
         <div class="print-note-line"></div>
-        <div class="print-note-line"></div>
       </div>
-    `;
+    `.trim();
+
+    const cleanupAfterPrint = () => {
+      printContainer.innerHTML = '';
+      window.removeEventListener('afterprint', cleanupAfterPrint);
+    };
+    window.addEventListener('afterprint', cleanupAfterPrint);
 
     window.print();
   },

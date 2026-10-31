@@ -6755,18 +6755,35 @@ html, body {
 
 @media print {
   @page {
-    size: A4 landscape;
-    margin: 8mm;
+    size: auto;
+    margin: 5mm 6mm;
   }
 
-  body {
+  html, body {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
     background: #ffffff !important;
     color: #000000 !important;
-    font-size: 9.5pt;
-    line-height: 1.25;
+    font-size: 8.5pt;
+    line-height: 1.2;
   }
 
-  /* Скрываем весь стандартный интерфейс при печати */
+  /* Полностью скрываем абсолютно все элементы страницы в body, кроме печатного макета */
+  body > *:not(#garden-print-layout) {
+    display: none !important;
+    height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    overflow: hidden !important;
+  }
+
+  /* Скрываем стандартный интерфейс */
   .app-container,
   .app-header,
   .app-navigation,
@@ -6790,12 +6807,14 @@ html, body {
     width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
   }
 
   .print-header {
     border-bottom: 2px solid #000000;
-    padding-bottom: 4px;
-    margin-bottom: 6px;
+    padding-bottom: 3px;
+    margin-bottom: 4px;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
@@ -6804,21 +6823,21 @@ html, body {
   }
 
   .print-header h1 {
-    font-size: 14pt;
+    font-size: 13pt;
     color: #000000 !important;
     margin: 0;
   }
 
   .print-meta {
-    font-size: 8pt;
+    font-size: 7.5pt;
     color: #333333;
   }
 
   .print-map-schematic {
     border: 1px solid #999999;
     border-radius: 4px;
-    padding: 4px;
-    margin-bottom: 6px;
+    padding: 3px;
+    margin-bottom: 4px;
     background: #fbfbfb;
     page-break-inside: avoid;
     break-inside: avoid;
@@ -6827,14 +6846,14 @@ html, body {
   .print-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 8pt;
-    margin-bottom: 6px;
+    font-size: 7.5pt;
+    margin-bottom: 4px;
   }
 
   .print-table th,
   .print-table td {
     border: 1px solid #444444;
-    padding: 2.5px 4px;
+    padding: 2px 3.5px;
     text-align: left;
   }
 
@@ -6855,17 +6874,21 @@ html, body {
 
   .print-notes-section {
     border: 1px dashed #666666;
-    padding: 5px;
-    margin-top: 6px;
-    font-size: 7.8pt;
+    border-radius: 3px;
+    padding: 4px;
+    margin-top: 4px;
+    margin-bottom: 0 !important;
+    font-size: 7.5pt;
     page-break-inside: avoid;
     break-inside: avoid;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
   }
 
   .print-note-line {
     border-bottom: 1px dotted #888888;
-    height: 12px;
-    margin-top: 3px;
+    height: 11px;
+    margin-top: 2px;
   }
 }
 
