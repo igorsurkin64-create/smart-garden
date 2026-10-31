@@ -2743,8 +2743,76 @@ html, body {
 
 .gh-bed-horizontal {
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4px 8px;
+}
+
+.gh-bed-h-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  gap: 3px;
+}
+
+.gh-bed-h-top-row {
+  display: flex;
   align-items: center;
-  padding: 5px 9px;
+  justify-content: space-between;
+  width: 100%;
+  gap: 6px;
+  min-height: 22px;
+}
+
+.gh-h-top-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.gh-h-top-right {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.gh-bed-h-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-top: 1px;
+}
+
+.gh-bed-h-bottom-row .gh-holes-micro-strip {
+  width: 100%;
+  max-width: 100%;
+  justify-content: center;
+  align-items: center;
+  background: rgba(241, 245, 249, 0.75);
+  padding: 2.5px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(203, 213, 225, 0.7);
+}
+
+[data-theme="dark"] .gh-bed-h-bottom-row .gh-holes-micro-strip {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(71, 85, 105, 0.7);
+}
+
+.gh-bed-h-bottom-row .gh-holes-micro-row {
+  justify-content: center;
+  gap: 4px;
+}
+
+.gh-bed-h-bottom-row .gh-micro-hole {
+  width: 7.5px;
+  height: 7.5px;
 }
 
 .gh-internal-bed-row {
