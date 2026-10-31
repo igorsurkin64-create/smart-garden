@@ -375,6 +375,12 @@ class GardenApp {
   // --- Вынесено в отдельный модуль: renderRotationGuideView ---
 
   openBedInspector(bedId, sectionId = null) {
+    // Гарантированно закрываем любое модальное окно, чтобы экран никогда не оставался затемнённым
+    const generalModal = document.getElementById('general-modal');
+    if (generalModal && generalModal.classList.contains('active')) {
+      generalModal.classList.remove('active');
+    }
+
     this.activeInspectorBedId = bedId;
     const bed = this.storage.getBedById(bedId);
     if (!bed) return;
@@ -1606,6 +1612,16 @@ class GardenApp {
   // --- Вынесено в отдельный модуль: openStorageFullModal ---
 
   setupEventListeners() {
+    // Закрытие модального окна по клику на затемненный фон (любое случайное зависание)
+    const generalModal = document.getElementById('general-modal');
+    if (generalModal) {
+      generalModal.addEventListener('click', (e) => {
+        if (e.target === generalModal || e.target.id === 'modal-dynamic-content') {
+          generalModal.classList.remove('active');
+        }
+      });
+    }
+
     // Переключатель темы
     const themeBtn = document.getElementById('theme-toggle-btn');
     if (themeBtn) {
@@ -1815,6 +1831,11 @@ class GardenApp {
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
+        const modal = document.getElementById('general-modal');
+        if (modal && modal.classList.contains('active')) {
+          modal.classList.remove('active');
+          return;
+        }
         const drawer = document.getElementById('bed-inspector-drawer');
         if (drawer && drawer.classList.contains('open')) {
           this.closeBedInspector();

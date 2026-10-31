@@ -995,6 +995,12 @@ class GardenMap {
   }
 
   selectBed(bedId, sectionId = null) {
+    // Если на экране оставалось открыто модальное окно, закрываем его
+    const modal = document.getElementById('general-modal');
+    if (modal && modal.classList.contains('active')) {
+      modal.classList.remove('active');
+    }
+
     this.selectedBedId = bedId;
     this.selectedSectionId = sectionId;
 

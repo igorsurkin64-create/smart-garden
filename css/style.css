@@ -4197,7 +4197,8 @@ html, body {
   animation: fadeIn 0.2s ease;
 }
 
-.modal-card {
+.modal-card,
+.modal-content {
   background: var(--bg-secondary);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);

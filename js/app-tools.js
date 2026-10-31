@@ -321,7 +321,7 @@
       const stats = calculateTotalGardenWater(beds, activeYear, currentWeather);
 
       modalContent.innerHTML = `
-        <div class="modal-content" style="max-width: 760px; max-height: 90vh; display: flex; flex-direction: column;">
+        <div class="modal-card modal-content" style="max-width: 760px; max-height: 90vh; display: flex; flex-direction: column;">
           <div class="modal-header">
             <h3 style="display: flex; align-items: center; gap: 8px;">💧 Калькулятор полива огорода (${activeYear} г.)</h3>
             <button class="modal-close-btn">&times;</button>
@@ -408,8 +408,8 @@
       });
     };
 
-    modal.classList.add('active');
     render();
+    modal.classList.add('active');
   },
 
   openStorageFullModal() {
@@ -425,7 +425,7 @@
     }
 
     modalContent.innerHTML = `
-      <div class="modal-content" style="max-width: 520px; border-top: 5px solid #ef4444;">
+      <div class="modal-card modal-content" style="max-width: 520px; border-top: 5px solid #ef4444;">
         <div class="modal-header">
           <h3 style="color: #ef4444; display: flex; align-items: center; gap: 8px;">⚠️ Память браузера переполнена!</h3>
           <button class="modal-close-btn">&times;</button>
@@ -811,7 +811,7 @@
       }
 
       modalContent.innerHTML = `
-        <div class="modal-content" style="max-width: 480px;">
+        <div class="modal-card modal-content" style="max-width: 480px;">
           <div class="modal-header">
             <h3 style="display: flex; align-items: center; gap: 8px;">
               🌱 Настройка лунки №${hole.index}
@@ -925,8 +925,12 @@
       }
     };
 
-    modal.classList.add('active');
-    renderModal();
+    renderModal().then(() => {
+      modal.classList.add('active');
+    }).catch(err => {
+      console.error('Error rendering hole edit modal:', err);
+      modal.classList.remove('active');
+    });
   },
 
   async openVarietyCatalogModal(initialCropId = null) {
@@ -952,7 +956,7 @@
       }
 
       modalContent.innerHTML = `
-        <div class="modal-content" style="max-width: 680px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-card modal-content" style="max-width: 680px; max-height: 85vh; display: flex; flex-direction: column;">
           <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between;">
             <h3 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1.15rem;">
               🏷️ Картотека сортов с фото
@@ -1196,8 +1200,12 @@
       });
     };
 
-    modal.classList.add('active');
-    render();
+    render().then(() => {
+      modal.classList.add('active');
+    }).catch(err => {
+      console.error('Error rendering variety catalog modal:', err);
+      modal.classList.remove('active');
+    });
   }
   });
 })();
