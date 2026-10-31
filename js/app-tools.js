@@ -473,6 +473,15 @@
     let currentPattern = planting.plantingPattern || 'zigzag';
     let holes = Array.isArray(planting.holes) ? JSON.parse(JSON.stringify(planting.holes)) : [];
 
+    // Определяем преобладающую культуру грядки/лунок для контекстных подсказок
+    const inspectorSelectCrop = document.getElementById('inspector-crop-select')?.value;
+    const existingHoleCrop = holes.find(h => h && h.cropId)?.cropId;
+    const bedEffectiveCropId = planting.cropId 
+      || inspectorSelectCrop 
+      || existingHoleCrop 
+      || (typeof window !== 'undefined' ? window._lastSelectedHoleCropId : null) 
+      || null;
+
     const bedLength = Math.max(bed.width, bed.height);
     const defaultHoleCount = currentPattern === 'single'
       ? Math.max(4, Math.min(24, Math.round(bedLength / 0.45)))
@@ -511,12 +520,13 @@
           enableBtn.onclick = () => {
             isExpanded = true;
             const initCount = defaultHoleCount;
+            const initCrop = bedEffectiveCropId || planting.cropId || null;
             holes = [];
             for (let i = 1; i <= initCount; i++) {
               holes.push({
                 index: i,
-                cropId: planting.cropId || null,
-                variety: planting.variety || '',
+                cropId: initCrop,
+                variety: i === 1 && planting.variety ? planting.variety : '',
                 note: ''
               });
             }
@@ -534,7 +544,7 @@
       let savedVarieties = [];
       try {
         if (window.photoStorage) {
-          savedVarieties = await window.photoStorage.getVarieties(planting.cropId || null);
+          savedVarieties = await window.photoStorage.getVarieties(bedEffectiveCropId || planting.cropId || null);
         }
       } catch (e) {
         console.warn('Could not load varieties:', e);
@@ -578,7 +588,8 @@
         `;
       };
 
-      const effectiveCrop = planting.cropId ? getCropById(planting.cropId) : null;
+      const effectiveCropId = bedEffectiveCropId || planting.cropId || null;
+      const effectiveCrop = effectiveCropId ? getCropById(effectiveCropId) : null;
       const popVarieties = effectiveCrop?.popularVarieties || [];
 
       // Доска грядки
@@ -688,10 +699,11 @@
       if (plusBtn) {
         plusBtn.onclick = () => {
           if (holes.length < 40) {
+            const nextCrop = bedEffectiveCropId || planting.cropId || holes[holes.length - 1]?.cropId || null;
             holes.push({
               index: holes.length + 1,
-              cropId: planting.cropId || null,
-              variety: planting.variety || '',
+              cropId: nextCrop,
+              variety: '',
               note: ''
             });
             render();
@@ -712,7 +724,7 @@
           const start = Math.min(fromIdx, toIdx);
           const end = Math.max(fromIdx, toIdx);
 
-          const defaultCrop = planting.cropId || holes.find(h => h && h.cropId)?.cropId || 'tomato';
+          const defaultCrop = bedEffectiveCropId || planting.cropId || holes.find(h => h && h.cropId)?.cropId || 'cucumber';
           for (let i = start; i <= end; i++) {
             if (holes[i]) {
               holes[i].variety = varietyVal;
@@ -747,7 +759,7 @@
       const catBtn = content.querySelector('#btn-open-variety-catalog');
       if (catBtn) {
         catBtn.onclick = () => {
-          this.openVarietyCatalogModal(planting.cropId);
+          this.openVarietyCatalogModal(bedEffectiveCropId || planting.cropId);
         };
       }
 
@@ -811,7 +823,26 @@
     const hole = holes[holeIndex] || { index: holeIndex + 1, cropId: null, variety: '', note: '' };
     const target = (bed.sections && bed.sections.length > 0 && activeSection) ? activeSection : bed;
     const planting = target.history?.[activeYear] || {};
-    let currentCropId = hole.cropId || planting.cropId || 'tomato';
+
+    const inspectorSelectCrop = document.getElementById('inspector-crop-select')?.value;
+    const prevHoleCrop = holeIndex > 0 ? holes[holeIndex - 1]?.cropId : null;
+    const nextHoleCrop = (holeIndex + 1 < holes.length) ? holes[holeIndex + 1]?.cropId : null;
+    const anyHoleCrop = holes.find(h => h && h.cropId)?.cropId;
+    const lastSelectedCrop = (typeof window !== 'undefined') ? window._lastSelectedHoleCropId : null;
+
+    let currentCropId = hole.cropId 
+      || prevHoleCrop 
+      || nextHoleCrop 
+      || anyHoleCrop 
+      || inspectorSelectCrop 
+      || planting.cropId 
+      || lastSelectedCrop 
+      || 'cucumber';
+
+    hole.cropId = currentCropId;
+    if (typeof window !== 'undefined') {
+      window._lastSelectedHoleCropId = currentCropId;
+    }
 
     let currentPhotoUrl = null;
 
@@ -912,6 +943,9 @@
         cropSelect.onchange = () => {
           currentCropId = cropSelect.value;
           hole.cropId = cropSelect.value;
+          if (typeof window !== 'undefined') {
+            window._lastSelectedHoleCropId = cropSelect.value;
+          }
           currentPhotoUrl = null;
           renderModal();
         };
@@ -965,6 +999,38 @@
           hole.variety = newVariety;
           hole.note = newNote;
 
+          if (typeof window !== 'undefined') {
+            window._lastSelectedHoleCropId = newCrop;
+          }
+
+          // Автоматически распространяем выбранную культуру на все незаполненные лунки грядки,
+          // чтобы при открытии следующей лунки сразу по умолчанию был огурец (или выбранная культура), а не томат!
+          holes.forEach(h => {
+            if (h && !h.cropId) {
+              h.cropId = newCrop;
+            }
+          });
+
+          // Синхронизируем культуру с текущей грядкой/секцией если она еще не была задана
+          if (!target.history) target.history = {};
+          if (!target.history[activeYear]) target.history[activeYear] = {};
+          if (!target.history[activeYear].cropId) {
+            target.history[activeYear].cropId = newCrop;
+          }
+          const inspectorCropSelect = document.getElementById('inspector-crop-select');
+          if (inspectorCropSelect && (!inspectorCropSelect.value || inspectorCropSelect.value === 'fallow')) {
+            inspectorCropSelect.value = newCrop;
+            const comboboxInput = document.getElementById('inspector-crop-combobox-input');
+            const leadIcon = document.getElementById('combobox-selected-icon');
+            const cObj = getCropById(newCrop);
+            if (comboboxInput && cObj) {
+              comboboxInput.value = getCropName(cObj, currentLang);
+            }
+            if (leadIcon && cObj) {
+              leadIcon.innerHTML = getCropSvg(cObj.id);
+            }
+          }
+
           if (currentPhotoUrl && newVariety && window.photoStorage) {
             await window.photoStorage.saveVariety(newCrop, newVariety, currentPhotoUrl);
           }
@@ -996,7 +1062,9 @@
 
     let activeFilterCrop = initialCropId || 'all';
     let isAdding = false;
-    let newCropId = (initialCropId && initialCropId !== 'all') ? initialCropId : 'tomato';
+    let newCropId = (initialCropId && initialCropId !== 'all') 
+      ? initialCropId 
+      : ((typeof window !== 'undefined' && window._lastSelectedHoleCropId) ? window._lastSelectedHoleCropId : 'tomato');
     let newPhotoUrl = null;
 
     const allCrops = (typeof window !== 'undefined' && window.CROPS_DATABASE) ? window.CROPS_DATABASE : [];

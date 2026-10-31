@@ -986,7 +986,7 @@ class GardenApp {
     });
 
     // Инициализация интерактивного комбобокса с живым поиском и созданием новой культуры
-    this.setupCropCombobox(bedId, activeSection, history, targetArea, neighborCropIds);
+    this.setupCropCombobox(bedId, activeSection, history, targetArea, neighborCropIds, activeYear, bed);
 
     // Инициализация калькулятора полива, схемы лунок, журнала подкормок и фотогалереи
     this.setupInspectorWaterCalculator(bed, targetArea, currentPlanting.cropId, currentLang);
@@ -995,7 +995,7 @@ class GardenApp {
     this.setupInspectorPhotos(bed, activeYear, currentLang);
   }
 
-  setupCropCombobox(bedId, activeSection, history, targetArea = 0, neighborCropIds = []) {
+  setupCropCombobox(bedId, activeSection, history, targetArea = 0, neighborCropIds = [], activeYear = null, bed = null) {
     const wrap = document.getElementById('crop-combobox-wrap');
     const input = document.getElementById('inspector-crop-combobox-input');
     const hiddenSelect = document.getElementById('inspector-crop-select');
@@ -1166,6 +1166,19 @@ class GardenApp {
         leadIcon.innerHTML = getCropSvg(crop.id);
         if (clearBtn) clearBtn.classList.add('visible');
         updateRotationPreview(crop.id);
+        if (typeof window !== 'undefined') {
+          window._lastSelectedHoleCropId = crop.id;
+        }
+        if (bed && activeYear) {
+          const targetObj = (bed.sections && bed.sections.length > 0 && activeSection) ? activeSection : bed;
+          const targetPlanting = targetObj.history?.[activeYear];
+          if (targetPlanting && Array.isArray(targetPlanting.holes)) {
+            targetPlanting.holes.forEach(h => {
+              if (h && !h.cropId) h.cropId = crop.id;
+            });
+          }
+          this.setupInspectorHoles(bed, activeSection, activeYear, currentLang);
+        }
       } else {
         hiddenSelect.value = '';
         input.value = '';
