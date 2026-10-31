@@ -518,6 +518,26 @@ class GardenMap {
       ? 'bed-type-greenhouse greenhouse-structure' 
       : `bed-type-${bed.type || 'raised'} bed-multi-section`;
 
+    // Общий статус севооборота для всей конструкции/теплицы (над всеми секциями в шапке)
+    let overallEval = null;
+    let worstScore = 999;
+    sections.forEach(sec => {
+      const secPlanting = sec.history?.[activeYear] || null;
+      const cId = secPlanting?.cropId || (secPlanting?.holes?.find(h => h && h.cropId)?.cropId);
+      if (cId) {
+        const secHist = this.storage.getBedHistoryArray(bed.id, activeYear, sec.id);
+        const ev = evaluateCropRotation(cId, secHist);
+        if (ev) {
+          const score = ev.status === 'danger' ? 0 : (ev.status === 'warning' ? 50 : 100);
+          if (score < worstScore) {
+            worstScore = score;
+            overallEval = ev;
+          }
+        }
+      }
+    });
+    const overallStatusBadge = overallEval ? this.getRotationBadge(overallEval, false) : '';
+
     return `
       <div class="bed-item ${bedClass} ${isInternalHorizontal ? 'gh-layout-rows' : 'gh-layout-cols'} ${isSelected ? 'selected' : ''}"
            id="bed-el-${bed.id}"
@@ -530,17 +550,18 @@ class GardenMap {
            "
            title="${escapeHtml(bedDispName)}: ${secCount} ${sectionWord}">
         
-        <!-- Excel-закладка («хвостик») сверху для названия и перемещения грядки -->
+        <!-- Excel-закладка («хвостик») сверху для названия и перемещения грядки (включает статус севооборота в ряд) -->
         <div class="bed-tab-handle" data-bed-id="${bed.id}" title="${escapeHtml(tr('drag_handle_title') || 'Зажмите и тяните за хвостик для перемещения грядки')}">
           <span class="bed-tab-icon">${typeIcon}</span>
           <span class="bed-tab-title">${escapeHtml(bedDispName)}</span>
+          ${overallStatusBadge ? `<span class="bed-tab-rot-wrap">${overallStatusBadge}</span>` : ''}
           <span class="bed-tab-grip">⋮⋮</span>
         </div>
 
         <!-- Конёк крыши для теплиц -->
         ${isGh ? `<div class="greenhouse-roof-ridge ${isGhHorizontal ? 'ridge-h' : 'ridge-v'}"></div>` : ''}
         
-        <!-- Полоса инструментов внутри грядки (без названия) -->
+        <!-- Полоса инструментов внутри грядки (над левой, над центр, над правой) -->
         <div class="bed-tools-bar">
           <div class="bed-tools-group">
             <button type="button" class="gh-tool-btn rotate-btn" data-bed-id="${bed.id}" title="${escapeHtml(tr('tool_rotate') || 'Повернуть на 90°')}">↻</button>
@@ -548,6 +569,11 @@ class GardenMap {
             <button type="button" class="gh-tool-btn clone-btn" data-bed-id="${bed.id}" title="${escapeHtml(tr('tool_clone') || 'Дублировать грядку')}">❐</button>
             <button type="button" class="gh-tool-btn delete-btn" data-bed-id="${bed.id}" title="${escapeHtml(tr('tool_delete') || 'Удалить с плана')}">🗑️</button>
           </div>
+          ${overallStatusBadge ? `
+            <div class="bed-tools-center-badge" title="Севооборот конструкции: ${escapeHtml(overallEval?.title || 'Идеально')}">
+              ${overallStatusBadge}
+            </div>
+          ` : ''}
           <span class="bed-sec-indicator">${secCount} ${sectionWord}</span>
         </div>
 
@@ -652,7 +678,10 @@ class GardenMap {
                   <div class="gh-internal-bed-row">
                     <div class="gh-strip-left">
                       <span class="gh-bed-num-badge">${secIdx + 1}</span>
-                      <span class="gh-bed-pill" title="${escapeHtml(secLocName)}">${escapeHtml(secShortName || `${secIdx + 1}`)}</span>
+                      <span class="gh-bed-pill" title="${escapeHtml(secLocName)}">
+                        ${escapeHtml(secShortName || `${secIdx + 1}`)}
+                        ${rotationEval ? `<span class="gh-pill-rot rot-${rotationEval.status}" title="${escapeHtml(rotationEval.reasons?.join('. ') || rotationEval.title)}">${rotationEval.status === 'optimal' ? '✓' : (rotationEval.status === 'warning' ? '!' : '✕')}</span>` : ''}
+                      </span>
                       ${currentCrop ? `
                         <div class="gh-crop-icon">${cropSvg}</div>
                         <div class="gh-crop-info-wrap">
@@ -681,7 +710,6 @@ class GardenMap {
                       `}
                     </div>
                     <div class="gh-strip-right">
-                      ${this.getRotationBadge(rotationEval, bed.width <= 3.5)}
                       ${prevCrop ? `
                         <span class="gh-prev-year-tag ${this.showPreviousYearOverlay ? 'highlight-prev' : ''}" title="${escapeHtml(grownInText)} ${escapeHtml(prevCropName)}">
                           <span class="prev-year-label">${prevYear}:</span>
@@ -884,10 +912,11 @@ class GardenMap {
            "
            title="${escapeHtml(bedDispName)}: ${currentCrop ? escapeHtml(currentCropName) : escapeHtml(unplantedText)}">
         
-        <!-- Excel-закладка («хвостик») сверху для названия и перемещения грядки -->
+        <!-- Excel-закладка («хвостик») сверху для названия и перемещения грядки (включает статус севооборота в ряд) -->
         <div class="bed-tab-handle" data-bed-id="${bed.id}" title="${escapeHtml(tr('drag_handle_title') || 'Зажмите и тяните за хвостик для перемещения грядки')}">
           <span class="bed-tab-icon">${typeIcon}</span>
           <span class="bed-tab-title">${escapeHtml(bedDispName)}</span>
+          ${statusBadge ? `<span class="bed-tab-rot-wrap">${statusBadge}</span>` : ''}
           <span class="bed-tab-grip">⋮⋮</span>
         </div>
 

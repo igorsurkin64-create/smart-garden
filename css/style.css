@@ -1319,6 +1319,88 @@ html, body {
   box-shadow: 0 -4px 12px var(--primary-glow) !important;
 }
 
+/* Бейдж севооборота в закладке названия грядки */
+.bed-tab-rot-wrap {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+}
+
+.bed-tab-rot-wrap .status-pill {
+  font-size: 0.70rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 800;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  white-space: nowrap;
+}
+
+.bed-tab-rot-wrap .status-pill.status-optimal {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #34d399;
+}
+
+.bed-tab-rot-wrap .status-pill.status-warning {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #f59e0b;
+}
+
+.bed-tab-rot-wrap .status-pill.status-danger {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #ef4444;
+}
+
+/* Бейдж севооборота по центру полосы инструментов над рядками (над Левой, над Центр, над Правой) */
+.bed-tools-center-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.bed-tools-center-badge .status-pill {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 1px 8px;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  white-space: nowrap;
+}
+
+/* Компактный индикатор севооборота внутри пилюли названия рядка */
+.gh-pill-rot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  font-size: 0.60rem;
+  font-weight: 900;
+  margin-left: 4px;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.gh-pill-rot.rot-optimal {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.gh-pill-rot.rot-warning {
+  background: #f59e0b;
+  color: #ffffff;
+}
+
+.gh-pill-rot.rot-danger {
+  background: #ef4444;
+  color: #ffffff;
+}
+
 /* Панель инструментов внутри грядок (освобождена от названия) */
 .bed-tools-bar {
   display: flex;

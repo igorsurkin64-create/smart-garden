@@ -529,8 +529,13 @@ class GardenApp {
       <div class="inspector-header">
         <div>
           <span class="inspector-badge">${this.advisor.formatBedType(bed.type)}</span>
-          <h2 class="inspector-title">
-            ${escapeHtml(bedTitle)}
+          <h2 class="inspector-title" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span>${escapeHtml(bedTitle)}</span>
+            ${rotationEval ? `
+              <span class="status-pill status-${rotationEval.status}" style="font-size: 0.72rem; font-weight: 800; padding: 1px 7px; border-radius: 4px;">
+                ${rotationEval.status === 'optimal' ? '✓ Идеально' : (rotationEval.status === 'warning' ? '⚠️ Внимание' : '✕ Нарушение')}
+              </span>
+            ` : ''}
             <button class="btn-rename-pill" id="btn-quick-rename-header" title="Быстро изменить название этой грядки">✏️ ${nameSubLabel}</button>
           </h2>
           <span class="text-xs text-muted">${dimText}</span>
@@ -608,11 +613,14 @@ class GardenApp {
               ${bed.sections.map((sec) => {
                 const secPlanting = sec.history?.[activeYear];
                 const secCrop = secPlanting?.cropId ? getCropById(secPlanting.cropId) : null;
+                const secHist = this.storage.getBedHistoryArray(bed.id, activeYear, sec.id);
+                const secRot = secPlanting?.cropId ? evaluateCropRotation(secPlanting.cropId, secHist) : null;
                 const isActive = sec.id === activeSection.id;
                 const secLocName = window.i18n ? window.i18n.getBedName(sec) : sec.name;
                 return `
                   <button type="button" class="gh-nav-tab ${isActive ? 'active' : ''}" data-section-id="${sec.id}">
                     ${secCrop ? secCrop.emoji : '🌱'} ${escapeHtml(secLocName)}
+                    ${secRot ? `<span class="gh-pill-rot rot-${secRot.status}" style="margin-left: 4px;">${secRot.status === 'optimal' ? '✓' : (secRot.status === 'warning' ? '!' : '✕')}</span>` : ''}
                   </button>
                 `;
               }).join('')}
@@ -625,9 +633,16 @@ class GardenApp {
 
         <!-- 4. Блок выбора посадки на активный год -->
         <div class="inspector-section">
-          <label class="section-label">
-            ${plantingLabel}
-          </label>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 4px;">
+            <label class="section-label" style="margin-bottom: 0;">
+              ${plantingLabel}
+            </label>
+            ${rotationEval ? `
+              <span class="status-pill status-${rotationEval.status}" style="font-size: 0.74rem; font-weight: 800; padding: 2px 8px; border-radius: 6px;" title="${escapeHtml(rotationEval.reasons?.join('. ') || rotationEval.title)}">
+                ${rotationEval.status === 'optimal' ? '✓ Идеально' : (rotationEval.status === 'warning' ? '⚠️ Внимание' : '✕ Нарушение')}
+              </span>
+            ` : ''}
+          </div>
 
           <div class="form-group">
             <label class="form-sublabel" style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">
