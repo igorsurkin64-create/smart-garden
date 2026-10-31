@@ -2055,6 +2055,453 @@ html, body {
   color: #94a3b8;
 }
 
+/* Вариант 1: Компактная цветная мини-лента лунок */
+.gh-holes-micro-strip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px;
+  background: rgba(241, 245, 249, 0.95);
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  cursor: pointer;
+  max-width: 220px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 1;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.gh-holes-micro-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.gh-holes-micro-strip:hover {
+  background: #ffffff;
+  border-color: #0284c7;
+  box-shadow: 0 1px 4px rgba(2, 132, 199, 0.25);
+  transform: translateY(-0.5px);
+}
+
+.gh-holes-micro-strip.is-vertical {
+  max-width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 2px 0;
+}
+
+[data-theme="dark"] .gh-holes-micro-strip {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: #475569;
+}
+
+[data-theme="dark"] .gh-holes-micro-strip:hover {
+  background: #1e293b;
+  border-color: #38bdf8;
+}
+
+.gh-micro-hole {
+  width: 6px;
+  height: 9px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  transition: transform 0.12s ease;
+  background-color: #cbd5e1;
+}
+
+.gh-micro-hole.is-planted {
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+.gh-micro-hole.is-empty {
+  background-color: rgba(203, 213, 225, 0.6);
+  border: 0.5px dashed #94a3b8;
+  opacity: 0.7;
+}
+
+[data-theme="dark"] .gh-micro-hole.is-empty {
+  background-color: rgba(71, 85, 105, 0.6);
+  border-color: #64748b;
+}
+
+.gh-micro-hole:hover {
+  transform: scale(1.4);
+  z-index: 5;
+}
+
+/* Вариант 2: Кнопка выпадающего списка сортов */
+.gh-varieties-dropdown-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  background: #ffffff;
+  border: 1.5px solid #0284c7;
+  border-radius: 12px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #0369a1;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(2, 132, 199, 0.12);
+  line-height: 1.25;
+  user-select: none;
+}
+
+.gh-varieties-dropdown-btn:hover {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+  transform: translateY(-0.5px);
+}
+
+.gh-varieties-dropdown-btn.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+}
+
+.gh-varieties-dropdown-btn.is-compact {
+  padding: 1px 6px;
+  font-size: 0.68rem;
+  margin: 1px 0;
+}
+
+.gh-btn-var-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.gh-btn-arrow {
+  font-size: 0.62rem;
+  transition: transform 0.15s ease;
+}
+
+.gh-varieties-dropdown-btn.active .gh-btn-arrow {
+  transform: rotate(180deg);
+}
+
+[data-theme="dark"] .gh-varieties-dropdown-btn {
+  background: #0f172a;
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+[data-theme="dark"] .gh-varieties-dropdown-btn:hover,
+[data-theme="dark"] .gh-varieties-dropdown-btn.active {
+  background: #38bdf8;
+  color: #0f172a;
+}
+
+/* Поповер сортов и лунок */
+.garden-varieties-popover {
+  position: fixed;
+  z-index: 99999;
+  width: 320px;
+  max-width: calc(100vw - 24px);
+  background: #ffffff;
+  border: 1.5px solid #0284c7;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: popoverFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+}
+
+@keyframes popoverFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+[data-theme="dark"] .garden-varieties-popover {
+  background: #0f172a;
+  border-color: #38bdf8;
+  color: #f8fafc;
+  box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.6);
+}
+
+.gvp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #f0f9ff;
+  border-bottom: 1px solid #bae6fd;
+}
+
+[data-theme="dark"] .gvp-header {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.gvp-header-lead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.gvp-crop-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.gvp-title {
+  font-size: 0.90rem;
+  font-weight: 800;
+  color: #0369a1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-theme="dark"] .gvp-title {
+  color: #38bdf8;
+}
+
+.gvp-subtitle {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+[data-theme="dark"] .gvp-subtitle {
+  color: #94a3b8;
+}
+
+.gvp-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.15rem;
+  line-height: 1;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: all 0.12s ease;
+}
+
+.gvp-close-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #0f172a;
+}
+
+[data-theme="dark"] .gvp-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+}
+
+.gvp-bar {
+  display: flex;
+  height: 6px;
+  width: 100%;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .gvp-bar {
+  background: #334155;
+}
+
+.gvp-bar-segment {
+  height: 100%;
+  transition: width 0.2s ease;
+}
+
+.gvp-bar-segment.is-empty {
+  background: repeating-linear-gradient(45deg, #cbd5e1 0px, #cbd5e1 4px, #e2e8f0 4px, #e2e8f0 8px);
+}
+
+[data-theme="dark"] .gvp-bar-segment.is-empty {
+  background: repeating-linear-gradient(45deg, #475569 0px, #475569 4px, #334155 4px, #334155 8px);
+}
+
+.gvp-list {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 10px;
+  max-height: 250px;
+  overflow-y: auto;
+  gap: 5px;
+}
+
+.gvp-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 9px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 6px;
+  transition: background 0.12s ease;
+}
+
+[data-theme="dark"] .gvp-item {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: #334155;
+}
+
+.gvp-item:hover {
+  background: #f1f5f9;
+}
+
+[data-theme="dark"] .gvp-item:hover {
+  background: rgba(30, 41, 59, 1);
+}
+
+.gvp-item.is-empty {
+  opacity: 0.75;
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+}
+
+[data-theme="dark"] .gvp-item.is-empty {
+  background: rgba(15, 23, 42, 0.4);
+  border-color: #475569;
+}
+
+.gvp-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.gvp-dot.is-empty {
+  background: #cbd5e1;
+  box-shadow: none;
+}
+
+[data-theme="dark"] .gvp-dot.is-empty {
+  background: #64748b;
+}
+
+.gvp-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.gvp-item-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.gvp-var-name {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+[data-theme="dark"] .gvp-var-name {
+  color: #f8fafc;
+}
+
+.gvp-empty-label {
+  font-size: 0.80rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+[data-theme="dark"] .gvp-empty-label {
+  color: #94a3b8;
+}
+
+.gvp-var-count {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #0369a1;
+  background: #e0f2fe;
+  padding: 1px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .gvp-var-count {
+  background: #0369a1;
+  color: #e0f2fe;
+}
+
+.gvp-item-meta {
+  font-size: 0.70rem;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+[data-theme="dark"] .gvp-item-meta {
+  color: #94a3b8;
+}
+
+.gvp-var-range strong {
+  color: #0284c7;
+}
+
+[data-theme="dark"] .gvp-var-range strong {
+  color: #38bdf8;
+}
+
+.gvp-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  gap: 8px;
+}
+
+[data-theme="dark"] .gvp-footer {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.gvp-footer-stat {
+  font-size: 0.72rem;
+  color: #475569;
+}
+
+[data-theme="dark"] .gvp-footer-stat {
+  color: #cbd5e1;
+}
+
+.gvp-footer-stat strong {
+  color: #10b981;
+}
+
+.gvp-edit-holes-btn {
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  background: #10b981;
+  color: #ffffff;
+  border: 1px solid #059669;
+  transition: all 0.15s ease;
+}
+
+.gvp-edit-holes-btn:hover {
+  background: #059669;
+}
+
 /* Компактные бейджи сортов для горизонтальных грядок */
 .gh-h-varieties-wrap {
   display: flex;
@@ -2215,12 +2662,12 @@ html, body {
 }
 
 .gh-crop-name {
-  font-size: 0.94rem;
+  font-size: 0.92rem;
   font-weight: 800;
   color: #000000;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex-shrink: 0;
+  line-height: 1.2;
 }
 
 [data-theme="dark"] .gh-crop-name {

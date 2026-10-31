@@ -903,11 +903,38 @@ function summarizeHolePlantings(holes = [], defaultCrop = null, lang = 'ru') {
   });
 
   const totalPlanted = targetHoles.length;
+  const plantedIndicesSet = new Set(targetHoles.map(h => h.index));
+  const emptyIndices = indexedHoles.filter(h => !plantedIndicesSet.has(h.index)).map(h => h.index);
+  const emptyRangeText = formatRanges(emptyIndices);
+
+  const holeMap = indexedHoles.map(h => {
+    const hasVar = Boolean(h.variety && h.variety.trim());
+    const vName = (h.variety || '').trim();
+    const cId = h.cropId || defaultCrop?.id || null;
+    const cropObj = cId ? getCropById(cId) : defaultCrop;
+    const isPlanted = hasVar || (!holesWithVariety.length && Boolean(h.cropId));
+    let color = '#cbd5e1';
+    if (hasVar) {
+      color = (typeof getVarietyColor === 'function' ? getVarietyColor(vName) : '#10b981');
+    } else if (isPlanted && cropObj) {
+      color = cropObj.color || '#10b981';
+    }
+    return {
+      index: h.index,
+      variety: vName,
+      cropId: cId,
+      isPlanted,
+      color
+    };
+  });
+
   return {
     totalHoles: holes.length,
     plantedCount: totalPlanted,
     emptyCount: holes.length - totalPlanted,
-    varieties
+    emptyRangeText,
+    varieties,
+    holes: holeMap
   };
 }
 

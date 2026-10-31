@@ -42,6 +42,8 @@ class GardenMap {
       initialPanY: 0
     };
 
+    this.activeVarietiesPopover = null;
+
     this.init();
   }
 
@@ -171,6 +173,21 @@ class GardenMap {
     window.addEventListener('resize', () => {
       this.centerPlotInView();
     });
+
+    // Закрытие поповера при клике вне него или по Esc
+    document.addEventListener('click', (e) => {
+      if (this.activeVarietiesPopover) {
+        if (!e.target.closest('#garden-varieties-popover') && !e.target.closest('.gh-varieties-dropdown-btn') && !e.target.closest('.gh-holes-micro-strip')) {
+          this.closeVarietiesPopover();
+        }
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.activeVarietiesPopover) {
+        this.closeVarietiesPopover();
+      }
+    });
   }
 
   setFilter(filterMode) {
@@ -200,6 +217,7 @@ class GardenMap {
   }
 
   zoomBy(factor, clientCenterX = null, clientCenterY = null, smooth = false) {
+    this.closeVarietiesPopover();
     const oldZoom = this.zoom;
     const newZoom = Math.max(0.3, Math.min(2.5, oldZoom * factor));
     if (oldZoom === newZoom) return;
@@ -343,6 +361,7 @@ class GardenMap {
   }
 
   render() {
+    this.closeVarietiesPopover();
     if (!this.bedsLayerEl) return;
 
     this.updateControlsLanguage();
@@ -683,16 +702,27 @@ class GardenMap {
                           <div class="gh-crop-heading-row">
                             <strong class="gh-crop-name">${escapeHtml(cleanCropName)}</strong>
                             ${holeSummary && holeSummary.varieties.length > 0 ? `
-                              <div class="gh-h-varieties-wrap">
-                                ${holeSummary.varieties.map(v => `
-                                  <span class="gh-h-var-badge" style="border-left-color: ${v.color};" title="Сорт: ${escapeHtml(v.variety)}, лунки: ${escapeHtml(v.rangeText)} (${v.count} шт)">
-                                    <span class="gh-v-var-dot" style="background-color: ${v.color};"></span>
-                                    <strong class="gh-h-var-name">${escapeHtml(v.variety)}</strong>
-                                    <span class="gh-h-var-pos">(${escapeHtml(v.rangeText)}${v.count > 1 ? ` • ${v.count} шт` : ''})</span>
-                                  </span>
+                              <!-- Вариант 1: Компактная цветная мини-лента лунок -->
+                              <div class="gh-holes-micro-strip" data-bed-id="${bed.id}" data-section-id="${sec.id}" title="Схема лунок: ${holeSummary.plantedCount} из ${holeSummary.totalHoles} высажено (нажмите для списка сортов)">
+                                ${holeSummary.holes.map(h => `
+                                  <span class="gh-micro-hole ${h.isPlanted ? 'is-planted' : 'is-empty'}"
+                                        style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
+                                        title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}"></span>
                                 `).join('')}
                               </div>
-                              <span class="gh-holes-chip-count" title="${holeSummary.plantedCount} кустов высажено">🌱 ${holeSummary.plantedCount} шт</span>
+
+                              <!-- Вариант 2: Кнопка выпадающего списка сортов -->
+                              <button type="button" class="gh-varieties-dropdown-btn" data-bed-id="${bed.id}" data-section-id="${sec.id}" title="Показать список сортов">
+                                <span class="gh-btn-var-dot" style="background-color: ${holeSummary.varieties[0]?.color || '#10b981'};"></span>
+                                <span class="gh-btn-var-label">
+                                  ${holeSummary.varieties.length === 1
+                                    ? escapeHtml(holeSummary.varieties[0].variety)
+                                    : `${holeSummary.varieties.length} ${holeSummary.varieties.length < 5 ? 'сорта' : 'сортов'}`}
+                                </span>
+                                <span class="gh-btn-arrow">▾</span>
+                              </button>
+
+                              <span class="gh-holes-chip-count" title="${holeSummary.plantedCount} кустов высажено из ${holeSummary.totalHoles} лунок">🌱 ${holeSummary.plantedCount}/${holeSummary.totalHoles}</span>
                             ` : (displayVariety ? `
                               <span class="gh-crop-var" title="${escapeHtml(displayVariety)}">(${escapeHtml(displayVariety)})</span>
                             ` : '')}
@@ -751,23 +781,28 @@ class GardenMap {
                         <div class="gh-v-crop-title" title="${escapeHtml(currentCropName)}">${escapeHtml(cleanCropName)}</div>
                         
                         ${holeSummary && holeSummary.varieties.length > 0 ? `
-                          <div class="gh-v-varieties-box">
-                            ${holeSummary.varieties.map(v => `
-                              <div class="gh-v-var-card" style="border-left-color: ${v.color};" title="Сорт: ${escapeHtml(v.variety)}, ${escapeHtml(v.rangeText)} (${v.count} шт)">
-                                <div class="gh-v-var-top">
-                                  <span class="gh-v-var-dot" style="background-color: ${v.color};"></span>
-                                  <strong class="gh-v-var-title">${escapeHtml(v.variety)}</strong>
-                                </div>
-                                <div class="gh-v-var-meta">
-                                  <span class="gh-v-var-range">${escapeHtml(v.rangeText)}</span>
-                                  <span class="gh-v-var-qty">${v.count} шт</span>
-                                </div>
-                              </div>
+                          <!-- Вариант 1: Компактная цветная мини-лента лунок -->
+                          <div class="gh-holes-micro-strip is-vertical" data-bed-id="${bed.id}" data-section-id="${sec.id}" title="Схема лунок: ${holeSummary.plantedCount} из ${holeSummary.totalHoles} высажено (нажмите для списка сортов)">
+                            ${holeSummary.holes.map(h => `
+                              <span class="gh-micro-hole ${h.isPlanted ? 'is-planted' : 'is-empty'}"
+                                    style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
+                                    title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}"></span>
                             `).join('')}
                           </div>
+
+                          <!-- Вариант 2: Кнопка выпадающего списка сортов -->
+                          <button type="button" class="gh-varieties-dropdown-btn is-compact" data-bed-id="${bed.id}" data-section-id="${sec.id}" title="Показать список сортов">
+                            <span class="gh-btn-var-dot" style="background-color: ${holeSummary.varieties[0]?.color || '#10b981'};"></span>
+                            <span class="gh-btn-var-label">
+                              ${holeSummary.varieties.length === 1 
+                                ? escapeHtml(holeSummary.varieties[0].variety)
+                                : `${holeSummary.varieties.length} ${holeSummary.varieties.length < 5 ? 'сорта' : 'сортов'}`}
+                            </span>
+                            <span class="gh-btn-arrow">▾</span>
+                          </button>
+
                           <div class="gh-v-summary-pill">
-                            🌱 ${holeSummary.plantedCount} куст${holeSummary.plantedCount === 1 ? '' : (holeSummary.plantedCount < 5 ? 'а' : 'ов')}
-                            ${holeSummary.emptyCount > 0 ? `<span class="gh-v-empty-sub"> (${holeSummary.emptyCount} св.)</span>` : ''}
+                            🌱 ${holeSummary.plantedCount}/${holeSummary.totalHoles}
                           </div>
                         ` : (displayVariety ? `
                           <span class="gh-v-variety-label" title="${escapeHtml(displayVariety)}">${escapeHtml(displayVariety)}</span>
@@ -937,16 +972,27 @@ class GardenMap {
                 <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
                   <strong class="crop-name">${escapeHtml(cleanCropName)}</strong>
                   ${holeSummary && holeSummary.varieties.length > 0 ? `
-                    <div class="gh-h-varieties-wrap">
-                      ${holeSummary.varieties.map(v => `
-                        <span class="gh-h-var-badge" style="border-left-color: ${v.color};" title="Сорт: ${escapeHtml(v.variety)}, лунки: ${escapeHtml(v.rangeText)} (${v.count} шт)">
-                          <span class="gh-v-var-dot" style="background-color: ${v.color};"></span>
-                          <strong class="gh-h-var-name">${escapeHtml(v.variety)}</strong>
-                          <span class="gh-h-var-pos">(${escapeHtml(v.rangeText)}${v.count > 1 ? ` • ${v.count} шт` : ''})</span>
-                        </span>
+                    <!-- Вариант 1: Компактная цветная мини-лента лунок -->
+                    <div class="gh-holes-micro-strip" data-bed-id="${bed.id}" title="Схема лунок: ${holeSummary.plantedCount} из ${holeSummary.totalHoles} высажено (нажмите для списка сортов)">
+                      ${holeSummary.holes.map(h => `
+                        <span class="gh-micro-hole ${h.isPlanted ? 'is-planted' : 'is-empty'}"
+                              style="${h.isPlanted ? `background-color: ${h.color}; border-color: ${h.color};` : ''}"
+                              title="№${h.index}: ${escapeHtml(h.variety || 'свободно')}"></span>
                       `).join('')}
                     </div>
-                    <span class="gh-holes-chip-count" title="${holeSummary.plantedCount} кустов высажено">🌱 ${holeSummary.plantedCount} шт</span>
+
+                    <!-- Вариант 2: Кнопка выпадающего списка сортов -->
+                    <button type="button" class="gh-varieties-dropdown-btn" data-bed-id="${bed.id}" title="Показать список сортов">
+                      <span class="gh-btn-var-dot" style="background-color: ${holeSummary.varieties[0]?.color || '#10b981'};"></span>
+                      <span class="gh-btn-var-label">
+                        ${holeSummary.varieties.length === 1 
+                          ? escapeHtml(holeSummary.varieties[0].variety)
+                          : `${holeSummary.varieties.length} ${holeSummary.varieties.length < 5 ? 'сорта' : 'сортов'}`}
+                      </span>
+                      <span class="gh-btn-arrow">▾</span>
+                    </button>
+
+                    <span class="gh-holes-chip-count" title="${holeSummary.plantedCount} кустов высажено из ${holeSummary.totalHoles} лунок">🌱 ${holeSummary.plantedCount}/${holeSummary.totalHoles}</span>
                   ` : (displayVariety ? `
                     <span class="crop-variety">${escapeHtml(displayVariety)}</span>
                   ` : '')}
@@ -1011,7 +1057,7 @@ class GardenMap {
     this.bedsLayerEl.querySelectorAll('.bed-item:not(.greenhouse-structure):not(.bed-multi-section)').forEach(el => {
       const bedId = el.getAttribute('data-bed-id');
       el.addEventListener('click', (e) => {
-        if (e.target.closest('.gh-tool-btn') || e.target.closest('.bed-action-mini')) return;
+        if (e.target.closest('.gh-tool-btn') || e.target.closest('.bed-action-mini') || e.target.closest('.gh-varieties-dropdown-btn') || e.target.closest('.gh-holes-micro-strip')) return;
         if (this.dragBedState.hasMoved) return;
         this.selectBed(bedId, null);
       });
@@ -1030,7 +1076,7 @@ class GardenMap {
       const bedId = ghEl.getAttribute('data-bed-id');
 
       ghEl.addEventListener('click', (e) => {
-        if (e.target.closest('.gh-tool-btn') || e.target.closest('.bed-action-mini')) return;
+        if (e.target.closest('.gh-tool-btn') || e.target.closest('.bed-action-mini') || e.target.closest('.gh-varieties-dropdown-btn') || e.target.closest('.gh-holes-micro-strip')) return;
         if (this.dragBedState.hasMoved) return;
 
         const secEl = e.target.closest('.gh-internal-bed');
@@ -1051,6 +1097,19 @@ class GardenMap {
     this.bedsLayerEl.querySelectorAll('.gh-tool-btn, .bed-action-mini').forEach(btn => {
       btn.addEventListener('mousedown', (e) => e.stopPropagation());
       btn.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+    });
+
+    // Вариант 1 + Вариант 2: клик по цветным меткам лунок или кнопке выпадающего списка
+    this.bedsLayerEl.querySelectorAll('.gh-varieties-dropdown-btn, .gh-holes-micro-strip').forEach(el => {
+      el.addEventListener('mousedown', (e) => e.stopPropagation());
+      el.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const bedId = el.getAttribute('data-bed-id');
+        const sectionId = el.getAttribute('data-section-id') || null;
+        this.showVarietiesPopover(el, bedId, sectionId);
+      });
     });
 
     // Поворот ↻
@@ -1209,6 +1268,7 @@ class GardenMap {
   }
 
   handleViewportMouseDown(e) {
+    this.closeVarietiesPopover();
     if (e.button === 1 || e.button === 0) {
       if (e.target.closest('.bed-item') || e.target.closest('.nav-control-btn')) {
         return;
@@ -1392,6 +1452,161 @@ class GardenMap {
       this.isPinching = false;
     }
     this.handleGlobalMouseUp();
+  }
+
+  closeVarietiesPopover() {
+    if (this.activeVarietiesPopover) {
+      if (this.activeVarietiesPopover.triggerBtn) {
+        this.activeVarietiesPopover.triggerBtn.classList.remove('active');
+      }
+      if (this.activeVarietiesPopover.element && this.activeVarietiesPopover.element.parentNode) {
+        this.activeVarietiesPopover.element.parentNode.removeChild(this.activeVarietiesPopover.element);
+      }
+      this.activeVarietiesPopover = null;
+    }
+  }
+
+  showVarietiesPopover(triggerEl, bedId, sectionId = null) {
+    if (this.activeVarietiesPopover && this.activeVarietiesPopover.triggerBtn === triggerEl) {
+      this.closeVarietiesPopover();
+      return;
+    }
+
+    this.closeVarietiesPopover();
+
+    const bed = this.storage.getBedById(bedId);
+    if (!bed) return;
+
+    const activeYear = this.storage.getActiveYear();
+    let sec = null;
+    let planting = null;
+    let secOrBedName = bed.name || 'Грядка';
+
+    if (sectionId && Array.isArray(bed.sections)) {
+      sec = bed.sections.find(s => s.id === sectionId);
+      if (sec) {
+        planting = sec.history?.[activeYear] || null;
+        secOrBedName = `${bed.name || 'Теплица'} • ${sec.name || 'Рядок'}`;
+      }
+    }
+    if (!planting) {
+      planting = bed.history?.[activeYear] || null;
+    }
+
+    const holes = planting?.holes || [];
+    if (!holes.length) return;
+
+    const cropId = planting?.cropId || holes.find(h => h && h.cropId)?.cropId || 'tomato';
+    const crop = getCropById(cropId);
+    const cropName = crop ? (typeof getCropName === 'function' ? getCropName(crop, this.currentLang) : crop.name) : 'Культура';
+    const holeSummary = (typeof summarizeHolePlantings === 'function') ? summarizeHolePlantings(holes, crop, this.currentLang) : null;
+    if (!holeSummary) return;
+
+    const popover = document.createElement('div');
+    popover.id = 'garden-varieties-popover';
+    popover.className = 'garden-varieties-popover';
+
+    popover.innerHTML = `
+      <div class="gvp-header">
+        <div class="gvp-header-lead">
+          <span class="gvp-crop-icon">${crop?.emoji || '🌱'}</span>
+          <div>
+            <div class="gvp-title">${escapeHtml(secOrBedName)}</div>
+            <div class="gvp-subtitle">${escapeHtml(cropName)} • ${holeSummary.totalHoles} лунок</div>
+          </div>
+        </div>
+        <button type="button" class="gvp-close-btn" title="Закрыть">✕</button>
+      </div>
+
+      <div class="gvp-bar">
+        ${holeSummary.varieties.map(v => `
+          <div class="gvp-bar-segment" style="width: ${(v.count / holeSummary.totalHoles) * 100}%; background-color: ${v.color};" title="${escapeHtml(v.variety)}: ${v.count} шт (${escapeHtml(v.rangeText)})"></div>
+        `).join('')}
+        ${holeSummary.emptyCount > 0 ? `
+          <div class="gvp-bar-segment is-empty" style="width: ${(holeSummary.emptyCount / holeSummary.totalHoles) * 100}%;" title="Свободно: ${holeSummary.emptyCount} шт"></div>
+        ` : ''}
+      </div>
+
+      <div class="gvp-list">
+        ${holeSummary.varieties.map(v => `
+          <div class="gvp-item">
+            <span class="gvp-dot" style="background-color: ${v.color};"></span>
+            <div class="gvp-item-body">
+              <div class="gvp-item-main">
+                <strong class="gvp-var-name">${escapeHtml(v.variety)}</strong>
+                <span class="gvp-var-count">${v.count} шт</span>
+              </div>
+              <div class="gvp-item-meta">
+                <span class="gvp-var-range">Лунки: <strong>${escapeHtml(v.rangeText)}</strong></span>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+
+        ${holeSummary.emptyCount > 0 ? `
+          <div class="gvp-item is-empty">
+            <span class="gvp-dot is-empty"></span>
+            <div class="gvp-item-body">
+              <div class="gvp-item-main">
+                <span class="gvp-empty-label">Свободные лунки</span>
+                <span class="gvp-var-count">${holeSummary.emptyCount} шт</span>
+              </div>
+              <div class="gvp-item-meta">
+                <span class="gvp-empty-range">${escapeHtml(holeSummary.emptyRangeText || 'не засажены')}</span>
+              </div>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+
+      <div class="gvp-footer">
+        <span class="gvp-footer-stat">Высажено: <strong>${holeSummary.plantedCount}</strong> из <strong>${holeSummary.totalHoles}</strong> кустов</span>
+        <button type="button" class="btn btn-sm btn-primary gvp-edit-holes-btn">Настроить лунки ✏️</button>
+      </div>
+    `;
+
+    document.body.appendChild(popover);
+
+    triggerEl.classList.add('active');
+    this.activeVarietiesPopover = {
+      element: popover,
+      triggerBtn: triggerEl
+    };
+
+    const rect = triggerEl.getBoundingClientRect();
+    const popoverWidth = 320;
+    let left = rect.left;
+    let top = rect.bottom + 8;
+
+    if (left + popoverWidth > window.innerWidth - 12) {
+      left = window.innerWidth - popoverWidth - 12;
+    }
+    if (left < 12) left = 12;
+
+    const popoverHeight = popover.offsetHeight || 320;
+    if (top + popoverHeight > window.innerHeight - 12) {
+      top = Math.max(12, rect.top - popoverHeight - 8);
+    }
+
+    popover.style.left = `${left}px`;
+    popover.style.top = `${top}px`;
+
+    popover.querySelector('.gvp-close-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.closeVarietiesPopover();
+    });
+
+    popover.querySelector('.gvp-edit-holes-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.closeVarietiesPopover();
+      this.selectBed(bedId, sectionId);
+      setTimeout(() => {
+        const box = document.getElementById('inspector-holes-box');
+        if (box) {
+          box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 250);
+    });
   }
 }
 
