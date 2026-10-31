@@ -176,6 +176,9 @@ class GardenApp {
     if (drawer) drawer.classList.remove('open');
     this.activeInspectorBedId = null;
     this.activeInspectorSectionId = null;
+    if (this.gardenMap) {
+      this.gardenMap.render();
+    }
   }
 
   showConfirmModal({ title, icon = '🗑️', message, confirmText = 'Подтвердить', confirmClass = 'btn-danger', onConfirm, onCancel }) {
@@ -815,6 +818,7 @@ class GardenApp {
       this.activeInspectorBedId = null;
       this.activeInspectorSectionId = null;
       this.gardenMap.selectBed(null, null);
+      this.gardenMap.render();
     });
 
     // Быстрое переименование в шапке инспектора

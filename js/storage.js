@@ -975,25 +975,70 @@ class GardenStorage {
     const bed = this.getBedById(bedId);
     if (!bed) return false;
 
+    let targetHistory = null;
     if (bed.sections && bed.sections.length > 0) {
       const sec = sectionId ? bed.sections.find(s => s.id === sectionId) : bed.sections[0];
       if (sec) {
         if (!sec.history) sec.history = {};
         if (!sec.history[year]) sec.history[year] = {};
-        sec.history[year].holes = holes;
-        sec.history[year].plantingPattern = pattern;
-        sec.history[year].updatedAt = new Date().toISOString();
-        this.saveData();
-        return true;
+        targetHistory = sec.history[year];
+      }
+    } else {
+      if (!bed.history) bed.history = {};
+      if (!bed.history[year]) bed.history[year] = {};
+      targetHistory = bed.history[year];
+    }
+
+    if (!targetHistory) return false;
+
+    targetHistory.holes = holes;
+    targetHistory.plantingPattern = pattern;
+    targetHistory.updatedAt = new Date().toISOString();
+
+    // Автоматическая синхронизация культуры и сортов из лунок
+    if (Array.isArray(holes) && holes.length > 0) {
+      const plantedHoles = holes.filter(h => h && (h.cropId || (h.variety && h.variety.trim())));
+      if (plantedHoles.length > 0) {
+        // Определяем культуру из лунок
+        const cropCounts = {};
+        plantedHoles.forEach(h => {
+          if (h.cropId) cropCounts[h.cropId] = (cropCounts[h.cropId] || 0) + 1;
+        });
+        let dominantCropId = null;
+        let maxCount = 0;
+        for (const [cid, cnt] of Object.entries(cropCounts)) {
+          if (cnt > maxCount) {
+            maxCount = cnt;
+            dominantCropId = cid;
+          }
+        }
+        if (!dominantCropId && !targetHistory.cropId) {
+          dominantCropId = 'tomato';
+        }
+        if (dominantCropId) {
+          targetHistory.cropId = dominantCropId;
+        }
+
+        // Собираем уникальные сорта
+        const varieties = [];
+        const seenVar = new Set();
+        holes.forEach(h => {
+          const v = (h.variety || '').trim();
+          if (v && !seenVar.has(v.toLowerCase())) {
+            seenVar.add(v.toLowerCase());
+            varieties.push(v);
+          }
+        });
+        if (varieties.length > 0) {
+          targetHistory.variety = varieties.join(', ');
+        }
       }
     }
 
-    if (!bed.history) bed.history = {};
-    if (!bed.history[year]) bed.history[year] = {};
-    bed.history[year].holes = holes;
-    bed.history[year].plantingPattern = pattern;
-    bed.history[year].updatedAt = new Date().toISOString();
     this.saveData();
+    try {
+      window.dispatchEvent(new CustomEvent('garden-data-changed', { detail: { bedId, year, sectionId } }));
+    } catch (_) {}
     return true;
   }
 

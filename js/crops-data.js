@@ -797,6 +797,24 @@ function getFamilyName(familyOrId, lang) {
   return family.nameRu || family.name;
 }
 
+const VARIETY_COLORS = [
+  '#059669', '#d97706', '#2563eb', '#7c3aed',
+  '#dc2626', '#0891b2', '#ea580c', '#4f46e5',
+  '#0d9488', '#b45309', '#1d4ed8', '#be185d'
+];
+
+function getVarietyColor(name) {
+  if (!name) return '#6b7280';
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  const idx = Math.abs(hash) % VARIETY_COLORS.length;
+  return VARIETY_COLORS[idx];
+}
+if (typeof window !== 'undefined') {
+  window.VARIETY_COLORS = VARIETY_COLORS;
+  window.getVarietyColor = getVarietyColor;
+}
+
 /**
  * Оценить севооборот для посадки культуры на грядку с известной историей
  * @param {string} newCropId - ID новой культуры для посадки

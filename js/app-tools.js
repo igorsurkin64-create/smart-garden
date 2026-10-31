@@ -712,10 +712,11 @@
           const start = Math.min(fromIdx, toIdx);
           const end = Math.max(fromIdx, toIdx);
 
+          const defaultCrop = planting.cropId || holes.find(h => h && h.cropId)?.cropId || 'tomato';
           for (let i = start; i <= end; i++) {
             if (holes[i]) {
               holes[i].variety = varietyVal;
-              if (planting.cropId) holes[i].cropId = planting.cropId;
+              holes[i].cropId = holes[i].cropId || defaultCrop;
             }
           }
           this.showToast(`Сорт «${varietyVal || '—'}» применён к лункам ${start + 1}–${end + 1}`);
@@ -755,6 +756,19 @@
       if (saveBtn) {
         saveBtn.onclick = () => {
           this.storage.updateBedHoles(bed.id, activeYear, holes, currentPattern, activeSection?.id);
+
+          // Синхронизируем поля в форме инспектора, если открыт
+          const targetObj = (bed.sections && bed.sections.length > 0 && activeSection) ? activeSection : bed;
+          const updatedPlanting = targetObj.history?.[activeYear] || {};
+          if (updatedPlanting.cropId) {
+            const cropSelect = document.getElementById('inspector-crop-select');
+            if (cropSelect) cropSelect.value = updatedPlanting.cropId;
+          }
+          if (updatedPlanting.variety) {
+            const varietyInput = document.getElementById('inspector-variety-input');
+            if (varietyInput) varietyInput.value = updatedPlanting.variety;
+          }
+
           this.showToast('✓ Схема посадки по лункам успешно сохранена!');
           if (this.gardenMap) this.gardenMap.render();
           render();

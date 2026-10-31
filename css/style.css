@@ -2048,6 +2048,111 @@ html, body {
   color: #ffffff;
 }
 
+/* Мини-полоса лунок и сортов на карте теплицы / грядки */
+.gh-crop-info-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  gap: 2px;
+}
+
+.gh-crop-heading-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+
+.gh-mini-holes-strip {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: wrap;
+  max-width: 100%;
+  margin-top: 2px;
+}
+
+.gh-mini-hole-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: #ffffff;
+  background-color: #10b981;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.gh-mini-hole-dot:hover {
+  transform: scale(1.28);
+  z-index: 5;
+}
+
+.gh-mini-hole-dot.empty {
+  background: rgba(148, 163, 184, 0.18);
+  border: 1px dashed #94a3b8;
+  color: #64748b;
+  box-shadow: none;
+}
+
+[data-theme="dark"] .gh-mini-hole-dot.empty {
+  background: rgba(100, 116, 139, 0.25);
+  border-color: #64748b;
+  color: #94a3b8;
+}
+
+.gh-mini-hole-more {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+
+.gh-holes-chip-count {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #065f46;
+  background: #d1fae5;
+  border: 1px solid #a7f3d0;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .gh-holes-chip-count {
+  color: #6ee7b7;
+  background: rgba(6, 95, 70, 0.4);
+  border-color: #047857;
+}
+
+.gh-v-mini-holes-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  margin-top: 4px;
+  width: 100%;
+}
+
+.gh-v-mini-holes-wrap .gh-mini-holes-strip {
+  justify-content: center;
+}
+
 .gh-prev-year-tag {
   font-size: 0.76rem;
   font-weight: 700;

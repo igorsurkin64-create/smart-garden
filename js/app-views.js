@@ -419,7 +419,9 @@
           const secArea = bedArea / bed.sections.length;
           const planting = sec.history?.[activeYear] || {};
           const prevPlanting = sec.history?.[activeYear - 1] || {};
-          const crop = planting.cropId ? getCropById(planting.cropId) : null;
+          const crop = planting.cropId 
+            ? getCropById(planting.cropId) 
+            : (planting.holes?.find(h => h && h.cropId) ? getCropById(planting.holes.find(h => h && h.cropId).cropId) : (planting.holes?.some(h => h && h.variety) ? getCropById('tomato') : null));
           const prevCrop = prevPlanting.cropId ? getCropById(prevPlanting.cropId) : null;
           const history = this.storage.getBedHistoryArray(bed.id, activeYear, sec.id);
           const rot = planting.cropId ? evaluateCropRotation(planting.cropId, history) : null;
@@ -455,7 +457,9 @@
       } else {
         const planting = bed.history?.[activeYear] || {};
         const prevPlanting = bed.history?.[activeYear - 1] || {};
-        const crop = planting.cropId ? getCropById(planting.cropId) : null;
+        const crop = planting.cropId 
+          ? getCropById(planting.cropId) 
+          : (planting.holes?.find(h => h && h.cropId) ? getCropById(planting.holes.find(h => h && h.cropId).cropId) : (planting.holes?.some(h => h && h.variety) ? getCropById('tomato') : null));
         const prevCrop = prevPlanting.cropId ? getCropById(prevPlanting.cropId) : null;
         const history = this.storage.getBedHistoryArray(bed.id, activeYear, null);
         const rot = planting.cropId ? evaluateCropRotation(planting.cropId, history) : null;
