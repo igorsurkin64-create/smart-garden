@@ -578,6 +578,10 @@
         `;
       };
 
+      const effectiveCrop = planting.cropId ? getCropById(planting.cropId) : null;
+      const popVarieties = effectiveCrop?.popularVarieties || [];
+
+      // Доска грядки
       content.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin: 6px 0;">
           <div class="water-weather-pills" style="display: flex; gap: 4px;">
@@ -619,20 +623,37 @@
 
         <!-- Экспресс-заполнение диапазона лунок -->
         <div class="holes-batch-panel">
-          <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
             <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">⚡ Быстрое заполнение сортов:</span>
             <button type="button" class="btn-text text-xs" id="btn-open-variety-catalog" style="color: #10b981; font-weight: 700; cursor: pointer; text-decoration: underline;">
               🏷️ Картотека сортов
             </button>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 5px;">
+            Укажите диапазон лунок (напр. 1–5), выберите сорт и нажмите «Заполнить». Для разных участков грядки можно задать разные сорта!
           </div>
           <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
             <span class="text-xs">С:</span>
             <input type="number" id="batch-from" class="form-input" style="width: 44px; padding: 2px 4px; font-size: 0.8rem; text-align: center;" value="1" min="1" max="${holes.length}">
             <span class="text-xs">по:</span>
             <input type="number" id="batch-to" class="form-input" style="width: 44px; padding: 2px 4px; font-size: 0.8rem; text-align: center;" value="${Math.min(5, holes.length)}" min="1" max="${holes.length}">
-            <input type="text" id="batch-variety" class="form-input" placeholder="Сорт (напр. Бычье сердце)..." style="flex: 1; min-width: 90px; padding: 3px 6px; font-size: 0.8rem;" value="${escapeHtml(planting.variety || '')}">
+            <input type="text" id="batch-variety" class="form-input" list="batch-variety-datalist" placeholder="Сорт (напр. Бычье сердце)..." style="flex: 1; min-width: 90px; padding: 3px 6px; font-size: 0.8rem;" value="${escapeHtml(planting.variety || '')}">
+            <datalist id="batch-variety-datalist">
+              ${popVarieties.map(v => `<option value="${escapeHtml(v)}">`).join('')}
+              ${savedVarieties.map(v => `<option value="${escapeHtml(v.name)}">`).join('')}
+            </datalist>
             <button type="button" class="btn btn-sm btn-primary" id="btn-batch-apply" style="padding: 3px 8px; font-size: 0.78rem;">Заполнить</button>
           </div>
+          ${popVarieties.length > 0 ? `
+            <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; align-items: center;">
+              <span style="font-size: 0.7rem; color: var(--text-muted);">Быстрый выбор:</span>
+              ${popVarieties.slice(0, 5).map(v => `
+                <button type="button" class="btn-text batch-variety-chip" data-var="${escapeHtml(v)}" style="font-size: 0.7rem; padding: 2px 6px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer;">
+                  + ${escapeHtml(v)}
+                </button>
+              `).join('')}
+            </div>
+          ` : ''}
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
@@ -701,6 +722,14 @@
           render();
         };
       }
+
+      content.querySelectorAll('.batch-variety-chip').forEach(chip => {
+        chip.onclick = () => {
+          const varName = chip.getAttribute('data-var');
+          const input = content.querySelector('#batch-variety');
+          if (input) input.value = varName;
+        };
+      });
 
       // Hole click -> open hole editor
       content.querySelectorAll('.hole-slot-btn').forEach(btn => {
@@ -912,6 +941,9 @@
     }
 
     let activeFilterCrop = initialCropId || 'all';
+    let isAdding = false;
+    let newCropId = (initialCropId && initialCropId !== 'all') ? initialCropId : 'tomato';
+    let newPhotoUrl = null;
 
     const render = async () => {
       let varieties = [];
@@ -921,15 +953,82 @@
 
       modalContent.innerHTML = `
         <div class="modal-content" style="max-width: 680px; max-height: 85vh; display: flex; flex-direction: column;">
-          <div class="modal-header">
-            <h3 style="display: flex; align-items: center; gap: 8px;">
-              🏷️ Картотека сортов с фотографиями
+          <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between;">
+            <h3 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1.15rem;">
+              🏷️ Картотека сортов с фото
             </h3>
-            <button class="modal-close-btn">&times;</button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" class="btn btn-sm btn-primary" id="btn-toggle-add-variety" style="padding: 4px 10px; font-size: 0.8rem; font-weight: 700;">
+                ${isAdding ? '✕ Закрыть форму' : '➕ Добавить сорт'}
+              </button>
+              <button class="modal-close-btn">&times;</button>
+            </div>
           </div>
           <div class="modal-body" style="padding: 1rem; overflow-y: auto; flex: 1;">
+            
+            ${isAdding ? `
+              <!-- Форма добавления нового сорта -->
+              <div class="card p-3 mb-3" style="background: var(--bg-secondary); border: 2px solid #10b981; border-radius: 8px;">
+                <h4 style="margin: 0 0 10px 0; font-size: 0.95rem; color: #10b981; display: flex; align-items: center; gap: 6px;">
+                  🌱 Добавить новый сорт в картотеку
+                </h4>
+                
+                <div class="form-group mb-2">
+                  <label class="form-sublabel" style="font-weight: 700; font-size: 0.8rem;">Культура (растение):</label>
+                  <select id="new-variety-crop" class="form-input">
+                    ${Object.values(CROPS_DATA).map(c => `
+                      <option value="${c.id}" ${newCropId === c.id ? 'selected' : ''}>${c.emoji} ${escapeHtml(c.name)}</option>
+                    `).join('')}
+                  </select>
+                </div>
+
+                <div class="form-group mb-2">
+                  <label class="form-sublabel" style="font-weight: 700; font-size: 0.8rem;">Название сорта или гибрида:</label>
+                  <input type="text" id="new-variety-name" class="form-input" list="new-variety-datalist" placeholder="Например: Бычье сердце, Кураж F1...">
+                  <datalist id="new-variety-datalist">
+                    ${(getCropById(newCropId)?.popularVarieties || []).map(v => `<option value="${escapeHtml(v)}">`).join('')}
+                  </datalist>
+                  <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; align-items: center;">
+                    <span style="font-size: 0.7rem; color: var(--text-muted);">Популярные:</span>
+                    ${(getCropById(newCropId)?.popularVarieties || []).slice(0, 5).map(v => `
+                      <button type="button" class="btn-text new-var-chip" data-var="${escapeHtml(v)}" style="font-size: 0.7rem; padding: 2px 5px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer;">
+                        + ${escapeHtml(v)}
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+
+                <div class="form-group mb-2" style="background: var(--bg-primary); padding: 8px; border-radius: 6px; border: 1px dashed var(--border-subtle);">
+                  <div style="font-weight: 700; font-size: 0.8rem; margin-bottom: 4px;">📸 Фотография сорта (пакетик семян или плод):</div>
+                  <div id="new-variety-photo-preview" style="margin: 4px 0; text-align: center;">
+                    ${newPhotoUrl ? `
+                      <img src="${newPhotoUrl}" style="max-height: 100px; max-width: 100%; border-radius: 6px;" alt="Фото">
+                    ` : `
+                      <span class="text-xs text-muted">Сфотографируйте пакетик с семенами или урожай</span>
+                    `}
+                  </div>
+                  <label class="btn btn-sm btn-outline mt-1" style="cursor: pointer; text-align: center; display: block; font-size: 0.78rem;">
+                    📷 ${newPhotoUrl ? 'Заменить фото' : 'Загрузить / сфотографировать сорт'}
+                    <input type="file" id="new-variety-photo-file" accept="image/*" style="display: none;">
+                  </label>
+                </div>
+
+                <div class="form-group mb-3">
+                  <label class="form-sublabel" style="font-size: 0.8rem;">Описание / вкусовые качества (необязательно):</label>
+                  <input type="text" id="new-variety-notes" class="form-input" placeholder="Например: крупноплодный, мясистый, до 450г, ранний">
+                </div>
+
+                <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                  <button type="button" class="btn btn-sm btn-outline" id="btn-cancel-add-variety">Отмена</button>
+                  <button type="button" class="btn btn-sm btn-primary" id="btn-save-new-variety" style="background: #10b981; border-color: #059669; font-weight: 700;">
+                    💾 Сохранить в картотеку
+                  </button>
+                </div>
+              </div>
+            ` : ''}
+
             <p class="text-xs text-muted" style="margin-top: 0;">
-              Хранилище ваших любимых сортов овощей и ягод с эталонными фотографиями плодов и пакетиков семян (в базе IndexedDB).
+              Хранилище сортов с эталонными фотографиями семян и плодов. Привязываются к лункам на грядках и хранятся в IndexedDB.
             </p>
 
             <div style="display: flex; gap: 4px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 10px;">
@@ -941,10 +1040,23 @@
             </div>
 
             ${varieties.length === 0 ? `
-              <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
-                <div style="font-size: 2.2rem; margin-bottom: 8px;">🌱</div>
-                <p>В картотеке пока нет сохранённых сортов с фотографиями.</p>
-                <p class="text-xs">Вы можете сфотографировать сорт в лунке на любой грядке, и он автоматически появится здесь!</p>
+              <div style="text-align: center; padding: 1.5rem 1rem; color: var(--text-muted); background: var(--bg-secondary); border-radius: 8px; border: 1px dashed var(--border-subtle);">
+                <div style="font-size: 2.2rem; margin-bottom: 6px;">🌱</div>
+                <h4 style="margin: 0 0 6px 0; color: var(--text-primary); font-size: 0.95rem;">В картотеке пока нет сортов</h4>
+                <p class="text-xs" style="max-width: 480px; margin: 0 auto 12px auto; line-height: 1.4;">
+                  Здесь сохраняются ваши проверенные сорта с фотографиями пакетиков семян и урожая. Вы можете добавить сорт прямо сейчас или выбрать один из популярных:
+                </p>
+                <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
+                  <button type="button" class="btn btn-sm btn-outline quick-add-var-btn" data-crop="tomato" data-name="Бычье сердце">
+                    🍅 + Бычье сердце
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline quick-add-var-btn" data-crop="cucumber" data-name="Кураж F1">
+                    🥒 + Кураж F1
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline quick-add-var-btn" data-crop="pepper" data-name="Калифорнийское чудо">
+                    🫑 + Калифорнийское чудо
+                  </button>
+                </div>
               </div>
             ` : `
               <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px;">
@@ -983,6 +1095,86 @@
 
       modalContent.querySelector('.modal-close-btn').onclick = () => modal.classList.remove('active');
       modalContent.querySelector('#variety-cat-close-btn').onclick = () => modal.classList.remove('active');
+
+      const toggleAddBtn = modalContent.querySelector('#btn-toggle-add-variety');
+      if (toggleAddBtn) {
+        toggleAddBtn.onclick = () => {
+          isAdding = !isAdding;
+          render();
+        };
+      }
+
+      if (isAdding) {
+        const cropSelect = modalContent.querySelector('#new-variety-crop');
+        if (cropSelect) {
+          cropSelect.onchange = () => {
+            newCropId = cropSelect.value;
+            render();
+          };
+        }
+
+        modalContent.querySelectorAll('.new-var-chip').forEach(chip => {
+          chip.onclick = () => {
+            const val = chip.getAttribute('data-var');
+            const input = modalContent.querySelector('#new-variety-name');
+            if (input) input.value = val;
+          };
+        });
+
+        const fileInput = modalContent.querySelector('#new-variety-photo-file');
+        if (fileInput) {
+          fileInput.onchange = async (e) => {
+            const f = e.target.files[0];
+            if (!f) return;
+            try {
+              newPhotoUrl = await this.compressPhotoFile(f, 1024, 0.8);
+              render();
+            } catch (err) {
+              alert('Ошибка обработки фото: ' + err.message);
+            }
+          };
+        }
+
+        const cancelBtn = modalContent.querySelector('#btn-cancel-add-variety');
+        if (cancelBtn) {
+          cancelBtn.onclick = () => {
+            isAdding = false;
+            newPhotoUrl = null;
+            render();
+          };
+        }
+
+        const saveBtn = modalContent.querySelector('#btn-save-new-variety');
+        if (saveBtn) {
+          saveBtn.onclick = async () => {
+            const name = modalContent.querySelector('#new-variety-name')?.value.trim();
+            if (!name) {
+              alert('Пожалуйста, введите название сорта.');
+              return;
+            }
+            const notes = modalContent.querySelector('#new-variety-notes')?.value.trim() || '';
+            if (window.photoStorage) {
+              await window.photoStorage.saveVariety(newCropId, name, newPhotoUrl, notes);
+            }
+            this.showToast(`✓ Сорт «${name}» сохранён в картотеку!`);
+            isAdding = false;
+            newPhotoUrl = null;
+            render();
+          };
+        }
+      }
+
+      modalContent.querySelectorAll('.quick-add-var-btn').forEach(btn => {
+        btn.onclick = () => {
+          newCropId = btn.getAttribute('data-crop');
+          const name = btn.getAttribute('data-name');
+          isAdding = true;
+          render().then(() => {
+            const nameInput = modalContent.querySelector('#new-variety-name');
+            if (nameInput) nameInput.value = name;
+          });
+        };
+      });
 
       modalContent.querySelectorAll('.btn-pattern-pill').forEach(btn => {
         btn.onclick = () => {
