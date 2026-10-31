@@ -830,6 +830,8 @@ class GardenApp {
          `Посадка на ${activeYear} год:`);
 
     const comboboxPh = window.t ? window.t('inspector_combobox_placeholder') : 'Начните вводить...';
+    const varietyLabel = window.t ? window.t('inspector_variety_label') : 'Сорт или гибрид (необязательно):';
+    const notesLabel = window.t ? window.t('inspector_notes_label') : 'Заметка к посадке (необязательно):';
     const varietyPh = window.t ? window.t('inspector_variety_placeholder') : 'Сорт или гибрид...';
     const notesPh = window.t ? window.t('inspector_notes_placeholder') : 'Заметка к посадке...';
     const savePlantingBtnText = currentLang === 'et' ? `💾 Salvesta ${activeYear}. a külv` :
@@ -994,10 +996,12 @@ class GardenApp {
           </div>
 
           <div class="form-group mt-2">
+            <label class="form-sublabel" for="inspector-variety-input">${varietyLabel}</label>
             <input type="text" id="inspector-variety-input" class="form-input" placeholder="${varietyPh}" value="${escapeHtml(currentPlanting.variety || '')}">
           </div>
 
           <div class="form-group mt-2">
+            <label class="form-sublabel" for="inspector-note-input">${notesLabel}</label>
             <input type="text" id="inspector-note-input" class="form-input" placeholder="${notesPh}" value="${escapeHtml(currentPlanting.note || '')}">
           </div>
 
