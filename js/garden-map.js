@@ -584,7 +584,21 @@ class GardenMap {
             if (parenMatch) {
               secShortName = parenMatch[1].trim();
             }
-            if (/лев|vasak|kreis|kair/i.test(secShortName)) {
+            if (secCount === 3) {
+              if (secIdx === 0) {
+                secShortName = currentLang === 'et' ? 'Vasak' : currentLang === 'lv' ? 'Kreisā' : currentLang === 'lt' ? 'Kairė' : 'Левый';
+              } else if (secIdx === 1) {
+                secShortName = currentLang === 'et' ? 'Kesk' : currentLang === 'lv' ? 'Centrs' : currentLang === 'lt' ? 'Centras' : 'Центр';
+              } else {
+                secShortName = currentLang === 'et' ? 'Parem' : currentLang === 'lv' ? 'Labā' : currentLang === 'lt' ? 'Dešinė' : 'Правый';
+              }
+            } else if (secCount === 2) {
+              if (secIdx === 0) {
+                secShortName = currentLang === 'et' ? 'Vasak' : currentLang === 'lv' ? 'Kreisā' : currentLang === 'lt' ? 'Kairė' : 'Левый';
+              } else {
+                secShortName = currentLang === 'et' ? 'Parem' : currentLang === 'lv' ? 'Labā' : currentLang === 'lt' ? 'Dešinė' : 'Правый';
+              }
+            } else if (/лев|vasak|kreis|kair/i.test(secShortName)) {
               secShortName = currentLang === 'et' ? 'Vasak' : currentLang === 'lv' ? 'Kreisā' : currentLang === 'lt' ? 'Kairė' : 'Левый';
             } else if (/прав|parem|lab|dešin/i.test(secShortName)) {
               secShortName = currentLang === 'et' ? 'Parem' : currentLang === 'lv' ? 'Labā' : currentLang === 'lt' ? 'Dešinė' : 'Правый';

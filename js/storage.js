@@ -488,6 +488,36 @@ class GardenStorage {
         if (!bed.history) bed.history = {};
       }
 
+      // Санитизация названий секций (исправление ошибочного "Левый, Правый, Правый" на "Левый, Центр, Правый")
+      if (bed.sections && Array.isArray(bed.sections)) {
+        const isGh = bed.type === 'greenhouse';
+        if (bed.sections.length === 3) {
+          const defaultNames3 = isGh
+            ? ['Левая грядка', 'Центральная грядка', 'Правая грядка']
+            : ['Рядок 1 (Левый)', 'Рядок 2 (Центр)', 'Рядок 3 (Правый)'];
+          
+          if (/прав/i.test(bed.sections[1].name)) {
+            bed.sections[1].name = defaultNames3[1];
+          }
+          if (/прав/i.test(bed.sections[0].name)) {
+            bed.sections[0].name = defaultNames3[0];
+          }
+          if (/центр|лев/i.test(bed.sections[2].name)) {
+            bed.sections[2].name = defaultNames3[2];
+          }
+        } else if (bed.sections.length === 2) {
+          const defaultNames2 = isGh
+            ? ['Левая грядка', 'Правая грядка']
+            : ['Рядок 1 (Левый)', 'Рядок 2 (Правый)'];
+          if (/прав/i.test(bed.sections[0].name)) {
+            bed.sections[0].name = defaultNames2[0];
+          }
+          if (/лев/i.test(bed.sections[1].name)) {
+            bed.sections[1].name = defaultNames2[1];
+          }
+        }
+      }
+
       if (typeof bed.x !== 'number') bed.x = 2;
       if (typeof bed.y !== 'number') bed.y = 2;
       if (typeof bed.width !== 'number') bed.width = 4;
@@ -876,9 +906,11 @@ class GardenStorage {
       for (let i = 0; i < count; i++) {
         const existing = prevSections[i];
         if (existing) {
+          const isStandardName = !existing.name || /^(?:Рядок \d+|Левая грядка|Правая грядка|Центральная грядка|Рядок \d+ \((?:Левый|Правый|Центр)\))$/i.test(existing.name.trim());
+          const newName = isStandardName ? names[i] : existing.name;
           newSections.push({
             ...existing,
-            name: existing.name || names[i]
+            name: newName
           });
         } else {
           // Если это 1-я секция и у грядки уже была история, переносим её сюда

@@ -6767,6 +6767,7 @@ html, body {
   }
 
   /* Скрываем весь стандартный интерфейс при печати */
+  .app-container,
   .app-header,
   .app-navigation,
   .map-toolbar,
@@ -6794,42 +6795,46 @@ html, body {
   .print-header {
     border-bottom: 2px solid #000000;
     padding-bottom: 4px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   .print-header h1 {
-    font-size: 15pt;
+    font-size: 14pt;
     color: #000000 !important;
     margin: 0;
   }
 
   .print-meta {
-    font-size: 8.5pt;
+    font-size: 8pt;
     color: #333333;
   }
 
   .print-map-schematic {
     border: 1px solid #999999;
     border-radius: 4px;
-    padding: 6px;
-    margin-bottom: 10px;
+    padding: 4px;
+    margin-bottom: 6px;
     background: #fbfbfb;
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   .print-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 8.5pt;
-    margin-bottom: 8px;
+    font-size: 8pt;
+    margin-bottom: 6px;
   }
 
   .print-table th,
   .print-table td {
     border: 1px solid #444444;
-    padding: 3px 5px;
+    padding: 2.5px 4px;
     text-align: left;
   }
 
@@ -6843,17 +6848,24 @@ html, body {
     background: #f9f9f9 !important;
   }
 
+  .print-table tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
   .print-notes-section {
     border: 1px dashed #666666;
-    padding: 6px;
-    margin-top: 8px;
-    font-size: 8pt;
+    padding: 5px;
+    margin-top: 6px;
+    font-size: 7.8pt;
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   .print-note-line {
     border-bottom: 1px dotted #888888;
-    height: 14px;
-    margin-top: 4px;
+    height: 12px;
+    margin-top: 3px;
   }
 }
 

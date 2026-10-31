@@ -490,25 +490,32 @@
       }
     });
 
-    // Генерация SVG-схемы огорода для печати
+    // Генерация наглядной SVG-схемы огорода для печати
+    const M_TO_PX = 28; // 28 px за метр для идеальной посадки на А4 альбомной ориентации
     let minX = 99999, minY = 99999, maxX = -99999, maxY = -99999;
     beds.forEach(b => {
-      minX = Math.min(minX, b.x);
-      minY = Math.min(minY, b.y);
-      maxX = Math.max(maxX, b.x + b.width * 50);
-      maxY = Math.max(maxY, b.y + b.height * 50);
+      const bx = (b.x || 0) * M_TO_PX;
+      const by = (b.y || 0) * M_TO_PX;
+      const bw = Math.max(0.5, b.width || 1) * M_TO_PX;
+      const bh = Math.max(0.5, b.height || 1) * M_TO_PX;
+      minX = Math.min(minX, bx);
+      minY = Math.min(minY, by);
+      maxX = Math.max(maxX, bx + bw);
+      maxY = Math.max(maxY, by + bh);
     });
-    const svgW = Math.max(600, (maxX - minX) + 60);
-    const svgH = Math.max(260, (maxY - minY) + 60);
-    const offsetX = minX - 30;
-    const offsetY = minY - 30;
+
+    const padding = 16;
+    const svgW = Math.max(480, (maxX - minX) + padding * 2);
+    const svgH = Math.max(120, (maxY - minY) + padding * 2);
+    const offsetX = minX - padding;
+    const offsetY = minY - padding;
 
     let svgBedsHtml = '';
     beds.forEach((b) => {
-      const bx = b.x - offsetX;
-      const by = b.y - offsetY;
-      const bw = b.width * 50;
-      const bh = b.height * 50;
+      const bx = (b.x || 0) * M_TO_PX - offsetX;
+      const by = (b.y || 0) * M_TO_PX - offsetY;
+      const bw = Math.max(0.5, b.width || 1) * M_TO_PX;
+      const bh = Math.max(0.5, b.height || 1) * M_TO_PX;
       const isGh = b.type === 'greenhouse';
       const strokeCol = isGh ? '#0284c7' : '#059669';
       const fillCol = isGh ? '#f0f9ff' : '#f0fdf4';
@@ -519,9 +526,27 @@
       if (crop) label += ` (${crop.emoji || ''} ${getCropName(crop, currentLang)})`;
 
       svgBedsHtml += `
-        <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="4" fill="${fillCol}" stroke="${strokeCol}" stroke-width="1.5" />
-        <text x="${bx + 6}" y="${by + 16}" font-size="10" font-weight="bold" fill="#111827">${escapeHtml(label)}</text>
-        <text x="${bx + 6}" y="${by + 30}" font-size="8.5" fill="#6b7280">${b.width}×${b.height}м</text>
+        <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="3" fill="${fillCol}" stroke="${strokeCol}" stroke-width="1.5" />
+      `;
+
+      // Если у грядки есть секции, рисуем линии разделения
+      if (b.sections && b.sections.length > 1) {
+        const secCount = b.sections.length;
+        const isHoriz = (b.orientation || 'horizontal') === 'horizontal';
+        for (let s = 1; s < secCount; s++) {
+          if (isHoriz) {
+            const lineY = by + (bh / secCount) * s;
+            svgBedsHtml += `<line x1="${bx}" y1="${lineY}" x2="${bx + bw}" y2="${lineY}" stroke="${strokeCol}" stroke-dasharray="2,2" stroke-width="1" />`;
+          } else {
+            const lineX = bx + (bw / secCount) * s;
+            svgBedsHtml += `<line x1="${lineX}" y1="${by}" x2="${lineX}" y2="${by + bh}" stroke="${strokeCol}" stroke-dasharray="2,2" stroke-width="1" />`;
+          }
+        }
+      }
+
+      svgBedsHtml += `
+        <text x="${bx + 4}" y="${by + 12}" font-size="8.5" font-weight="bold" fill="#111827">${escapeHtml(label)}</text>
+        <text x="${bx + 4}" y="${by + 22}" font-size="7.5" fill="#6b7280">${b.width}×${b.height}м</text>
       `;
     });
 
@@ -536,7 +561,7 @@
       </div>
 
       <div class="print-map-schematic">
-        <svg viewBox="0 0 ${svgW} ${svgH}" width="100%" height="160" style="display:block;">
+        <svg viewBox="0 0 ${svgW} ${svgH}" width="100%" height="130" style="display:block; max-height: 130px;">
           ${svgBedsHtml}
         </svg>
       </div>
