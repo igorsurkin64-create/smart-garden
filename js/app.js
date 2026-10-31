@@ -677,6 +677,15 @@ class GardenApp {
           </div>
         </div>
 
+        <!-- 4.3 Схема посадки по лункам и сортам (Шахматка / Ряды) -->
+        <div class="inspector-section" id="inspector-holes-box" style="border-left: 3px solid #10b981; background: rgba(16, 185, 129, 0.03);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+            <label class="section-label" style="margin-bottom: 0;">🌱 Схема посадки по лункам (${activeYear} г.)</label>
+            <span class="badge-mini" id="bed-holes-badge" style="font-size: 0.76rem; background: #dcfce7; color: #15803d; padding: 2px 7px; border-radius: 4px; font-weight: 800;"></span>
+          </div>
+          <div id="inspector-holes-content"></div>
+        </div>
+
         <!-- 5. Анализ севооборота -->
         <div class="inspector-section rotation-analysis-box" id="rotation-status-box">
           ${this.renderInspectorRotationStatus(rotationEval)}
@@ -954,8 +963,9 @@ class GardenApp {
     // Инициализация интерактивного комбобокса с живым поиском и созданием новой культуры
     this.setupCropCombobox(bedId, activeSection, history, targetArea, neighborCropIds);
 
-    // Инициализация калькулятора полива, журнала подкормок и фотогалереи
+    // Инициализация калькулятора полива, схемы лунок, журнала подкормок и фотогалереи
     this.setupInspectorWaterCalculator(bed, targetArea, currentPlanting.cropId, currentLang);
+    this.setupInspectorHoles(bed, activeSection, activeYear, currentLang);
     this.setupInspectorCareLog(bed, activeSection, activeYear, currentLang);
     this.setupInspectorPhotos(bed, activeYear, currentLang);
   }
@@ -1711,6 +1721,12 @@ class GardenApp {
       toolbarWaterBtn.addEventListener('click', () => this.openGardenWaterModal());
     }
 
+    // Картотека сортов с фотографиями
+    const varietiesBtn = document.getElementById('varieties-catalog-btn');
+    if (varietiesBtn) {
+      varietiesBtn.addEventListener('click', () => this.openVarietyCatalogModal());
+    }
+
     // Выпадающее меню дополнительных действий
     this.setupHeaderMenu();
 
@@ -1848,6 +1864,7 @@ class GardenApp {
     bindMobileAction('m-calendar-btn', () => this.openSeasonCalendarModal());
     bindMobileAction('m-print-btn', () => this.printGardenPlan());
     bindMobileAction('m-water-btn', () => this.openGardenWaterModal());
+    bindMobileAction('m-varieties-btn', () => this.openVarietyCatalogModal());
     bindMobileAction('m-backup-btn', () => this.openDbModal());
     bindMobileAction('m-demo-btn', () => this.confirmResetDemo());
     bindMobileAction('m-clear-btn', () => this.confirmClearPlan());

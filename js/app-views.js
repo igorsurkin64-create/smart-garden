@@ -425,6 +425,18 @@
           const rot = planting.cropId ? evaluateCropRotation(planting.cropId, history) : null;
           const cap = planting.cropId ? calculateCropCapacity(planting.cropId, secArea, currentLang) : null;
 
+          let varietyDisplay = planting.variety || '—';
+          let capacityDisplay = cap ? `~${cap.quantity} ${cap.unit}` : '—';
+          if (planting.holes && planting.holes.length > 0) {
+            const varCounts = {};
+            planting.holes.forEach(h => {
+              const v = (h.variety || planting.variety || 'Без сорта').trim();
+              varCounts[v] = (varCounts[v] || 0) + 1;
+            });
+            varietyDisplay = Object.entries(varCounts).map(([v, count]) => `${v} (${count} шт)`).join(', ');
+            capacityDisplay = `${planting.holes.length} лунок`;
+          }
+
           tableRows.push({
             num: `${bIdx + 1}.${sIdx + 1}`,
             name: `${bName} (${sec.name})`,
@@ -433,8 +445,8 @@
             area: `${secArea.toFixed(1)} м²`,
             cropName: crop ? getCropName(crop, currentLang) : '—',
             cropEmoji: crop?.emoji || '',
-            variety: planting.variety || '—',
-            capacity: cap ? `~${cap.quantity} ${cap.unit}` : '—',
+            variety: varietyDisplay,
+            capacity: capacityDisplay,
             prevCrop: prevCrop ? `${prevCrop.emoji || ''} ${getCropName(prevCrop, currentLang)}` : 'Пустовала',
             rotation: rot ? `${rot.status === 'optimal' ? '✅ Отлично' : (rot.status === 'warning' ? '⚠️ Внимание' : '⛔ Нарушение')}` : '—',
             note: planting.note || ''
@@ -449,6 +461,18 @@
         const rot = planting.cropId ? evaluateCropRotation(planting.cropId, history) : null;
         const cap = planting.cropId ? calculateCropCapacity(planting.cropId, bedArea, currentLang) : null;
 
+        let varietyDisplay = planting.variety || '—';
+        let capacityDisplay = cap ? `~${cap.quantity} ${cap.unit}` : '—';
+        if (planting.holes && planting.holes.length > 0) {
+          const varCounts = {};
+          planting.holes.forEach(h => {
+            const v = (h.variety || planting.variety || 'Без сорта').trim();
+            varCounts[v] = (varCounts[v] || 0) + 1;
+          });
+          varietyDisplay = Object.entries(varCounts).map(([v, count]) => `${v} (${count} шт)`).join(', ');
+          capacityDisplay = `${planting.holes.length} лунок`;
+        }
+
         tableRows.push({
           num: `${bIdx + 1}`,
           name: bName,
@@ -457,8 +481,8 @@
           area: `${bedArea.toFixed(1)} м²`,
           cropName: crop ? getCropName(crop, currentLang) : '—',
           cropEmoji: crop?.emoji || '',
-          variety: planting.variety || '—',
-          capacity: cap ? `~${cap.quantity} ${cap.unit}` : '—',
+          variety: varietyDisplay,
+          capacity: capacityDisplay,
           prevCrop: prevCrop ? `${prevCrop.emoji || ''} ${getCropName(prevCrop, currentLang)}` : 'Пустовала',
           rotation: rot ? `${rot.status === 'optimal' ? '✅ Отлично' : (rot.status === 'warning' ? '⚠️ Внимание' : '⛔ Нарушение')}` : '—',
           note: planting.note || ''

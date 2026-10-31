@@ -7209,6 +7209,233 @@ html, body {
   background: rgba(255, 255, 255, 0.4);
 }
 
+/* ==========================================================================
+   СХЕМА ПОСАДКИ ПО ЛУНКАМ (ШАХМАТНЫЙ И РЯДОВЫЙ ПОРЯДОК) И КАТАЛОГ СОРТОВ
+   ========================================================================== */
+
+.btn-pattern-pill {
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-primary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 600;
+}
+
+.btn-pattern-pill:hover {
+  border-color: #10b981;
+  color: var(--text-main);
+}
+
+.btn-pattern-pill.active {
+  background: #10b981;
+  border-color: #059669;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.3);
+}
+
+.holes-bed-board {
+  background: #f7f4ed;
+  border: 2px solid #d4c5a9;
+  border-radius: 12px;
+  padding: 12px 10px;
+  margin: 10px 0;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-x: auto;
+}
+
+[data-theme="dark"] .holes-bed-board {
+  background: #25221c;
+  border-color: #4a4031;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.holes-row-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: max-content;
+}
+
+.holes-row-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #854d0e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: 48px;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .holes-row-label {
+  color: #ca8a04;
+}
+
+.holes-row-items {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.holes-row-items.zigzag-offset {
+  margin-left: 24px;
+}
+
+.hole-slot-btn {
+  width: 58px;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 4px;
+  border-radius: 10px;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-subtle);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s ease;
+  user-select: none;
+  text-align: center;
+}
+
+.hole-slot-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  border-color: #10b981;
+}
+
+.hole-slot-btn.empty {
+  border: 2px dashed #d1d5db;
+  background: rgba(255, 255, 255, 0.6);
+  opacity: 0.85;
+}
+
+[data-theme="dark"] .hole-slot-btn.empty {
+  border-color: #4b5563;
+  background: rgba(31, 41, 55, 0.4);
+}
+
+.hole-slot-num {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--text-muted);
+  border-radius: 9999px;
+  width: 15px;
+  height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-theme="dark"] .hole-slot-num {
+  background: rgba(255, 255, 255, 0.15);
+  color: #e5e7eb;
+}
+
+.hole-slot-icon-wrap {
+  margin-top: 10px;
+  position: relative;
+}
+
+.hole-slot-emoji {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.hole-slot-photo-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  position: absolute;
+  bottom: -4px;
+  right: -8px;
+}
+
+.hole-slot-variety {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50px;
+  margin-top: 4px;
+  line-height: 1.15;
+}
+
+.hole-slot-variety-badge {
+  font-size: 0.62rem;
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: #ffffff;
+  margin-top: 2px;
+  max-width: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.holes-batch-panel {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.holes-variety-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  transition: all 0.15s ease;
+}
+
+.holes-variety-card:hover {
+  border-color: #10b981;
+}
+
+.holes-variety-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid var(--border-subtle);
+}
+
+.holes-variety-img-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  background: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  border: 1px dashed var(--border-subtle);
+}
+
+
 
 
 

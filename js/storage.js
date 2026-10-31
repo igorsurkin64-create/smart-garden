@@ -912,7 +912,9 @@ class GardenStorage {
       const sec = sectionId ? bed.sections.find(s => s.id === sectionId) : bed.sections[0];
       if (sec) {
         if (!sec.history) sec.history = {};
+        const oldSec = sec.history[year] || {};
         sec.history[year] = {
+          ...oldSec,
           cropId,
           variety,
           note,
@@ -924,13 +926,41 @@ class GardenStorage {
     }
 
     if (!bed.history) bed.history = {};
+    const oldBed = bed.history[year] || {};
     bed.history[year] = {
+      ...oldBed,
       cropId,
       variety,
       note,
       updatedAt: new Date().toISOString()
     };
 
+    this.saveData();
+    return true;
+  }
+
+  updateBedHoles(bedId, year, holes = [], pattern = 'zigzag', sectionId = null) {
+    const bed = this.getBedById(bedId);
+    if (!bed) return false;
+
+    if (bed.sections && bed.sections.length > 0) {
+      const sec = sectionId ? bed.sections.find(s => s.id === sectionId) : bed.sections[0];
+      if (sec) {
+        if (!sec.history) sec.history = {};
+        if (!sec.history[year]) sec.history[year] = {};
+        sec.history[year].holes = holes;
+        sec.history[year].plantingPattern = pattern;
+        sec.history[year].updatedAt = new Date().toISOString();
+        this.saveData();
+        return true;
+      }
+    }
+
+    if (!bed.history) bed.history = {};
+    if (!bed.history[year]) bed.history[year] = {};
+    bed.history[year].holes = holes;
+    bed.history[year].plantingPattern = pattern;
+    bed.history[year].updatedAt = new Date().toISOString();
     this.saveData();
     return true;
   }
@@ -1085,9 +1115,10 @@ class GardenStorage {
 class GardenPhotoStorage {
   constructor() {
     this.dbName = 'SmartGardenPhotosDB';
-    this.dbVersion = 1;
+    this.dbVersion = 2;
     this.db = null;
     this.memoryFallback = new Map();
+    this.varietyFallback = new Map();
   }
 
   async open() {
@@ -1103,6 +1134,11 @@ class GardenPhotoStorage {
             const store = db.createObjectStore('photos', { keyPath: 'id' });
             store.createIndex('bedId', 'bedId', { unique: false });
             store.createIndex('year', 'year', { unique: false });
+          }
+          if (!db.objectStoreNames.contains('varieties')) {
+            const vStore = db.createObjectStore('varieties', { keyPath: 'id' });
+            vStore.createIndex('cropId', 'cropId', { unique: false });
+            vStore.createIndex('name', 'name', { unique: false });
           }
         };
         req.onsuccess = (e) => {
@@ -1206,6 +1242,108 @@ class GardenPhotoStorage {
         const tx = db.transaction('photos', 'readwrite');
         const store = tx.objectStore('photos');
         const req = store.delete(photoId);
+        req.onsuccess = () => resolve(true);
+        req.onerror = () => resolve(false);
+      } catch (e) {
+        resolve(false);
+      }
+    });
+  }
+
+  // ==========================================
+  // КАТАЛОГ СОРТОВ С ФОТОГРАФИЯМИ (IndexedDB)
+  // ==========================================
+
+  async saveVariety(cropId, name, photoUrl = null, notes = '') {
+    const trimmedName = (name || '').trim();
+    if (!trimmedName) return null;
+    const normKey = `${cropId || 'any'}_${trimmedName.toLowerCase()}`;
+    const id = 'var_' + normKey.replace(/[^a-z0-9_а-яё]/gi, '_');
+
+    const varietyObj = {
+      id,
+      cropId: cropId || null,
+      name: trimmedName,
+      photoUrl: photoUrl || null,
+      notes: notes || '',
+      updatedAt: new Date().toISOString()
+    };
+
+    const db = await this.open();
+    if (!db) {
+      this.varietyFallback.set(id, varietyObj);
+      return varietyObj;
+    }
+
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction('varieties', 'readwrite');
+        const store = tx.objectStore('varieties');
+        const req = store.put(varietyObj);
+        req.onsuccess = () => resolve(varietyObj);
+        req.onerror = () => {
+          this.varietyFallback.set(id, varietyObj);
+          resolve(varietyObj);
+        };
+      } catch (err) {
+        this.varietyFallback.set(id, varietyObj);
+        resolve(varietyObj);
+      }
+    });
+  }
+
+  async getVarieties(cropId = null) {
+    const memList = [];
+    this.varietyFallback.forEach(v => {
+      if (!cropId || v.cropId === cropId) memList.push(v);
+    });
+
+    const db = await this.open();
+    if (!db) {
+      return memList.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction('varieties', 'readonly');
+        const store = tx.objectStore('varieties');
+        const req = store.getAll();
+        req.onsuccess = () => {
+          let list = req.result || [];
+          if (cropId) {
+            list = list.filter(v => v.cropId === cropId);
+          }
+          const ids = new Set(list.map(v => v.id));
+          memList.forEach(mv => {
+            if (!ids.has(mv.id)) list.push(mv);
+          });
+          list.sort((a, b) => a.name.localeCompare(b.name));
+          resolve(list);
+        };
+        req.onerror = () => resolve(memList);
+      } catch (e) {
+        resolve(memList);
+      }
+    });
+  }
+
+  async getVarietyByName(cropId, name) {
+    if (!name) return null;
+    const varieties = await this.getVarieties(cropId);
+    const target = name.trim().toLowerCase();
+    return varieties.find(v => v.name.trim().toLowerCase() === target) || null;
+  }
+
+  async deleteVariety(id) {
+    this.varietyFallback.delete(id);
+    const db = await this.open();
+    if (!db) return true;
+
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction('varieties', 'readwrite');
+        const store = tx.objectStore('varieties');
+        const req = store.delete(id);
         req.onsuccess = () => resolve(true);
         req.onerror = () => resolve(false);
       } catch (e) {
