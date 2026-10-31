@@ -2676,31 +2676,121 @@ html, body {
   gap: 1px;
 }
 
-/* Призрак прошлого года (Ghost Overlay) */
-.bed-history-ghost {
+/* Карточка предшественника (Режим «Прошлый год») */
+.bed-predecessor-card {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(15, 23, 42, 0.88);
-  color: #fff;
-  padding: 0.2rem 0.5rem;
-  font-size: 0.68rem;
+  bottom: 4px;
+  left: 6px;
+  right: 6px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  backdrop-filter: blur(4px);
-  animation: fadeIn 0.2s ease;
+  gap: 5px;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  border: 1.5px solid #38bdf8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  z-index: 8;
+  animation: fadeIn 0.18s ease;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
-.ghost-tag {
+[data-theme="dark"] .bed-predecessor-card {
+  background: #020617;
+  border-color: #38bdf8;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+
+.pred-year-tag {
+  font-weight: 800;
+  color: #facc15;
+  font-size: 0.74rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.pred-crop-avatar {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pred-crop-avatar .crop-svg-wrap,
+.pred-crop-avatar svg {
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+  display: block;
+}
+
+.pred-crop-title {
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+}
+
+.pred-crop-family {
+  font-size: 0.66rem;
   color: #94a3b8;
-  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.ghost-crop {
-  font-weight: 700;
-  color: #a7f3d0;
+.bed-predecessor-card.pred-empty {
+  background: #1e293b;
+  border-color: #475569;
+  color: #cbd5e1;
+}
+
+.pred-empty-label {
+  font-style: italic;
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+/* Подсветка в теплицах при активном режиме предшественников */
+.gh-prev-year-tag.highlight-prev {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  border: 1.5px solid #38bdf8 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+}
+
+.gh-prev-year-tag.highlight-prev .prev-year-label {
+  color: #facc15;
+  font-weight: 800;
+}
+
+.gh-prev-year-tag.highlight-prev .prev-crop-title-gh {
+  color: #38bdf8;
+  font-weight: 800;
+  margin-left: 3px;
+  font-size: 0.74rem;
+}
+
+.gh-v-bottom.highlight-prev {
+  background: rgba(15, 23, 42, 0.08);
+  border-top-color: #0284c7;
+}
+
+/* Кнопка "Прошлый год" в тулбаре в активном состоянии */
+#toggle-ghost-btn.active {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+  border-color: #0284c7 !important;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4) !important;
+  font-weight: 800 !important;
 }
 
 .bed-drag-handle {

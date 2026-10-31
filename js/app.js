@@ -882,7 +882,47 @@ class GardenApp {
       </div>
 
       <div class="inspector-body">
-        <!-- Блок разделения грядки на рядки (1, 2 или 3) -->
+        <!-- 1. Основные параметры грядки: Название, размеры, тип и ориентация (сразу сверху) -->
+        <div class="inspector-section" style="border-left: 3px solid #0284c7; background: rgba(2, 132, 199, 0.03);">
+          <label class="section-label">${paramsTitle}</label>
+          <div class="form-group">
+            <label class="form-sublabel">${nameSubLabel}</label>
+            <input type="text" id="inspector-bed-name" class="form-input" value="${escapeHtml(bed.name)}">
+          </div>
+          <div class="form-row-2 mt-2">
+            <div>
+              <label class="form-sublabel">${wSubLabel}</label>
+              <input type="number" id="inspector-bed-w" class="form-input" step="0.1" min="0.5" max="30" value="${bed.width}">
+            </div>
+            <div>
+              <label class="form-sublabel">${lSubLabel}</label>
+              <input type="number" id="inspector-bed-h" class="form-input" step="0.1" min="0.5" max="30" value="${bed.height}">
+            </div>
+          </div>
+          <div class="form-group mt-2">
+            <label class="form-sublabel">${typeSubLabel}</label>
+            <select id="inspector-bed-type" class="form-select">
+              <option value="greenhouse" ${bed.type === 'greenhouse' ? 'selected' : ''}>🏡 ${window.t ? window.t('type_greenhouse') : 'Теплица'}</option>
+              <option value="raised" ${bed.type === 'raised' ? 'selected' : ''}>🪵 ${window.t ? window.t('type_raised') : 'Приподнятая грядка'}</option>
+              <option value="ground" ${bed.type === 'ground' ? 'selected' : ''}>🌱 ${window.t ? window.t('type_ground') : 'Открытый грунт'}</option>
+              <option value="berry" ${bed.type === 'berry' ? 'selected' : ''}>🍓 ${window.t ? window.t('type_berry') : 'Клубничник'}</option>
+              <option value="warm" ${bed.type === 'warm' ? 'selected' : ''}>🔥 ${window.t ? window.t('type_warm') : 'Тёплая грядка'}</option>
+            </select>
+          </div>
+          <div class="btn-group-row mt-2">
+            <button class="btn btn-outline btn-sm" id="inspector-rotate-bed-btn" title="${rotBtnText}">
+              ${rotBtnText}
+            </button>
+            <button class="btn btn-outline btn-sm" id="inspector-clone-bed-btn" title="${cloneBtnText}">
+              ${cloneBtnText}
+            </button>
+          </div>
+          <button class="btn btn-primary btn-block mt-2" id="inspector-save-params-btn">
+            💾 ${updateBtnText}
+          </button>
+        </div>
+
+        <!-- 2. Блок разделения грядки на рядки (1, 2 или 3) -->
         <div class="inspector-section" style="border-left: 3px solid var(--primary);">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <label class="section-label" style="margin-bottom: 0;">${splitLabel}</label>
@@ -902,7 +942,7 @@ class GardenApp {
         </div>
 
         ${hasSections && sectionsCount > 1 ? `
-          <!-- Выбор активного рядка внутри грядки / теплицы -->
+          <!-- 3. Выбор активного рядка внутри грядки / теплицы -->
           <div class="inspector-section" style="border-left: 3px solid #0284c7;">
             <label class="section-label">
               ${chooseRowLabel}
@@ -926,7 +966,7 @@ class GardenApp {
           </div>
         ` : ''}
 
-        <!-- Блок выбора посадки на активный год -->
+        <!-- 4. Блок выбора посадки на активный год -->
         <div class="inspector-section">
           <label class="section-label">
             ${plantingLabel}
@@ -966,12 +1006,12 @@ class GardenApp {
           </button>
         </div>
 
-        <!-- Анализ севооборота -->
+        <!-- 5. Анализ севооборота -->
         <div class="inspector-section rotation-analysis-box" id="rotation-status-box">
           ${this.renderInspectorRotationStatus(rotationEval)}
         </div>
 
-        <!-- Умные рекомендации агронома -->
+        <!-- 6. Умные рекомендации агронома -->
         <div class="inspector-section">
           <label class="section-label">${topRecTitle}</label>
           <p class="text-xs text-muted">${topRecDesc}</p>
@@ -991,52 +1031,12 @@ class GardenApp {
           </div>
         </div>
 
-        <!-- История прошлых лет -->
+        <!-- 7. История прошлых лет -->
         <div class="inspector-section">
           <label class="section-label">${pastHistTitle}</label>
           <div class="history-list">
             ${this.renderBedPastHistoryList(targetSource, activeYear)}
           </div>
-        </div>
-
-        <!-- Параметры грядки -->
-        <div class="inspector-section">
-          <label class="section-label">${paramsTitle}</label>
-          <div class="form-group">
-            <label class="form-sublabel">${nameSubLabel}</label>
-            <input type="text" id="inspector-bed-name" class="form-input" value="${escapeHtml(bed.name)}">
-          </div>
-          <div class="form-row-2 mt-2">
-            <div>
-              <label class="form-sublabel">${wSubLabel}</label>
-              <input type="number" id="inspector-bed-w" class="form-input" step="0.1" min="0.5" max="30" value="${bed.width}">
-            </div>
-            <div>
-              <label class="form-sublabel">${lSubLabel}</label>
-              <input type="number" id="inspector-bed-h" class="form-input" step="0.1" min="0.5" max="30" value="${bed.height}">
-            </div>
-          </div>
-          <div class="form-group mt-2">
-            <label class="form-sublabel">${typeSubLabel}</label>
-            <select id="inspector-bed-type" class="form-select">
-              <option value="greenhouse" ${bed.type === 'greenhouse' ? 'selected' : ''}>🏡 ${window.t ? window.t('type_greenhouse') : 'Теплица'}</option>
-              <option value="raised" ${bed.type === 'raised' ? 'selected' : ''}>🪵 ${window.t ? window.t('type_raised') : 'Приподнятая грядка'}</option>
-              <option value="ground" ${bed.type === 'ground' ? 'selected' : ''}>🌱 ${window.t ? window.t('type_ground') : 'Открытый грунт'}</option>
-              <option value="berry" ${bed.type === 'berry' ? 'selected' : ''}>🍓 ${window.t ? window.t('type_berry') : 'Клубничник'}</option>
-              <option value="warm" ${bed.type === 'warm' ? 'selected' : ''}>🔥 ${window.t ? window.t('type_warm') : 'Тёплая грядка'}</option>
-            </select>
-          </div>
-          <div class="btn-group-row mt-2">
-            <button class="btn btn-outline btn-sm" id="inspector-rotate-bed-btn" title="${rotBtnText}">
-              ${rotBtnText}
-            </button>
-            <button class="btn btn-outline btn-sm" id="inspector-clone-bed-btn" title="${cloneBtnText}">
-              ${cloneBtnText}
-            </button>
-          </div>
-          <button class="btn btn-outline btn-block mt-2" id="inspector-save-params-btn">
-            ${updateBtnText}
-          </button>
         </div>
 
         <div class="inspector-footer-actions">
@@ -1761,13 +1761,16 @@ class GardenApp {
       resetDemoBtn.addEventListener('click', () => this.confirmResetDemo());
     }
 
-    // Кнопка наложения прошлого года на карту
+    // Кнопка показа предшественников (прошлый год) на карте
     const toggleGhostBtn = document.getElementById('toggle-ghost-btn');
     if (toggleGhostBtn) {
       toggleGhostBtn.addEventListener('click', () => {
         const isShown = this.gardenMap.togglePreviousYearOverlay();
         toggleGhostBtn.classList.toggle('active', isShown);
-        this.showToast(isShown ? 'Включен режим сравнения с прошлым годом' : 'Режим сравнения выключен');
+        const msg = isShown
+          ? (window.t ? window.t('toast_overlay_on') : '🕰️ Режим предшественников: показано, что росло в прошлом году')
+          : (window.t ? window.t('toast_overlay_off') : 'Режим сравнения выключен');
+        this.showToast(msg);
       });
     }
 

@@ -562,6 +562,12 @@ class GardenMap {
             const plantText = tr('plant_cta') || (currentLang === 'et' ? 'Istuta' : currentLang === 'lv' ? 'Stādīt' : currentLang === 'lt' ? 'Pasodinti' : 'Посадить');
             const freeText = tr('free_slot') || (currentLang === 'et' ? 'Vaba istutamiseks' : currentLang === 'lv' ? 'Brīvs stādīšanai' : currentLang === 'lt' ? 'Laisva sodinimui' : 'Свободно для посадки');
             const grownInText = tr('grown_in_year', { year: prevYear }) || `В ${prevYear} г. росло:`;
+            const emptyLastYearText = tr('empty_last_year') || (
+              currentLang === 'et' ? 'oli tühi' :
+              currentLang === 'lv' ? 'bija tukša' :
+              currentLang === 'lt' ? 'buvo tuščia' :
+              'грядка пустовала'
+            );
 
             const secHistory = this.storage.getBedHistoryArray(bed.id, activeYear, sec.id);
             const rotationEval = currentPlanting?.cropId
@@ -616,10 +622,17 @@ class GardenMap {
                     <div class="gh-strip-right">
                       ${this.getRotationBadge(rotationEval, bed.width <= 3.5)}
                       ${prevCrop ? `
-                        <span class="gh-prev-year-tag" title="${escapeHtml(grownInText)} ${escapeHtml(prevCropName)}">
-                          ${prevYear}: ${getCropSvg(prevCrop.id)}
+                        <span class="gh-prev-year-tag ${this.showPreviousYearOverlay ? 'highlight-prev' : ''}" title="${escapeHtml(grownInText)} ${escapeHtml(prevCropName)}">
+                          <span class="prev-year-label">${prevYear}:</span>
+                          <span class="prev-crop-svg">${getCropSvg(prevCrop.id)}</span>
+                          ${this.showPreviousYearOverlay ? `<strong class="prev-crop-title-gh">${escapeHtml(prevCropName)}</strong>` : ''}
                         </span>
-                      ` : ''}
+                      ` : (this.showPreviousYearOverlay ? `
+                        <span class="gh-prev-year-tag pred-empty-tag" title="${escapeHtml(emptyLastYearText)}">
+                          <span class="prev-year-label">${prevYear}:</span>
+                          <span class="pred-empty-label">${escapeHtml(emptyLastYearText)}</span>
+                        </span>
+                      ` : '')}
                     </div>
                   </div>
                 </div>
@@ -662,14 +675,14 @@ class GardenMap {
                   </div>
 
                   <!-- Низ: Предшественник -->
-                  <div class="gh-v-bottom">
+                  <div class="gh-v-bottom ${this.showPreviousYearOverlay ? 'highlight-prev' : ''}">
                     ${prevCrop ? `
                       <div class="gh-v-prev-wrap" title="${escapeHtml(grownInText)} ${escapeHtml(prevCropName)}">
                         <span class="gh-v-prev-year">'${String(prevYear).slice(-2)}:</span>
                         <span class="gh-v-prev-svg">${getCropSvg(prevCrop.id)}</span>
                       </div>
                     ` : `
-                      <span class="gh-v-empty-dot" title="${escapeHtml(freeText)}">🌱</span>
+                      <span class="gh-v-empty-dot" title="${escapeHtml(emptyLastYearText)}">—</span>
                     `}
                   </div>
                 </div>
@@ -727,6 +740,14 @@ class GardenMap {
 
     const cropSvgIcon = currentCrop ? getCropSvg(currentCrop.id) : '';
     const prevCropSvgIcon = prevCrop ? getCropSvg(prevCrop.id) : '';
+    const prevFamily = prevCrop ? getFamilyById(prevCrop.family) : null;
+    const prevFamilyName = prevFamily ? (typeof getFamilyName === 'function' ? getFamilyName(prevFamily, currentLang) : (prevFamily.nameRu || prevFamily.name)) : '';
+    const emptyLastYearText = tr('empty_last_year') || (
+      currentLang === 'et' ? 'oli tühi' :
+      currentLang === 'lv' ? 'bija tukša' :
+      currentLang === 'lt' ? 'buvo tuščia' :
+      'грядка пустовала'
+    );
 
     const typeIcons = {
       greenhouse: '🏡',
@@ -786,7 +807,7 @@ class GardenMap {
             </div>
           `}
 
-          ${prevCrop ? `
+          ${!this.showPreviousYearOverlay && prevCrop ? `
             <span class="bed-prev-year-pill" title="${escapeHtml(grownInText)} ${escapeHtml(prevCropName)}">
               <span class="prev-year-num">${prevYear}:</span>
               <span class="prev-crop-svg">${prevCropSvgIcon}</span>
@@ -794,10 +815,16 @@ class GardenMap {
           ` : ''}
         </div>
 
-        ${this.showPreviousYearOverlay && prevCrop ? `
-          <div class="bed-history-ghost" title="${escapeHtml(grownInText)} ${escapeHtml(prevCropName)}">
-            <span class="ghost-tag">${prevYear}:</span>
-            <span class="ghost-crop">${prevCropSvgIcon} ${escapeHtml(prevCropName)}</span>
+        ${this.showPreviousYearOverlay ? `
+          <div class="bed-predecessor-card ${prevCrop ? '' : 'pred-empty'}" title="${escapeHtml(grownInText)} ${escapeHtml(prevCropName || emptyLastYearText)}">
+            <span class="pred-year-tag">${prevYear}:</span>
+            ${prevCrop ? `
+              <span class="pred-crop-avatar">${prevCropSvgIcon}</span>
+              <strong class="pred-crop-title">${escapeHtml(prevCropName)}</strong>
+              ${prevFamilyName ? `<span class="pred-crop-family">(${escapeHtml(prevFamilyName)})</span>` : ''}
+            ` : `
+              <span class="pred-empty-label">${escapeHtml(emptyLastYearText)}</span>
+            `}
           </div>
         ` : ''}
       </div>
@@ -1042,14 +1069,10 @@ class GardenMap {
 
   handleWheel(e) {
     e.preventDefault();
-    if (e.ctrlKey) {
-      const factor = e.deltaY < 0 ? 1.15 : 0.87;
-      this.zoomBy(factor, e.clientX, e.clientY);
-    } else {
-      this.panX -= e.deltaX * 0.9;
-      this.panY -= e.deltaY * 0.9;
-      this.updateTransform();
-    }
+    if (Math.abs(e.deltaY) < 0.5) return;
+    // Колёсико мыши напрямую меняет масштаб (Zoom In / Zoom Out) в точке курсора
+    const factor = e.deltaY < 0 ? 1.14 : 0.88;
+    this.zoomBy(factor, e.clientX, e.clientY);
   }
 
   handleGlobalMouseMove(e) {
