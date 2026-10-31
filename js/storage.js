@@ -658,9 +658,14 @@ class GardenStorage {
       return true;
     } catch (e) {
       console.error('Ошибка сохранения данных в LocalStorage:', e);
-      if (typeof window !== 'undefined' && window.app && typeof window.app.showToast === 'function') {
-        const quotaMsg = (typeof window.t === 'function') ? window.t('toast_storage_error') : null;
-        window.app.showToast(quotaMsg || '⚠️ Ошибка сохранения: хранилище браузера переполнено! Сделайте резервную копию.', 'error');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('garden-storage-full', { detail: e }));
+        if (window.app && typeof window.app.openStorageFullModal === 'function') {
+          window.app.openStorageFullModal();
+        } else if (window.app && typeof window.app.showToast === 'function') {
+          const quotaMsg = (typeof window.t === 'function') ? window.t('toast_storage_error') : null;
+          window.app.showToast(quotaMsg || '⚠️ Память браузера переполнена! Экспортируйте план в файл.', 'error');
+        }
       }
       return false;
     }
@@ -1018,8 +1023,190 @@ class GardenStorage {
       return { success: false, error: e.message };
     }
   }
+
+  // --- Агро-журнал: Журнал подкормок и ухода (Care Logs) ---
+  addBedCareLog(bedId, year, logEntry, sectionId = null) {
+    const bed = this.getBedById(bedId);
+    if (!bed) return null;
+    const target = (sectionId && bed.sections)
+      ? (bed.sections.find(s => s.id === sectionId) || bed)
+      : bed;
+
+    if (!target.careLogs) target.careLogs = {};
+    const yStr = String(year);
+    if (!target.careLogs[yStr]) target.careLogs[yStr] = [];
+
+    const entry = {
+      id: 'log_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      date: logEntry.date || new Date().toISOString().split('T')[0],
+      type: logEntry.type || 'fertilizer', // fertilizer | protection | care
+      title: (logEntry.title || '').trim(),
+      note: (logEntry.note || '').trim(),
+      createdAt: new Date().toISOString()
+    };
+
+    target.careLogs[yStr].unshift(entry);
+    this.saveData();
+    return entry;
+  }
+
+  getBedCareLogs(bedId, year, sectionId = null) {
+    const bed = this.getBedById(bedId);
+    if (!bed) return [];
+    const target = (sectionId && bed.sections)
+      ? (bed.sections.find(s => s.id === sectionId) || bed)
+      : bed;
+
+    const yStr = String(year);
+    if (!target.careLogs || !target.careLogs[yStr]) return [];
+    return target.careLogs[yStr];
+  }
+
+  deleteBedCareLog(bedId, year, logId, sectionId = null) {
+    const bed = this.getBedById(bedId);
+    if (!bed) return false;
+    const target = (sectionId && bed.sections)
+      ? (bed.sections.find(s => s.id === sectionId) || bed)
+      : bed;
+
+    const yStr = String(year);
+    if (!target.careLogs || !target.careLogs[yStr]) return false;
+    target.careLogs[yStr] = target.careLogs[yStr].filter(item => item.id !== logId);
+    this.saveData();
+    return true;
+  }
+}
+
+/**
+ * Хранилище фотографий урожая в IndexedDB
+ * Позволяет хранить десятки снимков высокого качества,
+ * не расходуя лимит LocalStorage и не переполняя браузер!
+ */
+class GardenPhotoStorage {
+  constructor() {
+    this.dbName = 'SmartGardenPhotosDB';
+    this.dbVersion = 1;
+    this.db = null;
+    this.memoryFallback = new Map();
+  }
+
+  async open() {
+    if (this.db) return this.db;
+    if (typeof window === 'undefined' || !window.indexedDB) return null;
+
+    return new Promise((resolve) => {
+      try {
+        const req = window.indexedDB.open(this.dbName, this.dbVersion);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains('photos')) {
+            const store = db.createObjectStore('photos', { keyPath: 'id' });
+            store.createIndex('bedId', 'bedId', { unique: false });
+            store.createIndex('year', 'year', { unique: false });
+          }
+        };
+        req.onsuccess = (e) => {
+          this.db = e.target.result;
+          resolve(this.db);
+        };
+        req.onerror = (e) => {
+          console.warn('IndexedDB unavailable, fallback to memory:', e);
+          resolve(null);
+        };
+      } catch (err) {
+        console.warn('IndexedDB error:', err);
+        resolve(null);
+      }
+    });
+  }
+
+  async addPhoto(bedId, year, dataUrl, caption = '', date = '') {
+    const id = 'photo_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+    const photoObj = {
+      id,
+      bedId,
+      year: parseInt(year, 10),
+      caption: (caption || '').trim(),
+      date: date || new Date().toISOString().split('T')[0],
+      dataUrl,
+      createdAt: new Date().toISOString()
+    };
+
+    const db = await this.open();
+    if (!db) {
+      this.memoryFallback.set(id, photoObj);
+      return photoObj;
+    }
+
+    return new Promise((resolve, reject) => {
+      try {
+        const tx = db.transaction('photos', 'readwrite');
+        const store = tx.objectStore('photos');
+        const req = store.add(photoObj);
+        req.onsuccess = () => resolve(photoObj);
+        req.onerror = (err) => reject(err);
+      } catch (err) {
+        this.memoryFallback.set(id, photoObj);
+        resolve(photoObj);
+      }
+    });
+  }
+
+  async getPhotosByBed(bedId, year = null) {
+    const db = await this.open();
+    if (!db) {
+      const results = [];
+      this.memoryFallback.forEach(p => {
+        if (p.bedId === bedId && (year === null || p.year === parseInt(year, 10))) {
+          results.push(p);
+        }
+      });
+      return results.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    }
+
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction('photos', 'readonly');
+        const store = tx.objectStore('photos');
+        const index = store.index('bedId');
+        const req = index.getAll(bedId);
+        req.onsuccess = () => {
+          let list = req.result || [];
+          if (year !== null) {
+            const targetY = parseInt(year, 10);
+            list = list.filter(p => p.year === targetY);
+          }
+          list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+          resolve(list);
+        };
+        req.onerror = () => resolve([]);
+      } catch (e) {
+        resolve([]);
+      }
+    });
+  }
+
+  async deletePhoto(photoId) {
+    this.memoryFallback.delete(photoId);
+    const db = await this.open();
+    if (!db) return true;
+
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction('photos', 'readwrite');
+        const store = tx.objectStore('photos');
+        const req = store.delete(photoId);
+        req.onsuccess = () => resolve(true);
+        req.onerror = () => resolve(false);
+      } catch (e) {
+        resolve(false);
+      }
+    });
+  }
 }
 
 if (typeof window !== 'undefined') {
   window.GardenStorage = GardenStorage;
+  window.GardenPhotoStorage = GardenPhotoStorage;
+  window.photoStorage = new GardenPhotoStorage();
 }

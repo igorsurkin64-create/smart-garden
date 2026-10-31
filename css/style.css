@@ -6857,6 +6857,358 @@ html, body {
   }
 }
 
+/* ==========================================================================
+   5. Калькулятор полива (виджет в инспекторе и сводное модальное окно)
+   ========================================================================== */
+
+.btn-weather-pill {
+  padding: 3px 8px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-weather-pill:hover {
+  border-color: #0284c7;
+  color: #0284c7;
+}
+
+.btn-weather-pill.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+  box-shadow: 0 1px 4px rgba(2, 132, 199, 0.35);
+}
+
+.water-stats-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.water-metric-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.water-metric-val {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #0284c7;
+}
+
+[data-theme="dark"] .water-metric-val {
+  color: #38bdf8;
+}
+
+.water-submetric {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.water-advice-box {
+  background: rgba(2, 132, 199, 0.06);
+  border-left: 2.5px solid #0284c7;
+  padding: 4px 6px;
+  border-radius: 3px;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: var(--text-main);
+  margin-top: 4px;
+}
+
+.water-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.water-modal-stat-card {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  text-align: center;
+}
+
+.water-stat-num {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #0284c7;
+  line-height: 1.2;
+}
+
+[data-theme="dark"] .water-stat-num {
+  color: #38bdf8;
+}
+
+.water-stat-lbl {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   6. Журнал подкормок и ухода (Агро-дневник)
+   ========================================================================== */
+
+.chip-preset-btn {
+  padding: 2px 7px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.chip-preset-btn:hover {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+.care-timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.care-entry-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 0.8rem;
+}
+
+.care-entry-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.care-date-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.care-title-text {
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+}
+
+.care-note-text {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+.care-tag {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  align-self: flex-start;
+}
+
+.care-tag-fertilizer {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+[data-theme="dark"] .care-tag-fertilizer {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.care-tag-protection {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+[data-theme="dark"] .care-tag-protection {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.care-tag-care {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+[data-theme="dark"] .care-tag-care {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+}
+
+.btn-care-del {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 2px 4px;
+  line-height: 1;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-care-del:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ==========================================================================
+   7. Фотографии урожая (IndexedDB Галерея)
+   ========================================================================== */
+
+.photos-grid-wrap {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.photo-card-thumb {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  background: #0f172a;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.photo-card-thumb:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.photo-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-thumb-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
+  color: #ffffff;
+  padding: 2px 4px;
+  font-size: 0.66rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-photo-del {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  border: none;
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: all 0.15s ease;
+}
+
+.btn-photo-del:hover {
+  opacity: 1;
+  background: #ef4444;
+}
+
+/* Полноэкранный Lightbox для фото */
+.photo-lightbox-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.18s ease;
+}
+
+.photo-lightbox-img {
+  max-width: 90vw;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.photo-lightbox-caption {
+  color: #ffffff;
+  margin-top: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
+  max-width: 80vw;
+}
+
+.photo-lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #ffffff;
+  font-size: 1.8rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.photo-lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
 
 
 

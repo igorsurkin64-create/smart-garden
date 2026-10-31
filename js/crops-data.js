@@ -1348,6 +1348,271 @@ function solveCropRotationAssignment(beds, requestedCropIds = [], activeYear = 2
   return assignments;
 }
 
+/**
+ * ==========================================================================
+ * Нормативы водопотребления и калькулятор полива огорода
+ * ==========================================================================
+ */
+const CROP_WATER_NORMS = {
+  cucumber: {
+    weeklyLitersM2: 24,
+    frequencyDays: 'каждые 2 дня',
+    temperature: 'теплая отстоянная (+22..25°C)',
+    method: 'под корень или капельно, избегая увлажнения стебля у шейки',
+    tipsRu: 'Поверхностная корневая система. Не допускать пересыхания, иначе огурцы горчат.'
+  },
+  cabbage_white: {
+    weeklyLitersM2: 26,
+    frequencyDays: '2 раза в неделю',
+    temperature: 'прохладная (+18..20°C)',
+    method: 'обильный полив в лунки / дождевание до завязывания кочана',
+    tipsRu: 'Гигантский вынос влаги широкими листьями. Пик полива — во время налива кочана.'
+  },
+  broccoli: {
+    weeklyLitersM2: 22,
+    frequencyDays: 'каждые 2-3 дня',
+    temperature: 'умеренная (+18..22°C)',
+    method: 'под корень и мелкодисперсное дождевание в жару',
+    tipsRu: 'Любит влажный воздух вокруг головки, при засухе преждевременно уходит в цветушность.'
+  },
+  zucchini: {
+    weeklyLitersM2: 20,
+    frequencyDays: 'раз в 3-4 дня',
+    temperature: 'теплая (+20..22°C)',
+    method: 'строго под корень широким кольцом, не мочить листья и цветки',
+    tipsRu: 'При поливе холодной водой загнивают молодые завязи.'
+  },
+  pumpkin: {
+    weeklyLitersM2: 18,
+    frequencyDays: 'раз в неделю',
+    temperature: 'теплая (+20..22°C)',
+    method: 'глубокий обильный пролив всей прикорневой зоны',
+    tipsRu: 'Глубокие корни. За 3-4 недели до сбора полив полностью прекращают для сахаристости.'
+  },
+  pepper: {
+    weeklyLitersM2: 16,
+    frequencyDays: 'каждые 2-3 дня',
+    temperature: 'теплая (+22..24°C)',
+    method: 'под корень в утренние часы',
+    tipsRu: 'При дефиците влаги осыпаются цветки и формируются мелкие тонкостенные плоды.'
+  },
+  eggplant: {
+    weeklyLitersM2: 18,
+    frequencyDays: 'каждые 2-3 дня',
+    temperature: 'теплая (+22..24°C)',
+    method: 'под корень под мульчу',
+    tipsRu: 'Очень требовательны к теплу и равномерной влажности без застоя воды у корней.'
+  },
+  tomato: {
+    weeklyLitersM2: 15,
+    frequencyDays: '1-2 раза в неделю',
+    temperature: 'теплая (+20..22°C)',
+    method: 'строго под корень, мульчирование, сухой воздух в теплице',
+    tipsRu: 'Никакого дождевания по листьям — это главная защита от фитофторы!'
+  },
+  strawberry: {
+    weeklyLitersM2: 14,
+    frequencyDays: '2 раза в неделю',
+    temperature: 'умеренная (+18..20°C)',
+    method: 'под корень или по бороздам между кустами',
+    tipsRu: 'Критически важен полив во время цветения и налива ягод, а также после сбора урожая.'
+  },
+  carrot: {
+    weeklyLitersM2: 12,
+    frequencyDays: 'раз в 4-5 дней',
+    temperature: 'обычная отстоянная',
+    method: 'глубокое равномерное промачивание на глубину 20-30 см',
+    tipsRu: 'При неравномерном поливе (засуха, потом резкий залив) корнеплоды трескаются.'
+  },
+  beet: {
+    weeklyLitersM2: 12,
+    frequencyDays: 'раз в 5 дней',
+    temperature: 'обычная',
+    method: 'под корень по междурядьям',
+    tipsRu: 'За 3 недели до выкопки полив прекращают для лучшей лежкости зимой.'
+  },
+  radish: {
+    weeklyLitersM2: 14,
+    frequencyDays: 'через день малыми дозами',
+    temperature: 'прохладная',
+    method: 'мелкое дождевание из лейки с ситечком',
+    tipsRu: 'При малейшем пересыхании грунта редис грубеет, горчит и стрелкуется.'
+  },
+  onion: {
+    weeklyLitersM2: 9,
+    frequencyDays: 'раз в 5-6 дней',
+    temperature: 'умеренная',
+    method: 'по междурядьям, не мочить само перо',
+    tipsRu: 'Полив нужен только в мае-июне при росте пера. В июле полив полностью останавливают!'
+  },
+  garlic: {
+    weeklyLitersM2: 9,
+    frequencyDays: 'раз в неделю',
+    temperature: 'умеренная',
+    method: 'в бороздки между рядами',
+    tipsRu: 'За 3 недели до уборки (в июле) полив прекращают, чтобы чешуи высохли.'
+  },
+  dill: {
+    weeklyLitersM2: 12,
+    frequencyDays: '2 раза в неделю',
+    temperature: 'обычная',
+    method: 'дождевание',
+    tipsRu: 'Частый легкий полив дает сочную нежную зелень без жестких волокон.'
+  },
+  lettuce: {
+    weeklyLitersM2: 13,
+    frequencyDays: 'каждые 2 дня',
+    temperature: 'прохладная утренняя',
+    method: 'под корень, стараясь не пачкать розетки землей',
+    tipsRu: 'Листья на 95% состоят из воды, регулярный полив сохраняет нежность и сладость.'
+  },
+  celery: {
+    weeklyLitersM2: 16,
+    frequencyDays: '2 раза в неделю',
+    temperature: 'умеренная',
+    method: 'обильно под корень',
+    tipsRu: 'Влаголюбивая культура, почва должна быть умеренно влажной весь сезон.'
+  },
+  peas: {
+    weeklyLitersM2: 10,
+    frequencyDays: 'раз в 5 дней',
+    temperature: 'обычная',
+    method: 'под корень вдоль шпалеры',
+    tipsRu: 'Особенно важен полив во время массового цветения и налива стручков.'
+  },
+  beans: {
+    weeklyLitersM2: 11,
+    frequencyDays: 'раз в 4-5 дней',
+    temperature: 'теплая (+20°C)',
+    method: 'под корень',
+    tipsRu: 'До цветения поливают умеренно, с появлением бутонов полив удваивают.'
+  },
+  potato: {
+    weeklyLitersM2: 12,
+    frequencyDays: 'раз в неделю',
+    temperature: 'обычная',
+    method: 'в борозды между гребнями',
+    tipsRu: 'Критическая фаза полива — бутонизация и цветение (завязывание клубней).'
+  },
+  green_manure_phacelia: {
+    weeklyLitersM2: 8,
+    frequencyDays: 'при засухе раз в неделю',
+    temperature: 'любая',
+    method: 'дождевание',
+    tipsRu: 'Засухоустойчива, полив нужен только для дружных всходов.'
+  },
+  green_manure_mustard: {
+    weeklyLitersM2: 8,
+    frequencyDays: 'при засухе раз в неделю',
+    temperature: 'любая',
+    method: 'дождевание',
+    tipsRu: 'Быстро наращивает зеленую массу, неприхотлива к поливу.'
+  },
+  fallow: {
+    weeklyLitersM2: 0,
+    frequencyDays: 'не требуется',
+    temperature: '—',
+    method: 'отдых почвы под слоем мульчи',
+    tipsRu: 'Слой мульчи сохраняет естественную влагу в почве.'
+  }
+};
+
+/**
+ * Расчет нормы полива для отдельной грядки
+ */
+function calculateBedWaterNorm(cropId, areaM2 = 4, isGreenhouse = false, weather = 'normal') {
+  const norm = (cropId && CROP_WATER_NORMS[cropId]) ? CROP_WATER_NORMS[cropId] : {
+    weeklyLitersM2: 14,
+    frequencyDays: '2 раза в неделю',
+    temperature: 'теплая отстоянная',
+    method: 'под корень',
+    tipsRu: 'Регулярный умеренный полив теплой водой утром или вечером.'
+  };
+
+  const weatherCoeffs = {
+    hot: 1.45,
+    normal: 1.0,
+    rainy: isGreenhouse ? 0.9 : 0.25
+  };
+  const coeff = weatherCoeffs[weather] || 1.0;
+
+  const weeklyLiters = Math.round(norm.weeklyLitersM2 * areaM2 * coeff);
+  const buckets10L = (weeklyLiters / 10).toFixed(1);
+  const singleWateringLiters = Math.round(weeklyLiters / (norm.frequencyDays.includes('2') ? 2 : (norm.frequencyDays.includes('3') ? 3 : 1)));
+
+  return {
+    weeklyLiters,
+    weeklyBuckets10L: buckets10L,
+    singleWateringLiters,
+    frequencyDays: norm.frequencyDays,
+    temperature: norm.temperature,
+    method: norm.method,
+    tipsRu: norm.tipsRu,
+    baseLitersM2: norm.weeklyLitersM2
+  };
+}
+
+/**
+ * Сводный расчет полива для всего огорода
+ */
+function calculateTotalGardenWater(beds = [], activeYear = 2026, weather = 'normal') {
+  let totalLiters = 0;
+  let greenhouseLiters = 0;
+  let groundLiters = 0;
+  const breakdown = [];
+
+  beds.forEach(bed => {
+    const isGh = bed.type === 'greenhouse';
+    const hasSections = Boolean(bed.sections && bed.sections.length > 0);
+    const secCount = hasSections ? bed.sections.length : 1;
+    const bedArea = (bed.width || 4) * (bed.height || 1.2);
+
+    if (hasSections) {
+      const secArea = bedArea / secCount;
+      bed.sections.forEach((sec, idx) => {
+        const cropId = sec.history?.[activeYear]?.cropId || null;
+        const norm = calculateBedWaterNorm(cropId, secArea, isGh, weather);
+        totalLiters += norm.weeklyLiters;
+        if (isGh) greenhouseLiters += norm.weeklyLiters;
+        else groundLiters += norm.weeklyLiters;
+
+        breakdown.push({
+          bedId: bed.id,
+          bedName: `${bed.name} — ${sec.name || `Рядок ${idx + 1}`}`,
+          cropId,
+          areaM2: secArea,
+          weeklyLiters: norm.weeklyLiters,
+          isGreenhouse: isGh
+        });
+      });
+    } else {
+      const cropId = bed.history?.[activeYear]?.cropId || null;
+      const norm = calculateBedWaterNorm(cropId, bedArea, isGh, weather);
+      totalLiters += norm.weeklyLiters;
+      if (isGh) greenhouseLiters += norm.weeklyLiters;
+      else groundLiters += norm.weeklyLiters;
+
+      breakdown.push({
+        bedId: bed.id,
+        bedName: bed.name,
+        cropId,
+        areaM2: bedArea,
+        weeklyLiters: norm.weeklyLiters,
+        isGreenhouse: isGh
+      });
+    }
+  });
+
+  return {
+    totalLiters,
+    totalBuckets10L: (totalLiters / 10).toFixed(1),
+    totalBarrels200L: (totalLiters / 200).toFixed(1),
+    greenhouseLiters,
+    groundLiters,
+    breakdown
+  };
+}
+
 if (typeof window !== 'undefined') {
   window.CROP_FAMILIES = CROP_FAMILIES;
   window.CROPS_DATABASE = CROPS_DATABASE;
@@ -1365,4 +1630,7 @@ if (typeof window !== 'undefined') {
   window.CROP_CALENDAR_TIMELINE = CROP_CALENDAR_TIMELINE;
   window.getSeasonalCalendarEvents = getSeasonalCalendarEvents;
   window.solveCropRotationAssignment = solveCropRotationAssignment;
+  window.CROP_WATER_NORMS = CROP_WATER_NORMS;
+  window.calculateBedWaterNorm = calculateBedWaterNorm;
+  window.calculateTotalGardenWater = calculateTotalGardenWater;
 }
