@@ -518,10 +518,10 @@ class GardenStorage {
         }
       }
 
-      if (typeof bed.x !== 'number') bed.x = 2;
-      if (typeof bed.y !== 'number') bed.y = 2;
-      if (typeof bed.width !== 'number') bed.width = 4;
-      if (typeof bed.height !== 'number') bed.height = 1.2;
+      if (!Number.isFinite(bed.x) || bed.x < 0 || bed.x > 500) bed.x = 2;
+      if (!Number.isFinite(bed.y) || bed.y < 0 || bed.y > 500) bed.y = 2;
+      if (!Number.isFinite(bed.width) || bed.width < 0.3 || bed.width > 50) bed.width = 4;
+      if (!Number.isFinite(bed.height) || bed.height < 0.3 || bed.height > 50) bed.height = 1.2;
     });
 
     // Координаты грядок сохраняются строго в соответствии с выбором пользователя.
@@ -1036,9 +1036,6 @@ class GardenStorage {
     }
 
     this.saveData();
-    try {
-      window.dispatchEvent(new CustomEvent('garden-data-changed', { detail: { bedId, year, sectionId } }));
-    } catch (_) {}
     return true;
   }
 

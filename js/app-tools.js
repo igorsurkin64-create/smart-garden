@@ -1160,7 +1160,7 @@
               <button type="button" class="btn-pattern-pill ${activeFilterCrop === 'all' ? 'active' : ''}" data-crop="all">Все культуры</button>
               ${['tomato', 'cucumber', 'pepper', 'eggplant', 'strawberry', 'cabbage_white', 'carrot'].map(cId => {
                 const c = getCropById(cId);
-                return c ? `<button type="button" class="btn-pattern-pill ${activeFilterCrop === cId ? 'active' : ''}" data-crop="${cId}">${c.emoji} ${c.name}</button>` : '';
+                return c ? `<button type="button" class="btn-pattern-pill ${activeFilterCrop === cId ? 'active' : ''}" data-crop="${cId}">${escapeHtml(c.emoji)} ${escapeHtml(c.name)}</button>` : '';
               }).join('')}
             </div>
 
@@ -1192,14 +1192,14 @@
                       ${v.photoUrl ? `
                         <img src="${v.photoUrl}" class="holes-variety-img" alt="${escapeHtml(v.name)}">
                       ` : `
-                        <div class="holes-variety-img-placeholder">${c ? c.emoji : '🌱'}</div>
+                        <div class="holes-variety-img-placeholder">${c ? escapeHtml(c.emoji) : '🌱'}</div>
                       `}
                       <div style="flex: 1; min-width: 0;">
                         <div style="font-weight: 700; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                           ${escapeHtml(v.name)}
                         </div>
                         <div class="text-xs text-muted">
-                          ${c ? `${c.emoji} ${c.name}` : 'Культура не указана'}
+                          ${c ? `${escapeHtml(c.emoji)} ${escapeHtml(c.name)}` : 'Культура не указана'}
                         </div>
                         ${v.notes ? `<div class="text-xs text-secondary mt-1">${escapeHtml(v.notes)}</div>` : ''}
                       </div>

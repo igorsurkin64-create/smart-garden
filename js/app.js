@@ -992,9 +992,7 @@ class GardenApp {
         confirmClass: 'btn-danger',
         onConfirm: () => {
           this.storage.deleteBed(bedId);
-          drawer.classList.remove('open');
-          this.activeInspectorBedId = null;
-          this.activeInspectorSectionId = null;
+          this.closeBedInspector();
           this.gardenMap.render();
           const delToast = currentLang === 'et' ? `«${bedTitle}» on kustutatud` :
                            currentLang === 'lv' ? `«${bedTitle}» ir dzēsta` :
@@ -1317,12 +1315,16 @@ class GardenApp {
       }
     };
 
-    // Закрытие при клике снаружи
+    // Закрытие при клике снаружи (с очисткой предыдущего глобального обработчика)
+    if (this._comboboxDocClickHandler) {
+      document.removeEventListener('click', this._comboboxDocClickHandler);
+    }
     const onDocClick = (e) => {
       if (!wrap.contains(e.target)) {
         closeDropdown();
       }
     };
+    this._comboboxDocClickHandler = onDocClick;
     document.addEventListener('click', onDocClick);
   }
 
