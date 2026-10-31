@@ -70,10 +70,10 @@ class GardenMap {
         <span class="nav-zoom-indicator" id="map-zoom-indicator">100%</span>
         <button class="nav-control-btn" id="map-zoom-out-btn" data-i18n-title="zoom_out_title" title="${tr('zoom_out_title') || 'Отдалить (-)'}">➖</button>
         <div class="nav-divider"></div>
-        <button class="nav-control-btn" id="map-fit-btn" data-i18n="btn_fit_all" data-i18n-title="btn_fit_all_title" title="${tr('btn_fit_all_title') || 'Вписать все грядки в экран монитора'}">${tr('btn_fit_all') || '⛶ Вписать всё'}</button>
-        <button class="nav-control-btn" id="map-center-btn" data-i18n="btn_center" data-i18n-title="btn_center_title" title="${tr('btn_center_title') || 'Центрировать'}">${tr('btn_center') || '📍 Центр'}</button>
+        <button class="nav-control-btn" id="map-fit-btn" data-i18n-title="btn_fit_all_title" title="${tr('btn_fit_all_title') || 'Вписать все грядки в экран монитора'}"><span class="nav-control-icon">⛶</span><span class="nav-control-label" data-i18n="btn_fit_all_label"> ${tr('btn_fit_all_label') || 'Вписать всё'}</span></button>
+        <button class="nav-control-btn" id="map-center-btn" data-i18n-title="btn_center_title" title="${tr('btn_center_title') || 'Центрировать'}"><span class="nav-control-icon">📍</span><span class="nav-control-label" data-i18n="btn_center_label"> ${tr('btn_center_label') || 'Центр'}</span></button>
         <div class="nav-divider"></div>
-        <button class="nav-control-btn" id="map-arrange-btn" data-i18n="btn_arrange" data-i18n-title="btn_arrange_title" title="${tr('btn_arrange_title') || 'Разровнять грядки и выстроить ровные проходы без наложений'}">${tr('btn_arrange') || '📏 Расставить дорожки'}</button>
+        <button class="nav-control-btn" id="map-arrange-btn" data-i18n-title="btn_arrange_title" title="${tr('btn_arrange_title') || 'Разровнять грядки и выстроить ровные проходы без наложений'}"><span class="nav-control-icon">📏</span><span class="nav-control-label" data-i18n="btn_arrange_label"> ${tr('btn_arrange_label') || 'Расставить дорожки'}</span></button>
       </div>
 
       <!-- Вьюпорт на весь экран -->

@@ -22,7 +22,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Умный Огород">
   
-  <link rel="stylesheet" href="css/style.css?v=20261031_v5">
+  <link rel="stylesheet" href="css/style.css?v=20261031_v52">
 
   <!-- Yandex.Metrika counter -->
   <script type="text/javascript">
@@ -68,12 +68,14 @@
       <div class="header-right">
         <!-- Кнопка мобильного меню (для узких экранов смартфонов <= 768px) -->
         <button class="btn btn-outline mobile-menu-btn" id="mobile-menu-btn" aria-label="Меню" title="Все действия и меню">
-          ☰ Меню
+          <span class="mobile-menu-icon">☰</span>
+          <span class="mobile-menu-text"> Меню</span>
         </button>
 
         <!-- Главные действия: Новая грядка и Сохранение плана -->
-        <button class="btn btn-primary btn-add-bed-main" id="add-bed-btn" data-i18n="btn_add_bed" title="Создать новую грядку или теплицу на плане">
-          ➕ Новая грядка
+        <button class="btn btn-primary btn-add-bed-main" id="add-bed-btn" title="Создать новую грядку или теплицу на плане">
+          <span class="btn-text-full" data-i18n="btn_add_bed">➕ Новая грядка</span>
+          <span class="btn-text-short" data-i18n="btn_add_bed_short">➕ Грядка</span>
         </button>
         <button class="btn btn-outline btn-backup-main" id="db-modal-btn" data-i18n="btn_backup" title="Резервное копирование и экспорт в файл">
           💾 Резервная копия
@@ -167,19 +169,23 @@
       <div class="nav-tabs-wrapper">
         <button class="nav-tab active" data-tab="map" id="tab-nav-map">
           <span class="tab-icon">🗺️</span>
-          <span data-i18n="tab_map">План огорода</span>
+          <span class="tab-text-full" data-i18n="tab_map">План огорода</span>
+          <span class="tab-text-short" data-i18n="tab_map_short">План</span>
         </button>
         <button class="nav-tab" data-tab="table" id="tab-nav-table">
           <span class="tab-icon">📋</span>
-          <span data-i18n="tab_table">Сводка севооборота</span>
+          <span class="tab-text-full" data-i18n="tab_table">Сводка севооборота</span>
+          <span class="tab-text-short" data-i18n="tab_table_short">Сводка</span>
         </button>
         <button class="nav-tab" data-tab="encyclopedia" id="tab-nav-encyclopedia">
           <span class="tab-icon">🌿</span>
-          <span data-i18n="tab_encyclopedia">Справочник культур</span>
+          <span class="tab-text-full" data-i18n="tab_encyclopedia">Справочник культур</span>
+          <span class="tab-text-short" data-i18n="tab_encyclo_short">Культуры</span>
         </button>
         <button class="nav-tab" data-tab="planner" id="tab-nav-planner">
           <span class="tab-icon">💡</span>
-          <span data-i18n="tab_planner">Правила &amp; Калькулятор</span>
+          <span class="tab-text-full" data-i18n="tab_planner">Правила &amp; Калькулятор</span>
+          <span class="tab-text-short" data-i18n="tab_rules_short">Правила</span>
         </button>
       </div>
     </nav>
@@ -254,6 +260,7 @@
         </div>
 
         <!-- Выдвижная панель / Инспектор грядки (Bed Inspector) -->
+        <div class="bed-inspector-backdrop" id="bed-inspector-backdrop"></div>
         <aside class="bed-inspector-drawer" id="bed-inspector-drawer" aria-label="Свойства грядки">
           <!-- Заполняется динамически при клике по грядке -->
         </aside>
@@ -303,6 +310,28 @@
       </div>
 
       <div class="mobile-menu-body">
+        <div class="mobile-menu-section">
+          <div class="mobile-menu-section-title">Разделы программы</div>
+          <div class="mobile-views-grid">
+            <button class="mobile-view-btn active" id="m-nav-map" data-tab="map">
+              <span style="font-size: 1.25rem;">🗺️</span>
+              <span>План</span>
+            </button>
+            <button class="mobile-view-btn" id="m-nav-table" data-tab="table">
+              <span style="font-size: 1.25rem;">📋</span>
+              <span>Сводка</span>
+            </button>
+            <button class="mobile-view-btn" id="m-nav-encyclo" data-tab="encyclopedia">
+              <span style="font-size: 1.25rem;">🌿</span>
+              <span>Культуры</span>
+            </button>
+            <button class="mobile-view-btn" id="m-nav-rules" data-tab="planner">
+              <span style="font-size: 1.25rem;">💡</span>
+              <span>Правила</span>
+            </button>
+          </div>
+        </div>
+
         <div class="mobile-menu-section">
           <div class="mobile-menu-section-title">Быстрые действия</div>
           <button class="mobile-menu-item" id="m-autoplan-btn" style="color: #10b981; font-weight: 700;">
@@ -412,15 +441,15 @@
   <div id="garden-print-layout"></div>
 
   <!-- Скрипты приложения -->
-  <script src="js/i18n.js?v=20261031_v5"></script>
-  <script src="js/crops-data.js?v=20261031_v5"></script>
-  <script src="js/storage.js?v=20261031_v5"></script>
-  <script src="js/garden-map.js?v=20261031_v5"></script>
-  <script src="js/rotation-advisor.js?v=20261031_v5"></script>
-  <script src="js/app.js?v=20261031_v5"></script>
-  <script src="js/app-bed-modal.js?v=20261031_v5"></script>
-  <script src="js/app-views.js?v=20261031_v5"></script>
-  <script src="js/app-tools.js?v=20261031_v5"></script>
-  <script src="js/app-modals.js?v=20261031_v5"></script>
+  <script src="js/i18n.js?v=20261031_v52"></script>
+  <script src="js/crops-data.js?v=20261031_v52"></script>
+  <script src="js/storage.js?v=20261031_v52"></script>
+  <script src="js/garden-map.js?v=20261031_v52"></script>
+  <script src="js/rotation-advisor.js?v=20261031_v52"></script>
+  <script src="js/app.js?v=20261031_v52"></script>
+  <script src="js/app-bed-modal.js?v=20261031_v52"></script>
+  <script src="js/app-views.js?v=20261031_v52"></script>
+  <script src="js/app-tools.js?v=20261031_v52"></script>
+  <script src="js/app-modals.js?v=20261031_v52"></script>
 </body>
 </html>

@@ -26,6 +26,7 @@ const UI_TRANSLATIONS = {
     season_label: "📅 Сезон:",
     btn_add_season: "➕ Сезон",
     btn_add_bed: "➕ Новая грядка",
+    btn_add_bed_short: "➕ Грядка",
     btn_clear_plan: "🧹 Очистить план",
     btn_demo: "🔄 Демо-пример",
     btn_db: "💾 База данных",
@@ -125,9 +126,13 @@ const UI_TRANSLATIONS = {
 
     // Tabs
     tab_map: "План огорода",
+    tab_map_short: "План",
     tab_table: "Сводка севооборота",
+    tab_table_short: "Сводка",
     tab_encyclopedia: "Справочник культур",
+    tab_encyclo_short: "Культуры",
     tab_planner: "Правила & Калькулятор",
+    tab_rules_short: "Правила",
 
     // Toolbar on map
     filter_label: "🔍 Фильтр:",
@@ -146,6 +151,9 @@ const UI_TRANSLATIONS = {
     btn_fit_all: "⛶ Вписать всё",
     btn_center: "📍 Центр",
     btn_arrange: "📏 Расставить дорожки",
+    btn_fit_all_label: "Вписать всё",
+    btn_center_label: "Центр",
+    btn_arrange_label: "Расставить дорожки",
     btn_fit_all_title: "Вписать все грядки в экран монитора",
     btn_center_title: "Отцентрировать план по центру экрана",
     btn_arrange_title: "Разровнять грядки и выстроить ровные проходы",
@@ -309,6 +317,7 @@ const UI_TRANSLATIONS = {
     season_label: "📅 Hooaeg:",
     btn_add_season: "➕ Hooaeg",
     btn_add_bed: "➕ Uus peenar",
+    btn_add_bed_short: "➕ Peenar",
     btn_clear_plan: "🧹 Tühjenda plaan",
     btn_demo: "🔄 Näidisplaan",
     btn_db: "💾 Andmebaas",
@@ -408,9 +417,13 @@ const UI_TRANSLATIONS = {
 
     // Tabs
     tab_map: "Aiamaa plaan",
+    tab_map_short: "Plaan",
     tab_table: "Külvikorra ülevaade",
+    tab_table_short: "Koond",
     tab_encyclopedia: "Kultuuride teatmik",
+    tab_encyclo_short: "Kultuurid",
     tab_planner: "Reeglid & Kalkulaator",
+    tab_rules_short: "Reeglid",
 
     // Toolbar on map
     filter_label: "🔍 Filter:",
@@ -429,6 +442,9 @@ const UI_TRANSLATIONS = {
     btn_fit_all: "⛶ Sobita vaatesse",
     btn_center: "📍 Keskenda",
     btn_arrange: "📏 Paiguta rajad",
+    btn_fit_all_label: "Sobita vaatesse",
+    btn_center_label: "Keskenda",
+    btn_arrange_label: "Paiguta rajad",
     btn_fit_all_title: "Sobita kõik peenrad ekraanile",
     btn_center_title: "Keskenda aiaplaan ekraani keskele",
     btn_arrange_title: "Joonda peenrad ja loo ühtlased vahekäigud",
@@ -592,6 +608,7 @@ const UI_TRANSLATIONS = {
     season_label: "📅 Sezona:",
     btn_add_season: "➕ Sezona",
     btn_add_bed: "➕ Jauna dobe",
+    btn_add_bed_short: "➕ Dobe",
     btn_clear_plan: "🧹 Notīrīt plānu",
     btn_demo: "🔄 Demo paraugs",
     btn_db: "💾 Datu bāze",
@@ -691,9 +708,13 @@ const UI_TRANSLATIONS = {
 
     // Tabs
     tab_map: "Dārza plāns",
+    tab_map_short: "Plāns",
     tab_table: "Augsekas pārskats",
+    tab_table_short: "Kopsavilkums",
     tab_encyclopedia: "Kultūru rokasgrāmata",
+    tab_encyclo_short: "Kultūras",
     tab_planner: "Noteikumi & Kalkulators",
+    tab_rules_short: "Noteikumi",
 
     // Toolbar on map
     filter_label: "🔍 Filtrs:",
@@ -712,6 +733,9 @@ const UI_TRANSLATIONS = {
     btn_fit_all: "⛶ Ietilpināt visu",
     btn_center: "📍 Centrēt",
     btn_arrange: "📏 Izkārtot celiņus",
+    btn_fit_all_label: "Ietilpināt visu",
+    btn_center_label: "Centrēt",
+    btn_arrange_label: "Izkārtot celiņus",
     btn_fit_all_title: "Ietilpināt visas dobes ekrānā",
     btn_center_title: "Centrēt dārza plānu ekrānā",
     btn_arrange_title: "Izlīdzināt dobes un izveidot glītus celiņus",
@@ -875,6 +899,7 @@ const UI_TRANSLATIONS = {
     season_label: "📅 Sezonas:",
     btn_add_season: "➕ Sezonas",
     btn_add_bed: "➕ Nauja lysvė",
+    btn_add_bed_short: "➕ Lysvė",
     btn_clear_plan: "🧹 Išvalyti planą",
     btn_demo: "🔄 Demo pavyzdys",
     btn_db: "💾 Duomenų bazė",
@@ -974,9 +999,13 @@ const UI_TRANSLATIONS = {
 
     // Tabs
     tab_map: "Daržo planas",
+    tab_map_short: "Planas",
     tab_table: "Sėjomainos suvestinė",
+    tab_table_short: "Suvestinė",
     tab_encyclopedia: "Augalų žinynas",
+    tab_encyclo_short: "Augalai",
     tab_planner: "Taisyklės & Skaičiuoklė",
+    tab_rules_short: "Taisyklės",
 
     // Toolbar on map
     filter_label: "🔍 Filtras:",
@@ -995,6 +1024,9 @@ const UI_TRANSLATIONS = {
     btn_fit_all: "⛶ Sutalpinti viską",
     btn_center: "📍 Centruoti",
     btn_arrange: "📏 Išdėstyti takus",
+    btn_fit_all_label: "Sutalpinti viską",
+    btn_center_label: "Centruoti",
+    btn_arrange_label: "Išdėstyti takus",
     btn_fit_all_title: "Sutalpinti visas lysves ekrane",
     btn_center_title: "Centruoti daržo planą ekrano centre",
     btn_arrange_title: "Išlyginti lysves ir sukurti lygius praėjimus",

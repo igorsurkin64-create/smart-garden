@@ -683,6 +683,12 @@ html, body {
   font-size: 1rem;
 }
 
+.tab-text-short,
+.btn-text-short,
+.bed-inspector-backdrop {
+  display: none;
+}
+
 /* ==========================================================================
    Рабочая область (Main Content)
    ========================================================================== */
@@ -969,6 +975,16 @@ html, body {
   gap: 0.35rem;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
   backdrop-filter: blur(8px);
+}
+
+.nav-control-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-control-label {
+  display: inline;
 }
 
 .nav-control-btn {
@@ -6958,17 +6974,25 @@ html, body {
 }
 
 @media (max-width: 768px) {
-  /* Показываем кнопку мобильного меню */
+  /* Показываем кнопку мобильного меню как аккуратную иконку 34x34 */
   #mobile-menu-btn {
     display: inline-flex !important;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.45rem 0.75rem;
-    font-size: 0.84rem;
-    font-weight: 700;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    padding: 0 !important;
+    font-size: 1.15rem !important;
+    border-radius: var(--radius-md) !important;
   }
 
-  /* Скрываем громоздкие кнопки ПК из шапки */
+  .mobile-menu-text {
+    display: none !important;
+  }
+
+  /* Скрываем громоздкие кнопки ПК и десктопное выпадающее меню из шапки */
+  #header-menu-wrap,
   #clear-plan-btn,
   #reset-demo-btn,
   #db-modal-btn,
@@ -6981,15 +7005,19 @@ html, body {
     display: none !important;
   }
 
-  /* Скрываем навигационные вкладки — на телефоне только План Огорода! */
-  .app-navigation {
-    display: none !important;
+  /* Flexbox-компоновка экрана: Шапка (верх), Рабочая область (центр), Навигация (низ) */
+  .app-container {
+    height: 100vh !important;
+    height: 100dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
-  /* Компактная шапка */
   .app-header {
-    padding: 0.45rem 0.75rem !important;
-    gap: 0.4rem !important;
+    order: 1 !important;
+    flex-shrink: 0 !important;
+    padding: 0.4rem 0.65rem !important;
+    gap: 0.35rem !important;
     flex-wrap: nowrap !important;
     align-items: center !important;
   }
@@ -6999,13 +7027,13 @@ html, body {
   }
 
   .app-logo {
-    gap: 0.4rem !important;
+    gap: 0.35rem !important;
   }
 
   .logo-icon-badge {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 1.15rem !important;
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 1.05rem !important;
   }
 
   .app-subtitle {
@@ -7013,8 +7041,9 @@ html, body {
   }
 
   .app-title {
-    font-size: 1.05rem !important;
+    font-size: 0.98rem !important;
     margin: 0 !important;
+    white-space: nowrap !important;
   }
 
   .header-center {
@@ -7024,13 +7053,14 @@ html, body {
     flex: 1 !important;
     overflow-x: auto;
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
   }
   .header-center::-webkit-scrollbar {
     display: none;
   }
 
   .seasons-control-wrapper {
-    gap: 0.3rem !important;
+    gap: 0.25rem !important;
   }
 
   .seasons-label {
@@ -7038,32 +7068,151 @@ html, body {
   }
 
   .years-bar {
-    gap: 3px !important;
+    gap: 2px !important;
   }
 
   .year-btn {
-    padding: 0.32rem 0.5rem !important;
-    font-size: 0.78rem !important;
+    padding: 0.28rem 0.45rem !important;
+    font-size: 0.76rem !important;
   }
 
   .header-right {
     display: flex !important;
     align-items: center !important;
-    gap: 0.4rem !important;
+    gap: 0.35rem !important;
     flex-shrink: 0;
   }
 
+  .btn-text-full {
+    display: none !important;
+  }
+
+  .btn-text-short {
+    display: inline !important;
+  }
+
   #add-bed-btn {
-    padding: 0.45rem 0.75rem !important;
-    font-size: 0.82rem !important;
+    padding: 0.4rem 0.65rem !important;
+    font-size: 0.8rem !important;
     font-weight: 700 !important;
     white-space: nowrap !important;
   }
 
+  /* Основная рабочая область */
+  .main-content {
+    order: 2 !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+
+  /* Мобильная нижняя панель навигации (Mobile Bottom Navigation Bar) */
+  .app-navigation {
+    order: 3 !important;
+    display: flex !important;
+    position: relative !important;
+    height: 54px !important;
+    min-height: 54px !important;
+    max-height: 54px !important;
+    background: var(--bg-secondary) !important;
+    border-top: 1px solid var(--border-subtle) !important;
+    border-bottom: none !important;
+    padding: 0 4px !important;
+    margin: 0 !important;
+    z-index: 100 !important;
+    box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.08) !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+    box-sizing: content-box !important;
+    flex-shrink: 0 !important;
+  }
+
+  .nav-tabs-wrapper {
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    justify-content: space-around !important;
+    align-items: stretch !important;
+    gap: 2px !important;
+  }
+
+  .nav-tab {
+    flex: 1 1 25% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 3px 2px !important;
+    border-bottom: none !important;
+    border-top: 3px solid transparent !important;
+    border-radius: 6px !important;
+    gap: 2px !important;
+    color: var(--text-muted) !important;
+    background: transparent !important;
+    transition: all 0.15s ease !important;
+    -webkit-tap-highlight-color: transparent !important;
+    cursor: pointer;
+  }
+
+  .nav-tab .tab-icon {
+    font-size: 1.15rem !important;
+    line-height: 1 !important;
+  }
+
+  .tab-text-full {
+    display: none !important;
+  }
+
+  .tab-text-short {
+    display: block !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+    letter-spacing: -0.2px !important;
+  }
+
+  .nav-tab.active {
+    color: var(--primary) !important;
+    border-top-color: var(--primary) !important;
+    background: rgba(16, 185, 129, 0.08) !important;
+  }
+
+  /* Плавающий пульт карты: скрываем длинные тексты кнопок, оставляя только понятные иконки */
+  .map-controls-floating {
+    top: 0.5rem !important;
+    left: 0.5rem !important;
+    padding: 0.25rem 0.35rem !important;
+    gap: 0.25rem !important;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.15) !important;
+  }
+
+  .map-controls-floating .nav-control-label {
+    display: none !important;
+  }
+
+  .map-controls-floating .nav-control-btn {
+    padding: 0.3rem 0.45rem !important;
+    font-size: 0.85rem !important;
+    min-width: 28px !important;
+    height: 28px !important;
+  }
+
+  .map-controls-floating .nav-zoom-indicator {
+    font-size: 0.72rem !important;
+    min-width: 34px !important;
+    padding: 0 2px !important;
+  }
+
   /* Упрощенный тулбар карты */
   .map-toolbar {
-    padding: 0.35rem 0.6rem !important;
+    padding: 0.25rem 0.5rem !important;
     gap: 0.4rem !important;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .map-toolbar::-webkit-scrollbar {
+    display: none;
   }
 
   .toolbar-legend,
@@ -7092,6 +7241,25 @@ html, body {
     font-size: 0.78rem !important;
   }
 
+  /* Сенсорный фон (бэкдроп) для инспектора грядки */
+  .bed-inspector-backdrop {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    z-index: 985 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.25s ease !important;
+    backdrop-filter: blur(2px) !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  .bed-inspector-backdrop.active {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
   /* Выдвижная панель грядки как Bottom Sheet (выезжает снизу) */
   .bed-inspector-drawer {
     position: fixed !important;
@@ -7101,13 +7269,14 @@ html, body {
     right: 0 !important;
     width: 100% !important;
     max-width: 100vw !important;
-    max-height: 84vh !important;
+    max-height: 86vh !important;
     border-radius: 20px 20px 0 0 !important;
     border-left: none !important;
     border-top: 2px solid var(--border-color) !important;
     box-shadow: 0 -12px 45px rgba(0, 0, 0, 0.35) !important;
     transition: bottom 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
     z-index: 990 !important;
+    -webkit-overflow-scrolling: touch;
   }
 
   .bed-inspector-drawer.open {
@@ -7125,6 +7294,130 @@ html, body {
     border-radius: 999px;
     margin: 8px auto 0;
     flex-shrink: 0;
+  }
+
+  .inspector-body {
+    display: flex !important;
+    flex-direction: column !important;
+    padding-bottom: 2.5rem !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Логическая перестановка блоков в инспекторе на мобильных:
+     Сначала посадка, лунки и уход, а размеры и конструктивные параметры — внизу! */
+  .inspector-sections-nav { order: 1 !important; }
+  .inspector-planting-section { order: 2 !important; }
+  .inspector-holes-section { order: 3 !important; }
+  .inspector-rotation-section { order: 4 !important; }
+  .inspector-water-section { order: 5 !important; }
+  .inspector-care-section { order: 6 !important; }
+  .inspector-photos-section { order: 7 !important; }
+  .inspector-recs-section { order: 8 !important; }
+  .inspector-history-section { order: 9 !important; }
+  .inspector-split-section { order: 10 !important; }
+  .inspector-params-section { order: 11 !important; }
+  .inspector-footer-actions { order: 12 !important; }
+
+  /* Адаптивная доска лунок */
+  .holes-bed-board {
+    padding: 8px 6px !important;
+    gap: 8px !important;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+  }
+
+  .hole-slot-btn {
+    width: 48px !important;
+    min-height: 62px !important;
+    padding: 2px !important;
+  }
+
+  .hole-slot-num {
+    font-size: 0.58rem !important;
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  .hole-slot-icon-wrap {
+    margin-top: 6px !important;
+  }
+
+  .hole-slot-crop-svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .hole-slot-variety {
+    font-size: 0.6rem !important;
+    max-width: 42px !important;
+  }
+
+  /* Адаптивность модальных окон на смартфонах */
+  .modal-overlay {
+    padding: 0.5rem !important;
+  }
+
+  .modal-card,
+  .modal-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 94vh !important;
+    border-radius: 16px !important;
+  }
+
+  .modal-header {
+    padding: 0.75rem 1rem !important;
+  }
+
+  .modal-body {
+    padding: 0.75rem 1rem !important;
+  }
+
+  .modal-footer {
+    padding: 0.75rem 1rem !important;
+  }
+
+  /* Адаптивность вкладок "Сводка", "Справочник" и "Правила" */
+  .view-panel {
+    padding: 0.75rem !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .crop-catalog-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Кнопки переключения разделов в мобильном меню */
+  .mobile-views-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .mobile-view-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 4px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-main);
+    cursor: pointer;
+    gap: 3px;
+    transition: all 0.15s ease;
+    font-family: inherit;
+  }
+
+  .mobile-view-btn.active {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: #10b981;
+    color: #10b981;
   }
 
   /* Шторка мобильного меню */

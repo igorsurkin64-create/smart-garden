@@ -174,6 +174,8 @@ class GardenApp {
   closeBedInspector() {
     const drawer = document.getElementById('bed-inspector-drawer');
     if (drawer) drawer.classList.remove('open');
+    const backdrop = document.getElementById('bed-inspector-backdrop');
+    if (backdrop) backdrop.classList.remove('active');
     this.activeInspectorBedId = null;
     this.activeInspectorSectionId = null;
     if (this.gardenMap) {
@@ -318,9 +320,24 @@ class GardenApp {
         this.renderActiveTab();
       });
     });
+
+    const backdrop = document.getElementById('bed-inspector-backdrop');
+    if (backdrop) {
+      backdrop.addEventListener('click', () => {
+        this.closeBedInspector();
+      });
+    }
   }
 
   renderActiveTab() {
+    // Синхронизируем активные вкладки в нижней панели и мобильном меню
+    document.querySelectorAll('.nav-tab').forEach(t => {
+      t.classList.toggle('active', t.getAttribute('data-tab') === this.currentTab);
+    });
+    document.querySelectorAll('.mobile-view-btn').forEach(b => {
+      b.classList.toggle('active', b.getAttribute('data-tab') === this.currentTab);
+    });
+
     // Скрываем все виды
     document.getElementById('view-map').style.display = 'none';
     document.getElementById('view-table').style.display = 'none';
@@ -545,7 +562,7 @@ class GardenApp {
 
       <div class="inspector-body">
         <!-- 1. Основные параметры грядки: Название, размеры, тип и ориентация (сразу сверху) -->
-        <div class="inspector-section" style="border-left: 3px solid #0284c7; background: rgba(2, 132, 199, 0.03);">
+        <div class="inspector-section inspector-params-section" style="border-left: 3px solid #0284c7; background: rgba(2, 132, 199, 0.03);">
           <label class="section-label">${paramsTitle}</label>
           <div class="form-group">
             <label class="form-sublabel">${nameSubLabel}</label>
@@ -585,7 +602,7 @@ class GardenApp {
         </div>
 
         <!-- 2. Блок разделения грядки на рядки (1, 2 или 3) -->
-        <div class="inspector-section" style="border-left: 3px solid var(--primary);">
+        <div class="inspector-section inspector-split-section" style="border-left: 3px solid var(--primary);">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <label class="section-label" style="margin-bottom: 0;">${splitLabel}</label>
             <span class="text-xs" style="color: var(--primary); font-weight: 700;">${sectionsCount}</span>
@@ -605,7 +622,7 @@ class GardenApp {
 
         ${hasSections && sectionsCount > 1 ? `
           <!-- 3. Выбор активного рядка внутри грядки / теплицы -->
-          <div class="inspector-section" style="border-left: 3px solid #0284c7;">
+          <div class="inspector-section inspector-sections-nav" style="border-left: 3px solid #0284c7;">
             <label class="section-label">
               ${chooseRowLabel}
             </label>
@@ -632,7 +649,7 @@ class GardenApp {
         ` : ''}
 
         <!-- 4. Блок выбора посадки на активный год -->
-        <div class="inspector-section">
+        <div class="inspector-section inspector-planting-section">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 4px;">
             <label class="section-label" style="margin-bottom: 0;">
               ${plantingLabel}
@@ -702,7 +719,7 @@ class GardenApp {
         </div>
 
         <!-- 4.3 Схема посадки по лункам и сортам (Шахматка / Ряды) -->
-        <div class="inspector-section" id="inspector-holes-box" style="border-left: 3px solid #10b981; background: rgba(16, 185, 129, 0.03);">
+        <div class="inspector-section inspector-holes-section" id="inspector-holes-box" style="border-left: 3px solid #10b981; background: rgba(16, 185, 129, 0.03);">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
             <label class="section-label" style="margin-bottom: 0;">🌱 Схема посадки по лункам (${activeYear} г.)</label>
             <span class="badge-mini" id="bed-holes-badge" style="font-size: 0.76rem; background: #dcfce7; color: #15803d; padding: 2px 7px; border-radius: 4px; font-weight: 800;"></span>
@@ -711,12 +728,12 @@ class GardenApp {
         </div>
 
         <!-- 5. Анализ севооборота -->
-        <div class="inspector-section rotation-analysis-box" id="rotation-status-box">
+        <div class="inspector-section rotation-analysis-box inspector-rotation-section" id="rotation-status-box">
           ${this.renderInspectorRotationStatus(rotationEval)}
         </div>
 
         <!-- 5.1 Калькулятор полива для этой грядки -->
-        <div class="inspector-section" id="inspector-water-box" style="border-left: 3px solid #0284c7; background: rgba(2, 132, 199, 0.03);">
+        <div class="inspector-section inspector-water-section" id="inspector-water-box" style="border-left: 3px solid #0284c7; background: rgba(2, 132, 199, 0.03);">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
             <label class="section-label" style="margin-bottom: 0;">💧 Потребность в воде и полив</label>
             <span class="badge-mini" id="bed-water-rate" style="font-size: 0.76rem; background: #e0f2fe; color: #0284c7; padding: 2px 7px; border-radius: 4px; font-weight: 800;"></span>
@@ -730,7 +747,7 @@ class GardenApp {
         </div>
 
         <!-- 5.2 Журнал подкормок и ухода (Агро-дневник) -->
-        <div class="inspector-section" id="inspector-care-box" style="border-left: 3px solid #16a34a; background: rgba(22, 163, 74, 0.03);">
+        <div class="inspector-section inspector-care-section" id="inspector-care-box" style="border-left: 3px solid #16a34a; background: rgba(22, 163, 74, 0.03);">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
             <label class="section-label" style="margin-bottom: 0;">🌿 Журнал подкормок и ухода (${activeYear} г.)</label>
             <button type="button" class="btn btn-sm btn-outline" id="btn-toggle-add-care" style="padding: 2px 8px; font-size: 0.78rem;">➕ Записать</button>
@@ -777,7 +794,7 @@ class GardenApp {
         </div>
 
         <!-- 5.3 Фотографии урожая (IndexedDB) -->
-        <div class="inspector-section" id="inspector-photos-box" style="border-left: 3px solid #8b5cf6; background: rgba(139, 92, 246, 0.03);">
+        <div class="inspector-section inspector-photos-section" id="inspector-photos-box" style="border-left: 3px solid #8b5cf6; background: rgba(139, 92, 246, 0.03);">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
             <label class="section-label" style="margin-bottom: 0;">📸 Фотографии урожая (${activeYear} г.)</label>
             <label class="btn btn-sm btn-primary" style="cursor: pointer; padding: 2px 8px; font-size: 0.78rem; margin-bottom: 0;">
@@ -790,7 +807,7 @@ class GardenApp {
         </div>
 
         <!-- 6. Умные рекомендации агронома -->
-        <div class="inspector-section">
+        <div class="inspector-section inspector-recs-section">
           <label class="section-label">${topRecTitle}</label>
           <p class="text-xs text-muted">${topRecDesc}</p>
           <div class="recommended-crops-list">
@@ -810,7 +827,7 @@ class GardenApp {
         </div>
 
         <!-- 7. История прошлых лет -->
-        <div class="inspector-section">
+        <div class="inspector-section inspector-history-section">
           <label class="section-label">${pastHistTitle}</label>
           <div class="history-list">
             ${this.renderBedPastHistoryList(targetSource, activeYear)}
@@ -826,10 +843,13 @@ class GardenApp {
     `;
 
     drawer.classList.add('open');
+    const inspectorBackdrop = document.getElementById('bed-inspector-backdrop');
+    if (inspectorBackdrop) inspectorBackdrop.classList.add('active');
 
     // Навешиваем слушатели
     document.getElementById('close-inspector-btn').addEventListener('click', () => {
       drawer.classList.remove('open');
+      if (inspectorBackdrop) inspectorBackdrop.classList.remove('active');
       this.activeInspectorBedId = null;
       this.activeInspectorSectionId = null;
       this.gardenMap.selectBed(null, null);
@@ -1912,6 +1932,16 @@ class GardenApp {
         });
       }
     };
+
+    const switchToTab = (tabName) => {
+      this.currentTab = tabName;
+      this.renderActiveTab();
+    };
+
+    bindMobileAction('m-nav-map', () => switchToTab('map'));
+    bindMobileAction('m-nav-table', () => switchToTab('table'));
+    bindMobileAction('m-nav-encyclo', () => switchToTab('encyclopedia'));
+    bindMobileAction('m-nav-rules', () => switchToTab('planner'));
 
     bindMobileAction('m-autoplan-btn', () => this.openAutoPlanModal());
     bindMobileAction('m-calendar-btn', () => this.openSeasonCalendarModal());
