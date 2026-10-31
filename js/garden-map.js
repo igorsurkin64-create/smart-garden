@@ -1092,11 +1092,20 @@ class GardenMap {
 
       targetX = Math.round(targetX / this.gridSnap) * this.gridSnap;
       targetY = Math.round(targetY / this.gridSnap) * this.gridSnap;
+      targetX = Math.max(0.5, targetX);
+      targetY = Math.max(0.5, targetY);
 
-      const bedEl = document.getElementById(`bed-el-${this.dragBedState.bedId}`);
-      if (bedEl) {
-        bedEl.style.left = `${targetX * this.meterPixels}px`;
-        bedEl.style.top = `${targetY * this.meterPixels}px`;
+      this._dragPendingX = targetX;
+      this._dragPendingY = targetY;
+      if (!this._dragRafId) {
+        this._dragRafId = window.requestAnimationFrame(() => {
+          this._dragRafId = null;
+          const bedEl = document.getElementById(`bed-el-${this.dragBedState.bedId}`);
+          if (bedEl && this.dragBedState.isDragging) {
+            bedEl.style.left = `${this._dragPendingX * this.meterPixels}px`;
+            bedEl.style.top = `${this._dragPendingY * this.meterPixels}px`;
+          }
+        });
       }
       return;
     }
@@ -1107,11 +1116,25 @@ class GardenMap {
 
       this.panX = this.panState.initialPanX + dx;
       this.panY = this.panState.initialPanY + dy;
-      this.updateTransform();
+      if (!this._panRafId) {
+        this._panRafId = window.requestAnimationFrame(() => {
+          this._panRafId = null;
+          this.updateTransform();
+        });
+      }
     }
   }
 
   handleGlobalMouseUp() {
+    if (this._panRafId) {
+      window.cancelAnimationFrame(this._panRafId);
+      this._panRafId = null;
+      this.updateTransform();
+    }
+    if (this._dragRafId) {
+      window.cancelAnimationFrame(this._dragRafId);
+      this._dragRafId = null;
+    }
     if (this.dragBedState.isDragging) {
       const bedEl = document.getElementById(`bed-el-${this.dragBedState.bedId}`);
       if (bedEl) {
