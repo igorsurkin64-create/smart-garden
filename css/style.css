@@ -2059,28 +2059,51 @@ html, body {
 .gh-h-varieties-wrap {
   display: flex;
   align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
+  gap: 5px;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  max-width: 100%;
 }
 
 .gh-h-var-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-left: 3.5px solid #10b981;
+  border-left: 3px solid #10b981;
   padding: 1px 6px;
   border-radius: 4px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 1.3;
 }
 
 [data-theme="dark"] .gh-h-var-badge {
   background: #1e293b;
   border-color: #334155;
   color: #f8fafc;
+}
+
+.gh-h-var-name {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+[data-theme="dark"] .gh-h-var-name {
+  color: #f8fafc;
+}
+
+.gh-h-var-pos {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #0369a1;
+}
+
+[data-theme="dark"] .gh-h-var-pos {
+  color: #38bdf8;
 }
 
 /* Низ вертикальной грядки */

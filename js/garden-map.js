@@ -561,7 +561,7 @@ class GardenMap {
         <!-- Конёк крыши для теплиц -->
         ${isGh ? `<div class="greenhouse-roof-ridge ${isGhHorizontal ? 'ridge-h' : 'ridge-v'}"></div>` : ''}
         
-        <!-- Полоса инструментов внутри грядки (над левой, над центр, над правой) -->
+        <!-- Полоса инструментов внутри грядки -->
         <div class="bed-tools-bar">
           <div class="bed-tools-group">
             <button type="button" class="gh-tool-btn rotate-btn" data-bed-id="${bed.id}" title="${escapeHtml(tr('tool_rotate') || 'Повернуть на 90°')}">↻</button>
@@ -569,11 +569,6 @@ class GardenMap {
             <button type="button" class="gh-tool-btn clone-btn" data-bed-id="${bed.id}" title="${escapeHtml(tr('tool_clone') || 'Дублировать грядку')}">❐</button>
             <button type="button" class="gh-tool-btn delete-btn" data-bed-id="${bed.id}" title="${escapeHtml(tr('tool_delete') || 'Удалить с плана')}">🗑️</button>
           </div>
-          ${overallStatusBadge ? `
-            <div class="bed-tools-center-badge" title="Севооборот конструкции: ${escapeHtml(overallEval?.title || 'Идеально')}">
-              ${overallStatusBadge}
-            </div>
-          ` : ''}
           <span class="bed-sec-indicator">${secCount} ${sectionWord}</span>
         </div>
 
@@ -690,13 +685,14 @@ class GardenMap {
                             ${holeSummary && holeSummary.varieties.length > 0 ? `
                               <div class="gh-h-varieties-wrap">
                                 ${holeSummary.varieties.map(v => `
-                                  <span class="gh-h-var-badge" style="border-left-color: ${v.color};" title="Сорт: ${escapeHtml(v.variety)}, ${escapeHtml(v.rangeText)}">
+                                  <span class="gh-h-var-badge" style="border-left-color: ${v.color};" title="Сорт: ${escapeHtml(v.variety)}, лунки: ${escapeHtml(v.rangeText)} (${v.count} шт)">
                                     <span class="gh-v-var-dot" style="background-color: ${v.color};"></span>
-                                    <strong>${escapeHtml(v.variety)}</strong>: ${escapeHtml(v.rangeText)} (${v.count} шт)
+                                    <strong class="gh-h-var-name">${escapeHtml(v.variety)}</strong>
+                                    <span class="gh-h-var-pos">(${escapeHtml(v.rangeText)}${v.count > 1 ? ` • ${v.count} шт` : ''})</span>
                                   </span>
                                 `).join('')}
                               </div>
-                              <span class="gh-holes-chip-count">🌱 ${holeSummary.plantedCount} куст.</span>
+                              <span class="gh-holes-chip-count" title="${holeSummary.plantedCount} кустов высажено">🌱 ${holeSummary.plantedCount} шт</span>
                             ` : (displayVariety ? `
                               <span class="gh-crop-var" title="${escapeHtml(displayVariety)}">(${escapeHtml(displayVariety)})</span>
                             ` : '')}
@@ -941,13 +937,16 @@ class GardenMap {
                 <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
                   <strong class="crop-name">${escapeHtml(cleanCropName)}</strong>
                   ${holeSummary && holeSummary.varieties.length > 0 ? `
-                    ${holeSummary.varieties.map(v => `
-                      <span class="gh-h-var-badge" style="border-left-color: ${v.color};" title="Сорт: ${escapeHtml(v.variety)}, ${escapeHtml(v.rangeText)}">
-                        <span class="gh-v-var-dot" style="background-color: ${v.color};"></span>
-                        <strong>${escapeHtml(v.variety)}</strong>: ${escapeHtml(v.rangeText)} (${v.count} шт)
-                      </span>
-                    `).join('')}
-                    <span class="gh-holes-chip-count">🌱 ${holeSummary.plantedCount} куст.</span>
+                    <div class="gh-h-varieties-wrap">
+                      ${holeSummary.varieties.map(v => `
+                        <span class="gh-h-var-badge" style="border-left-color: ${v.color};" title="Сорт: ${escapeHtml(v.variety)}, лунки: ${escapeHtml(v.rangeText)} (${v.count} шт)">
+                          <span class="gh-v-var-dot" style="background-color: ${v.color};"></span>
+                          <strong class="gh-h-var-name">${escapeHtml(v.variety)}</strong>
+                          <span class="gh-h-var-pos">(${escapeHtml(v.rangeText)}${v.count > 1 ? ` • ${v.count} шт` : ''})</span>
+                        </span>
+                      `).join('')}
+                    </div>
+                    <span class="gh-holes-chip-count" title="${holeSummary.plantedCount} кустов высажено">🌱 ${holeSummary.plantedCount} шт</span>
                   ` : (displayVariety ? `
                     <span class="crop-variety">${escapeHtml(displayVariety)}</span>
                   ` : '')}

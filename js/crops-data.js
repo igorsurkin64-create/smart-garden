@@ -821,17 +821,35 @@ if (typeof window !== 'undefined') {
  */
 function summarizeHolePlantings(holes = [], defaultCrop = null, lang = 'ru') {
   if (!Array.isArray(holes) || holes.length === 0) return null;
-  const plantedHoles = holes.filter(h => h && ((h.variety && h.variety.trim()) || h.cropId));
-  if (plantedHoles.length === 0) return null;
+
+  // Привязываем оригинальный 1-based номер лунки на случай, если h.index не был проставлен
+  const indexedHoles = holes.map((h, i) => {
+    if (!h) return null;
+    return {
+      ...h,
+      index: (typeof h.index === 'number' && h.index > 0) ? h.index : (i + 1)
+    };
+  }).filter(Boolean);
+
+  // Ищем лунки, где явно указан сорт
+  const holesWithVariety = indexedHoles.filter(h => h.variety && h.variety.trim());
+
+  // Если сорта указаны хотя бы для одной лунки, группируем только лунки с сортами!
+  // Пустые нераспределенные лунки НЕ должны превращаться в псевдо-сорт "Томат 25 шт".
+  let targetHoles = holesWithVariety;
+  if (holesWithVariety.length === 0) {
+    const holesWithCrop = indexedHoles.filter(h => h.cropId);
+    if (holesWithCrop.length === 0) return null;
+    targetHoles = holesWithCrop;
+  }
 
   const groups = new Map();
-  holes.forEach((h, idx) => {
+  targetHoles.forEach((h) => {
     if (!h) return;
     const vName = (h.variety || '').trim();
     const cId = h.cropId || defaultCrop?.id || null;
-    if (!vName && !cId) return; // пустая лунка
+    const key = vName ? `var:::${vName.toLowerCase()}` : `crop:::${cId || 'default'}`;
 
-    const key = `${cId || ''}:::${vName || ''}`;
     if (!groups.has(key)) {
       const cropObj = cId ? getCropById(cId) : defaultCrop;
       groups.set(key, {
@@ -843,13 +861,13 @@ function summarizeHolePlantings(holes = [], defaultCrop = null, lang = 'ru') {
       });
     }
     const g = groups.get(key);
-    g.holeIndices.push(h.index || (idx + 1));
+    g.holeIndices.push(h.index);
     g.count++;
   });
 
   const formatRanges = (indices) => {
     if (!indices || indices.length === 0) return '';
-    if (indices.length === 1) return `лунка №${indices[0]}`;
+    if (indices.length === 1) return `№${indices[0]}`;
     const sorted = [...indices].sort((a, b) => a - b);
     const ranges = [];
     let start = sorted[0];
@@ -869,7 +887,9 @@ function summarizeHolePlantings(holes = [], defaultCrop = null, lang = 'ru') {
 
   const varieties = [];
   groups.forEach(g => {
-    const varTitle = g.variety || (g.crop ? (typeof getCropName === 'function' ? getCropName(g.crop, lang) : g.crop.name) : 'Посадка');
+    const rawCropName = g.crop ? (typeof getCropName === 'function' ? getCropName(g.crop, lang) : g.crop.name) : '';
+    const cleanCrop = rawCropName.replace(/\s*\(.*?\)/g, '').trim() || 'Посадка';
+    const varTitle = g.variety || cleanCrop;
     varieties.push({
       cropId: g.cropId,
       crop: g.crop,
@@ -882,10 +902,11 @@ function summarizeHolePlantings(holes = [], defaultCrop = null, lang = 'ru') {
     });
   });
 
+  const totalPlanted = targetHoles.length;
   return {
     totalHoles: holes.length,
-    plantedCount: plantedHoles.length,
-    emptyCount: holes.length - plantedHoles.length,
+    plantedCount: totalPlanted,
+    emptyCount: holes.length - totalPlanted,
     varieties
   };
 }
