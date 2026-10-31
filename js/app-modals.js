@@ -1519,8 +1519,7 @@
           `💬 <b>Сообщение:</b>\n${safeMsg}`;
 
         // Отправка через безопасный серверный прокси Google Apps Script (без токена в браузере)
-        // Вставьте сюда URL развёрнутого веб-приложения Google Apps Script (https://script.google.com/macros/s/.../exec)
-        const FEEDBACK_SCRIPT_URL = window.SMART_GARDEN_FEEDBACK_URL || '';
+        const FEEDBACK_SCRIPT_URL = window.SMART_GARDEN_FEEDBACK_URL || 'https://script.google.com/macros/s/AKfycbyeV4HD7wz_hotJdi_p112JEuDrgBChYKOp7auXC25M5FP6hDazzlN0NUTG_ztsVpRP/exec';
 
         try {
           if (!FEEDBACK_SCRIPT_URL) {
