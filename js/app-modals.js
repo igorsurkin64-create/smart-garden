@@ -24,16 +24,18 @@
     // Локализованные разделы инструкции
     const HELP_CONTENT = {
       ru: {
-        title: "📖 Руководство пользователя «Мой Огород»",
-        subtitle: "Интерактивная инструкция по работе с картой, грядками, севооборотом и резервными копиями",
+        title: "📖 Руководство пользователя «Умный Огород»",
+        subtitle: "Интерактивная инструкция по работе с картой, лунками, севооборотом, поливом и резервными копиями",
         tabs: [
           { id: 'quickstart', label: '🚀 Быстрый старт' },
-          { id: 'rotation', label: '🔄 Севооборот' },
+          { id: 'holes', label: '🌱 Лунки и сорта' },
+          { id: 'rotation', label: '🔄 Севооборот и культуры' },
           { id: 'beds', label: '📦 Конструктор грядок' },
-          { id: 'data', label: '💾 Данные и копии' },
+          { id: 'care', label: '💧 Полив и уход' },
+          { id: 'data', label: '💾 Данные и печать' },
           { id: 'tips', label: '💡 Советы агронома' },
           { id: 'donate', label: '☕ Поддержать автора' },
-          { id: 'feedback', label: '💡 Идеи и отзывы' }
+          { id: 'feedback', label: '✈️ Связь и Telegram' }
         ],
         sections: {
           quickstart: [
@@ -49,35 +51,87 @@
             },
             {
               icon: '📏',
-              title: 'Автоматическая расстановка дорожек',
+              title: 'Автоматическая расстановка дорожек (60 см)',
               desc: 'Кнопка <strong>📏 Расставить дорожки</strong> мгновенно упорядочивает грядки ровными рядами с комфортными проходами по 60 см без взаимных наложений.'
             },
             {
               icon: '🖐️',
-              title: 'Перемещение грядок по участку',
-              desc: 'Зажмите маркер <span class="help-kbd">⋮⋮</span> в левом углу грядки или её заголовок и перетаскивайте в любое удобное место. Новые координаты сохраняются автоматически.'
+              title: 'Управление грядками прямо на карте',
+              desc: 'Зажмите маркер <span class="help-kbd">⋮⋮</span> в левом углу грядки или её заголовок и перетаскивайте в любое удобное место. Кнопка <strong>↻</strong> поворачивает грядку на 90°, кнопка <strong>❐</strong> создаёт точную копию грядки, а кнопка <strong>🗑️</strong> удаляет её.'
             },
             {
-              icon: '↻',
-              title: 'Поворот и дублирование',
-              desc: 'Кнопка <strong>↻</strong> на карточке грядки поворачивает её на 90°. Кнопка <strong>❐</strong> мгновенно создаёт рядом точную копию грядки, а кнопка <strong>🗑️</strong> удаляет её.'
+              icon: '📝',
+              title: 'Инспектор грядки и посадок в 1 клик',
+              desc: 'Кликните на любую грядку или ряд в теплице — справа откроется панель Инспектора для выбора культуры, настройки лунок, расчёта полива и журнала ухода.'
+            },
+            {
+              icon: '📲',
+              title: 'Установка на телефон и ПК (PWA офлайн)',
+              desc: 'Нажмите кнопку <strong>📲 Установить</strong> в верхнем меню — приложение установится на рабочий стол или экран телефона и будет работать автономно даже без интернета.'
+            }
+          ],
+          holes: [
+            {
+              icon: '⚡',
+              title: 'Схемы посадки: шахматка, 2 ряда, 1 ряд',
+              desc: 'Для любой грядки или рядка теплицы можно настроить схему лунок: <strong>⚡ В 2 ряда со смещением (шахматка)</strong>, <strong>═ В 2 ряда (параллельно)</strong> или <strong>─ В 1 ряд</strong> с регулировкой количества лунок от 2 до 40 шт.'
+            },
+            {
+              icon: '🍅',
+              title: 'Разные сорта на одной грядке',
+              desc: 'Больше не нужно ограничиваться одним сортом! Вы можете высадить в лунку №1 сорт <em>«Черри»</em>, в лунки №2–20 — сорт <em>«Бычье сердце»</em>, а в лунки №21–27 — сорт <em>«Хурма»</em>.'
+            },
+            {
+              icon: '⚡',
+              title: 'Быстрое заполнение сортов (диапазоны)',
+              desc: 'Укажите диапазон лунок (например, <em>«С 1 по 10»</em>), выберите сорт из картотеки или введите название и нажмите <strong>«Заполнить»</strong> — лунки мгновенно будут размечены нужным сортом.'
+            },
+            {
+              icon: '🥒',
+              title: 'Умное наследование культуры',
+              desc: 'Если на грядке или в первой лунке выбран Огурец, при открытии любой следующей лунки сразу по умолчанию активен <strong>🥒 Огурец</strong> с быстрыми кнопками популярных сортов (<em>Герман F1</em>, <em>Кураж F1</em>, <em>Парижский корнишон</em>).'
+            },
+            {
+              icon: '🗺️',
+              title: '2D-микро-лента лунок прямо на плане',
+              desc: 'Прямо на карточке грядки отображается уменьшенная лента всех лунок с подсветкой высаженных растений, индикатор заполнения (<em>🌱 27/27</em>) и кнопка сортов (<em>⚡ 3 сорта ▾</em>).'
+            },
+            {
+              icon: '📋',
+              title: 'Выпадающий список сортов на карте',
+              desc: 'Кликните на кнопку сортов на грядке — откроется красивое меню со списком всех высаженных сортов, номерами их лунок и количеством занятых мест.'
+            },
+            {
+              icon: '📸',
+              title: 'Картотека сортов и фото пакетиков семян',
+              desc: 'В окне настройки лунки можно сфотографировать пакетик с семенами или урожай. Фотография сохранится в картотеку сортов и будет привязана к этой культуре.'
             }
           ],
           rotation: [
             {
               icon: '🟢',
-              title: 'Зелёный индикатор — «Идеально»',
-              desc: 'Превосходный предшественник! Растения принадлежат к разным семействам, почва отдохнула, отсутствуют общие болезни и вредители. Урожай будет максимальным.'
+              title: 'Зелёный индикатор — «Идеально ✓»',
+              desc: 'Превосходный предшественник! Растения принадлежат к разным ботаническим семействам, почва отдохнула, отсутствуют общие болезни и вредители. Урожай будет максимальным.'
             },
             {
               icon: '🟡',
-              title: 'Жёлтый индикатор — «Внимание»',
+              title: 'Жёлтый индикатор — «Внимание !»',
               desc: 'Допустимый предшественник. Посадка возможна, однако рекомендуется обогатить почву: внести перегной, компост, биогумус или золу.'
             },
             {
               icon: '🔴',
-              title: 'Красный индикатор — «Нарушение!»',
-              desc: 'Недопустимо! Родственные культуры из одного ботанического семейства (например, томат после картофеля — оба Паслёновые) либо опасный предшественник. Высокий риск фитофторы, нематод и почвоутомления.'
+              title: 'Красный индикатор — «Нарушение ✕»',
+              desc: 'Недопустимо! Родственные культуры из одного семейства подряд (напр. томат после картофеля — оба Паслёновые) либо опасный предшественник. Высокий риск фитофторы, нематод и почвоутомления.'
+            },
+            {
+              icon: '🔍',
+              title: 'Живой поиск культур и комбобокс',
+              desc: 'Вводите первые буквы названия культуры в строке поиска — выпадающий список мгновенно фильтрует растения с красивыми иконками.'
+            },
+            {
+              icon: '➕',
+              title: 'Создание любой своей культуры в 1 клик',
+              desc: 'Если нужного растения нет в каталоге, введите его название в строке поиска и нажмите <strong>«➕ Создать культуру»</strong>. Выберите значок (смайлик) и семейство — культура сразу добавится в вашу личную базу и будет учитываться в севообороте!'
             },
             {
               icon: '💡',
@@ -93,8 +147,8 @@
           beds: [
             {
               icon: '🏠',
-              title: 'Теплицы с независимыми секциями',
-              desc: 'Создавайте теплицы с 2 или 3 отдельными рядами (Левый, Центр, Правый) с проходами. В каждой секции можно независимо сажать свою культуру и контролировать севооборот.'
+              title: 'Теплицы с независимыми секциями (Левый, Центр, Правый)',
+              desc: 'Создавайте теплицы с 2 или 3 отдельными рядами с проходами. В каждой секции можно независимо сажать свою культуру, вести свой севооборот и настраивать схему лунок.'
             },
             {
               icon: '🪵',
@@ -112,16 +166,48 @@
               desc: 'Для каждой грядки или рядка можно указать конкретный сорт («Бычье сердце», «Кураж F1») и записать памятку по поливу, подкормке, дате посева и сбора урожая.'
             }
           ],
+          care: [
+            {
+              icon: '💧',
+              title: 'Умный калькулятор нормы полива',
+              desc: 'Автоматически рассчитывает потребность в воде для выбранной культуры: общий объём на грядку (в литрах) и индивидуальную норму на каждый куст/лунку.'
+            },
+            {
+              icon: '🌦️',
+              title: 'Корректировка полива по погоде',
+              desc: 'Переключайте кнопки погоды в Инспекторе: <strong>«☀️ Жара»</strong> (повышенная норма), <strong>«⛅ Норма»</strong>, <strong>«🌧️ Дождь / Пасмурно»</strong> (сниженный полив) — нормы пересчитываются моментально.'
+            },
+            {
+              icon: '📝',
+              title: 'Журнал подкормок и ухода',
+              desc: 'Фиксируйте внесение органики, минеральных удобрений, золы, опрыскивание от вредителей, даты высадки рассады и пасынкования с точными датами прямо в инспекторе грядки.'
+            },
+            {
+              icon: '📸',
+              title: 'Фотогалерея грядки по годам',
+              desc: 'Загружайте фотографии посадок, цветения и созревания урожая по годам — создавайте наглядную визуальную летопись каждого уголка вашего огорода!'
+            }
+          ],
           data: [
             {
               icon: '💾',
               title: 'Полная автономность и автосохранение',
-              desc: 'Программа работает без интернета. Все грядки, сезоны и заметки моментально сохраняются в локальной памяти вашего браузера или приложения (LocalStorage).'
+              desc: 'Программа работает без интернета. Все грядки, схемы лунок, заметки и история моментально сохраняются в локальной памяти вашего браузера или телефона (LocalStorage).'
+            },
+            {
+              icon: '🖨️',
+              title: 'Печать плана огорода (формат А4)',
+              desc: 'Кнопка <strong>«🖨️ Печать плана»</strong> готовит красивый макет А4 для вывода на принтер или сохранения в PDF: план участка, таблица посадок и памятка по севообороту.'
+            },
+            {
+              icon: '📲',
+              title: 'Установка как приложение (PWA)',
+              desc: 'Нажмите кнопку <strong>📲 Установить</strong> в шапке программы, чтобы установить «Умный Огород» на рабочий стол компьютера или экран смартфона для быстрого запуска в 1 клик.'
             },
             {
               icon: '📥',
-              title: 'Сохранение плана в файл',
-              desc: 'Через кнопку <strong>«💾 Резервная копия»</strong> сохраните файл плана на свой компьютер или телефон, чтобы обезопасить данные или перенести их на другое устройство.'
+              title: 'Сохранение плана в файл (Резервная копия)',
+              desc: 'Через меню <strong>«💾 Резервная копия»</strong> сохраните файл плана (.json) на свой компьютер или телефон, чтобы обезопасить данные или перенести их на другое устройство.'
             },
             {
               icon: '📤',
@@ -131,7 +217,7 @@
             {
               icon: '🔄',
               title: 'Демо-образец для обучения',
-              desc: 'Кнопка <strong>«🔄 Демо-пример»</strong> загружает готовый образец участка с 26 грядками и теплицами и историей за 3 года (2024–2026).'
+              desc: 'Кнопка <strong>«🔄 Демо-пример»</strong> загружает готовый образцовый участок с 26 грядками и теплицами и историей за 3 года (2024–2026).'
             }
           ],
           tips: [
@@ -175,9 +261,14 @@
           ],
           feedback: [
             {
+              icon: '🚀',
+              title: 'Прямая отправка в Telegram-чат проекта',
+              desc: 'В окне <strong>«💡 Идеи и отзывы»</strong> напишите ваше предложение или вопрос и нажмите синюю кнопку <strong>«🚀 Отправить прямо в Telegram-чат»</strong> — бот мгновенно доставит сообщение в чат сообщества @smartgarden_chat!'
+            },
+            {
               icon: '💡',
               title: 'Предложить новую функцию или улучшение',
-              desc: 'Есть идея, как сделать планировщик ещё удобнее? Нажмите кнопку <strong>«💡 Идеи и отзывы»</strong> в верхнем меню программы, чтобы отправить ваше пожелание автору.'
+              desc: 'Есть идея, как сделать планировщик ещё удобнее? Напишите нам, и автор обязательно рассмотрит и добавит её в ближайших обновлениях.'
             },
             {
               icon: '🌱',
@@ -187,12 +278,12 @@
             {
               icon: '🐛',
               title: 'Сообщить об ошибке или неточности',
-              desc: 'Заметили опечатку, сбой в расчете севооборота или странное поведение интерфейса? Сообщите через форму обратной связи — исправим в ближайшем обновлении.'
+              desc: 'Заметили опечатку, сбой в расчёте севооборота или странное поведение интерфейса? Сообщите через форму обратной связи — исправим немедленно.'
             },
             {
               icon: '✉️',
-              title: 'Прямой контакт с автором',
-              desc: 'Вы также можете написать напрямую на email: <strong style="color:var(--primary);">igor.surkin64@gmail.com</strong>. Автор лично отвечает на все письма садоводов.'
+              title: 'Прямой email автора',
+              desc: 'Вы также можете написать напрямую на почту: <strong style="color:var(--primary);">igor.surkin64@gmail.com</strong>. Автор лично отвечает на все письма садоводов.'
             }
           ]
         }
@@ -202,12 +293,14 @@
         subtitle: "Interaktiivne juhend aiamaa kaardi, peenarde, külvikorra ja varukoopiate haldamiseks",
         tabs: [
           { id: 'quickstart', label: '🚀 Kiire algus' },
+          { id: 'holes', label: '🌱 Istutuspesad ja sordid' },
           { id: 'rotation', label: '🔄 Külvikord' },
           { id: 'beds', label: '📦 Peenarde ehitaja' },
-          { id: 'data', label: '💾 Andmed ja varukoopiad' },
+          { id: 'care', label: '💧 Kastmine ja hooldus' },
+          { id: 'data', label: '💾 Andmed ja trükk' },
           { id: 'tips', label: '💡 Nõuanded' },
           { id: 'donate', label: '☕ Toeta autorit' },
-          { id: 'feedback', label: '💡 Tagasiside & ideed' }
+          { id: 'feedback', label: '✈️ Tagasiside & Telegram' }
         ],
         sections: {
           quickstart: [
@@ -235,6 +328,28 @@
               icon: '↻',
               title: 'Pööramine ja kopeerimine',
               desc: 'Nupp <strong>↻</strong> pöörab peenart 90°. Nupp <strong>❐</strong> teeb peenrast koopia ja <strong>🗑️</strong> kustutab selle.'
+            }
+          ],
+          holes: [
+            {
+              icon: '⚡',
+              title: 'Istutusskeemid (siksak, 2 rida, 1 rida)',
+              desc: 'Iga peenra jaoks saab valida istutusskeemi: siksak <strong>⚡</strong>, 2 rida <strong>═</strong> või 1 rida <strong>─</strong> ja määrata taimepesade arvu (2–40 tk).'
+            },
+            {
+              icon: '🍅',
+              title: 'Erinevad sordid ühel peenral',
+              desc: 'Võite istutada pesadesse erinevaid sorte (nt kirsstomatid, härjasüda jne) ja märkida igale pesale sordi nime.'
+            },
+            {
+              icon: '⚡',
+              title: 'Kiire sortide täitmine',
+              desc: 'Määrake pesade vahemik (nt 1–10) ja valige sort — süsteem täidab need ühe klõpsuga.'
+            },
+            {
+              icon: '📸',
+              title: 'Sortide kartoteek ja fotod',
+              desc: 'Tehke foto seemnepakist või saagist ja salvestage see otse sordi juurde.'
             }
           ],
           rotation: [
@@ -284,6 +399,18 @@
               icon: '✏️',
               title: 'Sordid ja märkmed',
               desc: 'Igale peenrale või reale saab lisada täpse sordi nime ja hooldusmärkmed kastmise või väetamise kohta.'
+            }
+          ],
+          care: [
+            {
+              icon: '💧',
+              title: 'Kastmiskalkulaator',
+              desc: 'Arvutab automaatselt veevajaduse liitrites peenra ja üksikute taimede kohta vastavalt ilmale (kuumus, tavaline, vihm).'
+            },
+            {
+              icon: '📝',
+              title: 'Hooldus- ja väetamispäevik',
+              desc: 'Salvestage väetamise, kastmise ja taimekaitse kuupäevad ning märkmed otse peenra kaardile.'
             }
           ],
           data: [
@@ -376,12 +503,14 @@
         subtitle: "Interaktīva pamācība darbam ar dārza plānu, dobēm, augseku un datu dublēšanu",
         tabs: [
           { id: 'quickstart', label: '🚀 Ātrais starts' },
+          { id: 'holes', label: '🌱 Stādīšanas bedrītes' },
           { id: 'rotation', label: '🔄 Augseka' },
           { id: 'beds', label: '📦 Dobju konstruktors' },
-          { id: 'data', label: '💾 Dati un kopijas' },
+          { id: 'care', label: '💧 Laistīšana un kopšana' },
+          { id: 'data', label: '💾 Dati un druka' },
           { id: 'tips', label: '💡 Padomi' },
           { id: 'donate', label: '☕ Atbalstīt autoru' },
-          { id: 'feedback', label: '💡 Idejas & atsauksmes' }
+          { id: 'feedback', label: '✈️ Saziņa & Telegram' }
         ],
         sections: {
           quickstart: [
@@ -409,6 +538,28 @@
               icon: '↻',
               title: 'Pagriešana un dublēšana',
               desc: 'Poga <strong>↻</strong> pagriež dobi par 90°. Poga <strong>❐</strong> izveido dobes kopiju, bet <strong>🗑️</strong> to izdzēš.'
+            }
+          ],
+          holes: [
+            {
+              icon: '⚡',
+              title: 'Stādīšanas shēmas (šaha kārtībā, 2 rindās, 1 rindā)',
+              desc: 'Katrai dobei var iestatīt bedrīšu shēmu: šaha kārtībā <strong>⚡</strong>, 2 taisnās rindās <strong>═</strong> vai 1 rindā <strong>─</strong> (2–40 bedrītes).'
+            },
+            {
+              icon: '🍅',
+              title: 'Dažādas šķirnes vienā dobē',
+              desc: 'Varat stādīt dažādas šķirnes atsevišķās bedrītēs un fiksēt katras bedrītes nosaukumu.'
+            },
+            {
+              icon: '⚡',
+              title: 'Ātrā šķirņu aizpildīšana diapazonā',
+              desc: 'Norādiet bedrīšu diapazonu (piem., 1–10) un izvēlieties šķirni — tās tiks aizpildītas ar 1 klikšķi.'
+            },
+            {
+              icon: '📸',
+              title: 'Šķirņu kartotēka ar fotogrāfijām',
+              desc: 'Nofotografējiet sēklu paciņu vai ražu un saglabājiet to dobes kartotēkā.'
             }
           ],
           rotation: [
@@ -458,6 +609,18 @@
               icon: '✏️',
               title: 'Šķirnes un kopšanas piezīmes',
               desc: 'Katrai dobei var norādīt konkrētu šķirni un piezīmes par laistīšanu un mēslošanu.'
+            }
+          ],
+          care: [
+            {
+              icon: '💧',
+              title: 'Laistīšanas kalkulators',
+              desc: 'Automātiski aprēķina ūdens daudzumu litros dobei un katrai bedrītei atkarībā no laika apstākļiem.'
+            },
+            {
+              icon: '📝',
+              title: 'Kopšanas un mēslošanas žurnāls',
+              desc: 'Reģistrējiet mēslošanas, laistīšanas un apstrādes datumus tieši dobes kartītē.'
             }
           ],
           data: [
@@ -550,12 +713,14 @@
         subtitle: "Interaktyvi instrukcija darbui su daržo planu, lysvėmis, sėjomaina ir atsarginėmis kopijomis",
         tabs: [
           { id: 'quickstart', label: '🚀 Greita pradžia' },
+          { id: 'holes', label: '🌱 Duobutės ir veislės' },
           { id: 'rotation', label: '🔄 Sėjomaina' },
           { id: 'beds', label: '📦 Lysvių konstruktorius' },
+          { id: 'care', label: '💧 Laistymas ir priežiūra' },
           { id: 'data', label: '💾 Duomenys ir kopijos' },
           { id: 'tips', label: '💡 Patarimai' },
           { id: 'donate', label: '☕ Paremti autorių' },
-          { id: 'feedback', label: '💡 Idėjos & atsiliepimai' }
+          { id: 'feedback', label: '✈️ Grįžtamasis ryšys & Telegram' }
         ],
         sections: {
           quickstart: [
@@ -583,6 +748,28 @@
               icon: '↻',
               title: 'Pasukimas ir dubliavimas',
               desc: 'Mygtukas <strong>↻</strong> pasuka lysvę 90° kampu. Mygtukas <strong>❐</strong> sukuria kopiją, o <strong>🗑️</strong> ją pašalina.'
+            }
+          ],
+          holes: [
+            {
+              icon: '⚡',
+              title: 'Sodinimo schemos (šachmatiškai, 2 eilėmis, 1 eile)',
+              desc: 'Kiekvienai lysvei galima nustatyti duobučių schemą: šachmatiškai <strong>⚡</strong>, 2 eilėmis <strong>═</strong> arba 1 eile <strong>─</strong> (2–40 vnt.).'
+            },
+            {
+              icon: '🍅',
+              title: 'Skirtingos veislės vienoje lysvėje',
+              desc: 'Galite sodinti kelias veisles toje pačioje lysvėje ir priskirti joms atskiras duobutes.'
+            },
+            {
+              icon: '⚡',
+              title: 'Greitas veislių užpildymas',
+              desc: 'Nurodykite duobučių intervalą (pvz., 1–10) ir pasirinkite veislę 1 paspaudimu.'
+            },
+            {
+              icon: '📸',
+              title: 'Veislių kartoteka ir nuotraukos',
+              desc: 'Nufotografuokite sėklų pakuotę ar derlių ir išsaugokite programoje.'
             }
           ],
           rotation: [
@@ -632,6 +819,18 @@
               icon: '✏️',
               title: 'Veislės ir priežiūros pastabos',
               desc: 'Kiekvienai lysvei ar eilei galima nurodyti konkrečią veislę ir įrašyti laistymo bei tręšimo pastabas.'
+            }
+          ],
+          care: [
+            {
+              icon: '💧',
+              title: 'Laistymo skaičiuoklė',
+              desc: 'Automatiškai apskaičiuoja vandens poreikį litrais lysvei ir kiekvienai duobutei pagal orą.'
+            },
+            {
+              icon: '📝',
+              title: 'Priežiūros ir tręšimo žurnalas',
+              desc: 'Fiksuokite tręšimo, laistymo ir augalų apsaugos datas tiesiai inspektoriuje.'
             }
           ],
           data: [
