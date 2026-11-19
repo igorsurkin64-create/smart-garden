@@ -203,85 +203,102 @@ body.theme-cartoon .bed-item.selected {
   filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.65));
 }
 
-/* ---------- 3. ЖИВЫЕ 3D-КУСТИКИ РАСТЕНИЙ ПРЯМО НА ЗАСАЖЕННЫХ ГРЯДКАХ! ---------- */
-body.theme-cartoon .bed-item.is-planted-bed::before,
-body.theme-cartoon .gh-internal-bed.is-planted-bed::before {
+/* ---------- 3. ЖИВЫЕ 3D-КУСТИКИ РАСТЕНИЙ ПРЯМО НА ЗАСАЖЕННЫХ ГРЯДКАХ (и в «Живом саду», и на «Схеме»!) ---------- */
+.gh-internal-bed.is-planted-bed {
+  position: relative;
+  overflow: hidden;
+}
+
+.bed-item.is-planted-bed::before,
+.gh-internal-bed.is-planted-bed::before {
   content: '';
   position: absolute;
   inset: 3px;
   border-radius: 10px;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.72;
+  opacity: 0.36;
   /* Базовые пушистые зелёные мультяшные кустики в рядках */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='68' height='54' viewBox='0 0 68 54'%3E%3Cg transform='translate(6,8)'%3E%3Cellipse cx='14' cy='24' rx='12' ry='4.5' fill='%232e1a0c' opacity='0.45'/%3E%3Ccircle cx='9' cy='18' r='8' fill='%232e7d32' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='20' cy='18' r='8' fill='%23388e3c' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='14' cy='12' r='9' fill='%234caf50' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='12' cy='9' r='3.2' fill='%23a5d6a7' opacity='0.8'/%3E%3C/g%3E%3Cg transform='translate(38,24)'%3E%3Cellipse cx='14' cy='22' rx='11' ry='4' fill='%232e1a0c' opacity='0.45'/%3E%3Ccircle cx='9' cy='16' r='7.5' fill='%232e7d32' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='19' cy='16' r='7.5' fill='%23388e3c' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='14' cy='11' r='8.5' fill='%2366bb6a' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='12' cy='8.5' r='3' fill='%23c8e6c9' opacity='0.8'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 68px 54px;
+}
+
+body.theme-cartoon .bed-item.is-planted-bed::before,
+body.theme-cartoon .gh-internal-bed.is-planted-bed::before {
+  opacity: 0.76;
   animation: cartoon-foliage-sway 5s ease-in-out infinite;
 }
 
 /* 🍅 Томаты: зелёные кусты с маленькими красными помидорками! */
-body.theme-cartoon .bed-item.is-planted-bed[data-crop-id="tomato"]::before,
-body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-id="tomato"]::before {
+.bed-item.is-planted-bed[data-crop-id="tomato"]::before,
+.gh-internal-bed.is-planted-bed[data-crop-id="tomato"]::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='56' viewBox='0 0 72 56'%3E%3Cg transform='translate(5,6)'%3E%3Cellipse cx='16' cy='26' rx='13' ry='4.5' fill='%232b170a' opacity='0.48'/%3E%3Ccircle cx='10' cy='18' r='8.5' fill='%232e7d32' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='22' cy='18' r='8.5' fill='%23388e3c' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='12' r='9.5' fill='%2343a047' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='11' cy='17' r='3.6' fill='%23ef4444' stroke='%237f1d1d' stroke-width='1.1'/%3E%3Ccircle cx='10' cy='15.8' r='1.1' fill='%23ffffff' opacity='0.75'/%3E%3Ccircle cx='21' cy='15' r='3.2' fill='%23ef4444' stroke='%237f1d1d' stroke-width='1.1'/%3E%3Ccircle cx='20.2' cy='14' r='0.9' fill='%23ffffff' opacity='0.75'/%3E%3C/g%3E%3Cg transform='translate(40,22)'%3E%3Cellipse cx='14' cy='24' rx='11' ry='4' fill='%232b170a' opacity='0.45'/%3E%3Ccircle cx='9' cy='17' r='7.5' fill='%232e7d32' stroke='%23163d18' stroke-width='1.4'/%3E%3Ccircle cx='19' cy='17' r='7.5' fill='%23388e3c' stroke='%23163d18' stroke-width='1.4'/%3E%3Ccircle cx='14' cy='11' r='8.5' fill='%234caf50' stroke='%23163d18' stroke-width='1.4'/%3E%3Ccircle cx='16' cy='16' r='3.3' fill='%23ef4444' stroke='%237f1d1d' stroke-width='1.1'/%3E%3Ccircle cx='15.2' cy='15' r='1' fill='%23ffffff' opacity='0.75'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 72px 56px;
 }
 
 /* 🥒 Огурцы, кабачки, тыквы: широкие резные листья с жёлтыми цветочками! */
-body.theme-cartoon .bed-item.is-planted-bed[data-crop-family="cucurbitaceae"]::before,
-body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-family="cucurbitaceae"]::before {
+.bed-item.is-planted-bed[data-crop-family="cucurbitaceae"]::before,
+.gh-internal-bed.is-planted-bed[data-crop-family="cucurbitaceae"]::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='56' viewBox='0 0 72 56'%3E%3Cg transform='translate(5,6)'%3E%3Cellipse cx='16' cy='26' rx='13' ry='4.5' fill='%232b170a' opacity='0.45'/%3E%3Ccircle cx='10' cy='18' r='9' fill='%232e7d32' stroke='%23143d17' stroke-width='1.5'/%3E%3Ccircle cx='22' cy='19' r='8.5' fill='%2343a047' stroke='%23143d17' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='12' r='9' fill='%2366bb6a' stroke='%23143d17' stroke-width='1.5'/%3E%3Ccircle cx='19' cy='12' r='3.2' fill='%23facc15' stroke='%23a16207' stroke-width='1'/%3E%3Ccircle cx='19' cy='12' r='1.1' fill='%23f97316'/%3E%3C/g%3E%3Cg transform='translate(40,22)'%3E%3Cellipse cx='14' cy='24' rx='12' ry='4' fill='%232b170a' opacity='0.45'/%3E%3Ccircle cx='10' cy='17' r='8' fill='%23388e3c' stroke='%23143d17' stroke-width='1.4'/%3E%3Ccircle cx='19' cy='16' r='8' fill='%234caf50' stroke='%23143d17' stroke-width='1.4'/%3E%3Ccircle cx='12' cy='14' r='2.8' fill='%23fde047' stroke='%23a16207' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 72px 56px;
 }
 
 /* 🍓 Клубника: кустики с ягодками и белыми цветочками! */
-body.theme-cartoon .bed-item.is-planted-bed[data-crop-id="strawberry"]::before,
-body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-id="strawberry"]::before {
+.bed-item.is-planted-bed[data-crop-id="strawberry"]::before,
+.gh-internal-bed.is-planted-bed[data-crop-id="strawberry"]::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='68' height='54' viewBox='0 0 68 54'%3E%3Cg transform='translate(5,7)'%3E%3Cellipse cx='15' cy='24' rx='12' ry='4' fill='%232b170a' opacity='0.45'/%3E%3Ccircle cx='10' cy='17' r='7.5' fill='%232e7d32' stroke='%23143d17' stroke-width='1.4'/%3E%3Ccircle cx='20' cy='17' r='7.5' fill='%2343a047' stroke='%23143d17' stroke-width='1.4'/%3E%3Ccircle cx='15' cy='12' r='8' fill='%234caf50' stroke='%23143d17' stroke-width='1.4'/%3E%3Cpath d='M12 16 C10 16 9.5 18.5 12 21.5 C14.5 18.5 14 16 12 16 Z' fill='%23ef4444' stroke='%237f1d1d' stroke-width='1'/%3E%3Ccircle cx='20' cy='13' r='2.6' fill='%23ffffff' stroke='%23d1d5db' stroke-width='0.8'/%3E%3Ccircle cx='20' cy='13' r='1.1' fill='%23facc15'/%3E%3C/g%3E%3Cg transform='translate(38,22)'%3E%3Ccircle cx='10' cy='16' r='7' fill='%23388e3c' stroke='%23143d17' stroke-width='1.4'/%3E%3Ccircle cx='18' cy='15' r='7.5' fill='%2366bb6a' stroke='%23143d17' stroke-width='1.4'/%3E%3Cpath d='M16 16 C14 16 13.5 18.5 16 21 C18.5 18.5 18 16 16 16 Z' fill='%23ef4444' stroke='%237f1d1d' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 68px 54px;
 }
 
 /* 🥬 Капуста и салат: крупные объёмные кочаны-розетки! */
-body.theme-cartoon .bed-item.is-planted-bed[data-crop-family="brassicaceae"]::before,
-body.theme-cartoon .bed-item.is-planted-bed[data-crop-id="lettuce"]::before,
-body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-family="brassicaceae"]::before {
+.bed-item.is-planted-bed[data-crop-family="brassicaceae"]::before,
+.bed-item.is-planted-bed[data-crop-id="lettuce"]::before,
+.gh-internal-bed.is-planted-bed[data-crop-family="brassicaceae"]::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='68' height='54' viewBox='0 0 68 54'%3E%3Cg transform='translate(6,8)'%3E%3Cellipse cx='14' cy='23' rx='12' ry='4.5' fill='%232b170a' opacity='0.45'/%3E%3Ccircle cx='14' cy='15' r='11' fill='%23388e3c' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='14' cy='15' r='7.5' fill='%2366bb6a' stroke='%232e7d32' stroke-width='1.2'/%3E%3Ccircle cx='14' cy='15' r='4.2' fill='%23c8e6c9'/%3E%3C/g%3E%3Cg transform='translate(38,22)'%3E%3Cellipse cx='13' cy='21' rx='11' ry='4' fill='%232b170a' opacity='0.45'/%3E%3Ccircle cx='13' cy='14' r='10' fill='%2343a047' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='13' cy='14' r='6.5' fill='%2381c784' stroke='%232e7d32' stroke-width='1.2'/%3E%3Ccircle cx='13' cy='14' r='3.5' fill='%23e8f5e9'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 68px 54px;
 }
 
 /* 🍆 Баклажаны: пышные кустики с глянцевыми фиолетовыми баклажанами! */
-body.theme-cartoon .bed-item.is-planted-bed[data-crop-id="eggplant"]::before,
-body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-id="eggplant"]::before {
+.bed-item.is-planted-bed[data-crop-id="eggplant"]::before,
+.gh-internal-bed.is-planted-bed[data-crop-id="eggplant"]::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='56' viewBox='0 0 72 56'%3E%3Cg transform='translate(5,6)'%3E%3Cellipse cx='16' cy='26' rx='13' ry='4.5' fill='%232b170a' opacity='0.48'/%3E%3Ccircle cx='10' cy='18' r='8.5' fill='%232e7d32' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='22' cy='18' r='8.5' fill='%23388e3c' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='12' r='9.5' fill='%2343a047' stroke='%23163d18' stroke-width='1.5'/%3E%3Cellipse cx='11.5' cy='18' rx='3.2' ry='4.8' transform='rotate(-16 11.5 18)' fill='%237b1fa2' stroke='%2338006b' stroke-width='1.2'/%3E%3Cellipse cx='10.6' cy='16.6' rx='0.9' ry='2' transform='rotate(-16 10.6 16.6)' fill='%23e1bee7' opacity='0.8'/%3E%3Cellipse cx='21' cy='16' rx='2.8' ry='4.2' transform='rotate(14 21 16)' fill='%236a1b9a' stroke='%2338006b' stroke-width='1.2'/%3E%3C/g%3E%3Cg transform='translate(40,22)'%3E%3Cellipse cx='14' cy='24' rx='11' ry='4' fill='%232b170a' opacity='0.45'/%3E%3Ccircle cx='9' cy='17' r='7.5' fill='%232e7d32' stroke='%23163d18' stroke-width='1.4'/%3E%3Ccircle cx='19' cy='17' r='7.5' fill='%23388e3c' stroke='%23163d18' stroke-width='1.4'/%3E%3Ccircle cx='14' cy='11' r='8.5' fill='%234caf50' stroke='%23163d18' stroke-width='1.4'/%3E%3Cellipse cx='16' cy='17' rx='3' ry='4.4' transform='rotate(-10 16 17)' fill='%237b1fa2' stroke='%2338006b' stroke-width='1.2'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 72px 56px;
 }
 
 /* 🫑 Перцы: кустики с красными и жёлтыми перчиками! */
-body.theme-cartoon .bed-item.is-planted-bed[data-crop-id="pepper"]::before,
-body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-id="pepper"]::before {
+.bed-item.is-planted-bed[data-crop-id="pepper"]::before,
+.gh-internal-bed.is-planted-bed[data-crop-id="pepper"]::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='56' viewBox='0 0 72 56'%3E%3Cg transform='translate(5,6)'%3E%3Cellipse cx='16' cy='26' rx='13' ry='4.5' fill='%232b170a' opacity='0.48'/%3E%3Ccircle cx='10' cy='18' r='8.5' fill='%232e7d32' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='22' cy='18' r='8.5' fill='%23388e3c' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='12' r='9' fill='%234caf50' stroke='%23163d18' stroke-width='1.5'/%3E%3Crect x='8' y='13.5' width='6.2' height='8' rx='3' fill='%23ef4444' stroke='%237f1d1d' stroke-width='1.1'/%3E%3Crect x='18.5' y='12.5' width='5.8' height='7.5' rx='2.8' fill='%23facc15' stroke='%23854d0e' stroke-width='1.1'/%3E%3C/g%3E%3Cg transform='translate(40,22)'%3E%3Ccircle cx='10' cy='16' r='7.5' fill='%232e7d32' stroke='%23163d18' stroke-width='1.4'/%3E%3Ccircle cx='19' cy='16' r='7.5' fill='%2343a047' stroke='%23163d18' stroke-width='1.4'/%3E%3Crect x='12' y='13' width='6' height='7.5' rx='3' fill='%23f97316' stroke='%237c2d12' stroke-width='1.1'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 72px 56px;
 }
 
 /* 🎃 Тыква: широкие листья с оранжевыми тыковками! */
-body.theme-cartoon .bed-item.is-planted-bed[data-crop-id="pumpkin"]::before {
+.bed-item.is-planted-bed[data-crop-id="pumpkin"]::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='76' height='58' viewBox='0 0 76 58'%3E%3Cg transform='translate(5,6)'%3E%3Ccircle cx='10' cy='16' r='8.5' fill='%232e7d32' stroke='%23143d17' stroke-width='1.5'/%3E%3Ccircle cx='23' cy='15' r='8.5' fill='%2343a047' stroke='%23143d17' stroke-width='1.5'/%3E%3Cellipse cx='16' cy='21' rx='7.5' ry='6' fill='%23f97316' stroke='%237c2d12' stroke-width='1.4'/%3E%3Cellipse cx='16' cy='21' rx='3.2' ry='6' fill='%23fb923c' stroke='%239a3412' stroke-width='1'/%3E%3C/g%3E%3Cg transform='translate(42,22)'%3E%3Ccircle cx='10' cy='14' r='7.5' fill='%23388e3c' stroke='%23143d17' stroke-width='1.4'/%3E%3Cellipse cx='17' cy='18' rx='6.8' ry='5.2' fill='%23f97316' stroke='%237c2d12' stroke-width='1.4'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 76px 58px;
 }
 
 /* 🥕 Морковь, свёкла, лук, чеснок: яркие пучки сочной зелёной ботвы в рядках! */
+.bed-item.is-planted-bed[data-crop-family="apiaceae"]::before,
+.bed-item.is-planted-bed[data-crop-family="amaryllidaceae"]::before,
+.bed-item.is-planted-bed[data-crop-family="chenopodiaceae"]::before,
+.gh-internal-bed.is-planted-bed[data-crop-family="apiaceae"]::before,
+.gh-internal-bed.is-planted-bed[data-crop-family="amaryllidaceae"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='48' viewBox='0 0 58 48'%3E%3Cg stroke='%23144519' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cellipse cx='15' cy='27' rx='7' ry='2.5' fill='%232e1a0c' stroke='none' opacity='0.45'/%3E%3Cpath d='M15 26 Q11 15 6 10 Q13 13 15 26 Z' fill='%234ade80'/%3E%3Cpath d='M15 26 Q16 12 17 6 Q20 14 15 26 Z' fill='%2386efac'/%3E%3Cpath d='M15 26 Q21 15 26 11 Q20 18 15 26 Z' fill='%2322c55e'/%3E%3Cellipse cx='43' cy='41' rx='7' ry='2.5' fill='%232e1a0c' stroke='none' opacity='0.45'/%3E%3Cpath d='M43 40 Q39 29 34 24 Q41 27 43 40 Z' fill='%234ade80'/%3E%3Cpath d='M43 40 Q44 26 45 20 Q48 28 43 40 Z' fill='%2386efac'/%3E%3Cpath d='M43 40 Q49 29 54 25 Q48 32 43 40 Z' fill='%2322c55e'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 58px 48px;
+}
+
 body.theme-cartoon .bed-item.is-planted-bed[data-crop-family="apiaceae"]::before,
 body.theme-cartoon .bed-item.is-planted-bed[data-crop-family="amaryllidaceae"]::before,
 body.theme-cartoon .bed-item.is-planted-bed[data-crop-family="chenopodiaceae"]::before,
 body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-family="apiaceae"]::before,
 body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-family="amaryllidaceae"]::before {
   opacity: 0.9;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='48' viewBox='0 0 58 48'%3E%3Cg stroke='%23144519' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cellipse cx='15' cy='27' rx='7' ry='2.5' fill='%232e1a0c' stroke='none' opacity='0.45'/%3E%3Cpath d='M15 26 Q11 15 6 10 Q13 13 15 26 Z' fill='%234ade80'/%3E%3Cpath d='M15 26 Q16 12 17 6 Q20 14 15 26 Z' fill='%2386efac'/%3E%3Cpath d='M15 26 Q21 15 26 11 Q20 18 15 26 Z' fill='%2322c55e'/%3E%3Cellipse cx='43' cy='41' rx='7' ry='2.5' fill='%232e1a0c' stroke='none' opacity='0.45'/%3E%3Cpath d='M43 40 Q39 29 34 24 Q41 27 43 40 Z' fill='%234ade80'/%3E%3Cpath d='M43 40 Q44 26 45 20 Q48 28 43 40 Z' fill='%2386efac'/%3E%3Cpath d='M43 40 Q49 29 54 25 Q48 32 43 40 Z' fill='%2322c55e'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 58px 48px;
 }
 
 /* Контент грядки всегда лежит ПОВЕРХ декоративных кустиков */
-body.theme-cartoon .bed-item > *:not(.bed-tab-handle):not(.greenhouse-roof-ridge),
-body.theme-cartoon .gh-internal-bed > * {
+.bed-item > *:not(.bed-tab-handle):not(.greenhouse-roof-ridge),
+.gh-internal-bed > * {
   position: relative;
   z-index: 2;
 }
