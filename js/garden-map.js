@@ -129,6 +129,17 @@ class GardenMap {
           <div class="season-particle autumn-leaf al-5"></div>
         </div>
 
+        <!-- Кнопки-стрелки прокрутки участка (для тех, кому привычнее листать кнопками) -->
+        <div class="map-pan-dpad" aria-label="Навигация по участку">
+          <button type="button" class="dpad-btn dpad-up" id="dpad-up" title="Сдвинуть карту вверх">▲</button>
+          <div class="dpad-mid-row">
+            <button type="button" class="dpad-btn dpad-left" id="dpad-left" title="Сдвинуть карту влево">◀</button>
+            <button type="button" class="dpad-btn dpad-fit" id="dpad-fit" title="Показать весь участок целиком">⛶</button>
+            <button type="button" class="dpad-btn dpad-right" id="dpad-right" title="Сдвинуть карту вправо">▶</button>
+          </div>
+          <button type="button" class="dpad-btn dpad-down" id="dpad-down" title="Сдвинуть карту вниз">▼</button>
+        </div>
+
         <!-- Оверлей чистого плана / Пустой огород (Onboarding Hero) -->
         <div class="empty-garden-overlay" id="empty-garden-overlay" style="display: none;"></div>
       </div>
@@ -140,7 +151,19 @@ class GardenMap {
     this.bedsLayerEl = document.getElementById('beds-layer');
     this.emptyOverlayEl = document.getElementById('empty-garden-overlay');
     this.zoomIndicatorEl = document.getElementById('map-zoom-indicator');
+    this.selectedDecorId = null;
     this.dragDecorState = { isDragging: false, decorId: null, startX: 0, startY: 0, initialX: 0, initialY: 0 };
+
+    const panStep = (dx, dy) => {
+      this.panX += dx;
+      this.panY += dy;
+      this.updateTransform();
+    };
+    document.getElementById('dpad-up')?.addEventListener('click', (e) => { e.stopPropagation(); panStep(0, 140); });
+    document.getElementById('dpad-down')?.addEventListener('click', (e) => { e.stopPropagation(); panStep(0, -140); });
+    document.getElementById('dpad-left')?.addEventListener('click', (e) => { e.stopPropagation(); panStep(160, 0); });
+    document.getElementById('dpad-right')?.addEventListener('click', (e) => { e.stopPropagation(); panStep(-160, 0); });
+    document.getElementById('dpad-fit')?.addEventListener('click', (e) => { e.stopPropagation(); this.fitPlotToView(true); });
 
     document.getElementById('map-zoom-in-btn').addEventListener('click', () => this.zoomBy(1.2, null, null, true));
     document.getElementById('map-zoom-out-btn').addEventListener('click', () => this.zoomBy(0.83, null, null, true));
@@ -304,6 +327,9 @@ class GardenMap {
     if (!this.decorLayerEl || typeof getDecorTemplate !== 'function') return;
     const items = this.storage.getDecorItems();
     const lang = (typeof window !== 'undefined' && window.i18n) ? window.i18n.getLanguage() : 'ru';
+    const lblRotate = lang === 'et' ? 'Pööra' : lang === 'lv' ? 'Pagriezt' : lang === 'lt' ? 'Pasukti' : 'Повернуть';
+    const lblClone = lang === 'et' ? 'Kopeeri' : lang === 'lv' ? 'Kopēt' : lang === 'lt' ? 'Kopijuoti' : 'Копия';
+    const lblDelete = lang === 'et' ? 'Kustuta' : lang === 'lv' ? 'Dzēst' : lang === 'lt' ? 'Trinti' : 'Удалить';
 
     this.decorLayerEl.innerHTML = items.map(item => {
       const tpl = getDecorTemplate(item.type);
@@ -313,26 +339,26 @@ class GardenMap {
       const heightPx = (item.height || tpl.height || 2) * this.meterPixels;
       const rot = item.rotation || 0;
       const zClass = `decor-z-${tpl.zLayer || 'mid'}`;
+      const isSelected = this.selectedDecorId === item.id;
 
       return `
-        <div class="decor-item ${zClass}"
+        <div class="decor-item ${zClass} ${isSelected ? 'decor-selected' : ''}"
              id="decor-el-${item.id}"
              data-decor-id="${item.id}"
-             style="left: ${leftPx}px; top: ${topPx}px; width: ${widthPx}px; height: ${heightPx}px;"
-             title="${escapeHtml(getDecorName(tpl, lang))} (зажмите и перетащите)">
-          <div class="decor-svg-stage" style="transform: rotate(${rot}deg);">
+             style="left: ${leftPx}px; top: ${topPx}px; width: ${widthPx}px; height: ${heightPx}px;">
+          <div class="decor-svg-stage" style="transform: rotate(${rot}deg);" title="${escapeHtml(getDecorName(tpl, lang))} — нажмите для действий или перетащите">
             ${tpl.svg}
           </div>
           <div class="decor-item-tools">
-            <button type="button" class="gh-tool-btn decor-rotate-btn" data-decor-id="${item.id}" title="Повернуть на 90°">↻</button>
-            <button type="button" class="gh-tool-btn decor-clone-btn" data-decor-id="${item.id}" title="Дублировать">❐</button>
-            <button type="button" class="gh-tool-btn decor-delete-btn" data-decor-id="${item.id}" title="Удалить">🗑️</button>
+            <button type="button" class="decor-action-btn decor-rotate-btn" data-decor-id="${item.id}" title="${lblRotate} на 90°">↻ ${lblRotate}</button>
+            <button type="button" class="decor-action-btn decor-clone-btn" data-decor-id="${item.id}" title="${lblClone}">❐ ${lblClone}</button>
+            <button type="button" class="decor-action-btn decor-action-danger decor-delete-btn" data-decor-id="${item.id}" title="${lblDelete} (клавиша Delete)">🗑️ ${lblDelete}</button>
           </div>
         </div>
       `;
     }).join('');
 
-    // Привязываем перетаскивание и кнопки управления декора
+    // Привязываем выбор, перетаскивание и кнопки управления декора
     this.decorLayerEl.querySelectorAll('.decor-item').forEach(el => {
       el.addEventListener('mousedown', (e) => {
         if (e.target.closest('.decor-item-tools')) return;
@@ -340,6 +366,14 @@ class GardenMap {
         const id = el.getAttribute('data-decor-id');
         const item = this.storage.getDecorItems().find(d => d.id === id);
         if (!item) return;
+
+        // Выделяем объект, чтобы крупная панель действий оставалась видимой
+        if (this.selectedDecorId !== id) {
+          this.selectedDecorId = id;
+          this.decorLayerEl.querySelectorAll('.decor-item.decor-selected').forEach(n => n.classList.remove('decor-selected'));
+          el.classList.add('decor-selected');
+        }
+
         this.dragDecorState = {
           isDragging: true,
           decorId: id,
@@ -355,7 +389,9 @@ class GardenMap {
     this.decorLayerEl.querySelectorAll('.decor-rotate-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.storage.rotateDecorItem(btn.getAttribute('data-decor-id'));
+        const id = btn.getAttribute('data-decor-id');
+        this.storage.rotateDecorItem(id);
+        this.selectedDecorId = id;
         this.renderDecorItems();
       });
     });
@@ -363,16 +399,21 @@ class GardenMap {
     this.decorLayerEl.querySelectorAll('.decor-clone-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.storage.cloneDecorItem(btn.getAttribute('data-decor-id'));
+        const clone = this.storage.cloneDecorItem(btn.getAttribute('data-decor-id'));
+        if (clone) this.selectedDecorId = clone.id;
         this.renderDecorItems();
+        if (window.app) window.app.showToast('❐ Объект скопирован рядом — перетащите его куда нужно!');
       });
     });
 
     this.decorLayerEl.querySelectorAll('.decor-delete-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.storage.deleteDecorItem(btn.getAttribute('data-decor-id'));
+        const id = btn.getAttribute('data-decor-id');
+        this.storage.deleteDecorItem(id);
+        if (this.selectedDecorId === id) this.selectedDecorId = null;
         this.renderDecorItems();
+        if (window.app) window.app.showToast('🗑️ Объект декора удалён с плана');
       });
     });
   }
@@ -460,13 +501,37 @@ class GardenMap {
       this.centerPlotInView();
     });
 
-    // Закрытие поповера при клике вне него или по Esc
+    // Закрытие поповера и снятие выделения декора при клике вне него
     document.addEventListener('click', (e) => {
       if (this.activeVarietiesPopover) {
         if (!e.target.closest('#garden-varieties-popover') && !e.target.closest('.gh-varieties-dropdown-btn') && !e.target.closest('.gh-holes-micro-strip')) {
           this.closeVarietiesPopover();
         }
       }
+      if (this.selectedDecorId && !e.target.closest('.decor-item')) {
+        this.selectedDecorId = null;
+        this.decorLayerEl?.querySelectorAll('.decor-item.decor-selected').forEach(n => n.classList.remove('decor-selected'));
+      }
+    });
+
+    // Горячие клавиши: Delete для удаления выделенного декора, стрелки для плавного сдвига карты
+    document.addEventListener('keydown', (e) => {
+      const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target?.isContentEditable) return;
+
+      if ((e.key === 'Delete' || e.key === 'Backspace') && this.selectedDecorId) {
+        e.preventDefault();
+        this.storage.deleteDecorItem(this.selectedDecorId);
+        this.selectedDecorId = null;
+        this.renderDecorItems();
+        if (window.app) window.app.showToast('🗑️ Объект декора удалён (Delete)');
+        return;
+      }
+
+      if (e.key === 'ArrowUp') { this.panY += 100; this.updateTransform(); }
+      else if (e.key === 'ArrowDown') { this.panY -= 100; this.updateTransform(); }
+      else if (e.key === 'ArrowLeft') { this.panX += 120; this.updateTransform(); }
+      else if (e.key === 'ArrowRight') { this.panX -= 120; this.updateTransform(); }
     });
 
     document.addEventListener('keydown', (e) => {
@@ -1019,11 +1084,11 @@ class GardenMap {
                           <span class="gh-crop-var" title="${escapeHtml(displayVariety)}">(${escapeHtml(displayVariety)})</span>
                         ` : '')}
 
-                        ${prevCrop ? `
-                          <span class="gh-prev-year-tag ${this.showPreviousYearOverlay ? 'highlight-prev' : ''}" title="${escapeHtml(grownInText)} ${escapeHtml(prevCropName)}">
+                        ${this.showPreviousYearOverlay && prevCrop ? `
+                          <span class="gh-prev-year-tag highlight-prev" title="${escapeHtml(grownInText)} ${escapeHtml(prevCropName)}">
                             <span class="prev-year-label">${prevYear}:</span>
                             <span class="prev-crop-svg">${getCropSvg(prevCrop.id)}</span>
-                            ${this.showPreviousYearOverlay ? `<strong class="prev-crop-title-gh">${escapeHtml(prevCropName)}</strong>` : ''}
+                            <strong class="prev-crop-title-gh">${escapeHtml(prevCropName)}</strong>
                           </span>
                         ` : (this.showPreviousYearOverlay ? `
                           <span class="gh-prev-year-tag pred-empty-tag" title="${escapeHtml(emptyLastYearText)}">
@@ -1329,7 +1394,7 @@ class GardenMap {
                   <span class="crop-variety">${escapeHtml(displayVariety)}</span>
                 ` : '')}
 
-                ${!this.showPreviousYearOverlay && prevCrop ? `
+                ${this.showPreviousYearOverlay && prevCrop ? `
                   <span class="bed-prev-year-pill" title="${escapeHtml(grownInText)} ${escapeHtml(prevCropName)}">
                     <span class="prev-year-num">${prevYear}:</span>
                     <span class="prev-crop-svg">${prevCropSvgIcon}</span>

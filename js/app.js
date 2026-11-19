@@ -521,6 +521,10 @@ class GardenApp {
     if (toolbarCalBtn) {
       toolbarCalBtn.addEventListener('click', () => this.openSeasonCalendarModal());
     }
+    const toolbarVarietiesBtn = document.getElementById('toolbar-varieties-btn');
+    if (toolbarVarietiesBtn) {
+      toolbarVarietiesBtn.addEventListener('click', () => this.openVarietyCatalogModal());
+    }
 
     // Умный авто-севооборот в 1 клик
     const autoPlanBtn = document.getElementById('auto-plan-btn');

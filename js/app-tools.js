@@ -838,10 +838,11 @@
             <button type="button" class="btn-pattern-pill ${currentPattern === 'double_parallel' ? 'active' : ''}" data-pattern="double_parallel">${H.pDouble}</button>
             <button type="button" class="btn-pattern-pill ${currentPattern === 'single' ? 'active' : ''}" data-pattern="single">${H.pSingle}</button>
           </div>
-          <div style="display: flex; align-items: center; gap: 4px;">
-            <button type="button" class="btn btn-sm btn-outline" id="holes-count-minus" style="padding: 2px 7px; font-weight: 800;">−</button>
-            <span style="font-size: 0.82rem; font-weight: 800; min-width: 50px; text-align: center;">${holes.length} ${H.pcs}</span>
-            <button type="button" class="btn btn-sm btn-outline" id="holes-count-plus" style="padding: 2px 7px; font-weight: 800;">+</button>
+          <div style="display: flex; align-items: center; gap: 5px; background: var(--bg-primary); padding: 3px 6px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+            <span style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted);">Лунок:</span>
+            <button type="button" class="btn btn-sm btn-outline" id="holes-count-minus" style="padding: 2px 9px; font-weight: 900; font-size: 0.95rem;">−</button>
+            <input type="number" id="holes-count-input" min="1" max="60" value="${holes.length}" style="width: 48px; text-align: center; font-weight: 800; font-size: 0.88rem; padding: 2px 4px; border: 1px solid var(--border-subtle); border-radius: 6px; background: var(--bg-secondary); color: var(--text-main);">
+            <button type="button" class="btn btn-sm btn-outline" id="holes-count-plus" style="padding: 2px 9px; font-weight: 900; font-size: 0.95rem;">+</button>
           </div>
         </div>
 
@@ -923,30 +924,31 @@
         };
       });
 
+      const resizeHoles = (targetCount) => {
+        const clamped = Math.max(1, Math.min(60, parseInt(targetCount, 10) || holes.length));
+        const nextCrop = document.getElementById('inspector-crop-select')?.value || bedEffectiveCropId || planting.cropId || holes[holes.length - 1]?.cropId || null;
+        while (holes.length < clamped) {
+          holes.push({ index: holes.length + 1, cropId: nextCrop, variety: '', note: '' });
+        }
+        while (holes.length > clamped) {
+          holes.pop();
+        }
+        render();
+      };
+
       const minusBtn = content.querySelector('#holes-count-minus');
       if (minusBtn) {
-        minusBtn.onclick = () => {
-          if (holes.length > 2) {
-            holes.pop();
-            render();
-          }
-        };
+        minusBtn.onclick = () => resizeHoles(holes.length - 1);
       }
 
       const plusBtn = content.querySelector('#holes-count-plus');
       if (plusBtn) {
-        plusBtn.onclick = () => {
-          if (holes.length < 40) {
-            const nextCrop = bedEffectiveCropId || planting.cropId || holes[holes.length - 1]?.cropId || null;
-            holes.push({
-              index: holes.length + 1,
-              cropId: nextCrop,
-              variety: '',
-              note: ''
-            });
-            render();
-          }
-        };
+        plusBtn.onclick = () => resizeHoles(holes.length + 1);
+      }
+
+      const countInput = content.querySelector('#holes-count-input');
+      if (countInput) {
+        countInput.onchange = () => resizeHoles(countInput.value);
       }
 
       // Batch apply
@@ -1075,14 +1077,15 @@
     const anyHoleCrop = holes.find(h => h && h.cropId)?.cropId;
     const lastSelectedCrop = (typeof window !== 'undefined') ? window._lastSelectedHoleCropId : null;
 
-    let currentCropId = hole.cropId 
-      || prevHoleCrop 
-      || nextHoleCrop 
-      || anyHoleCrop 
-      || inspectorSelectCrop 
-      || planting.cropId 
-      || lastSelectedCrop 
-      || 'cucumber';
+    // Приоритет: культура этой лунки -> выбранная культура грядки/рядка -> соседняя лунка -> последняя выбранная
+    let currentCropId = hole.cropId
+      || inspectorSelectCrop
+      || planting.cropId
+      || prevHoleCrop
+      || nextHoleCrop
+      || anyHoleCrop
+      || lastSelectedCrop
+      || 'tomato';
 
     hole.cropId = currentCropId;
     if (typeof window !== 'undefined') {
@@ -1334,7 +1337,10 @@
             <h3 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1.15rem;">
               ${VC.title}
             </h3>
-            <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <button type="button" class="btn btn-sm btn-outline" id="btn-print-varieties-a4" style="padding: 4px 10px; font-size: 0.8rem; font-weight: 700;" title="Распечатать выбранные сорта с фото и описаниями на листе A4">
+                🖨️ Печать A4
+              </button>
               <button type="button" class="btn btn-sm btn-primary" id="btn-toggle-add-variety" style="padding: 4px 10px; font-size: 0.8rem; font-weight: 700;">
                 ${isAdding ? VC.closeForm : VC.addVarBtn}
               </button>
@@ -1559,6 +1565,77 @@
           render();
         };
       });
+
+      const printVarBtn = modalContent.querySelector('#btn-print-varieties-a4');
+      if (printVarBtn) {
+        printVarBtn.onclick = () => {
+          if (!varieties || varieties.length === 0) {
+            this.showToast('⚠️ Сначала добавьте хотя бы один сорт в каталог, чтобы распечатать лист А4!');
+            return;
+          }
+          const filterCropObj = activeFilterCrop !== 'all' ? getCropById(activeFilterCrop) : null;
+          const filterTitle = filterCropObj ? `${filterCropObj.emoji} ${getCropName(filterCropObj, currentLang)}` : VC.allCrops;
+          const printWin = window.open('', '_blank', 'width=900,height=700');
+          if (!printWin) {
+            this.showToast('⚠️ Разрешите всплывающие окна в браузере для печати А4');
+            return;
+          }
+          const cardsHtml = varieties.map((v, idx) => {
+            const c = v.cropId ? getCropById(v.cropId) : null;
+            const cName = c ? `${c.emoji} ${escapeHtml(getCropName(c, currentLang))}` : escapeHtml(VC.noCrop);
+            return `
+              <div class="var-print-card">
+                <div class="var-print-photo">
+                  ${v.photoUrl ? `<img src="${v.photoUrl}" alt="${escapeHtml(v.name)}">` : `<div class="var-print-no-photo">${c ? c.emoji : '🌱'}</div>`}
+                </div>
+                <div class="var-print-info">
+                  <div class="var-print-crop">${idx + 1}. ${cName}</div>
+                  <div class="var-print-name">${escapeHtml(v.name)}</div>
+                  ${v.notes ? `<div class="var-print-notes">${escapeHtml(v.notes)}</div>` : `<div class="var-print-notes muted">—</div>`}
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          printWin.document.write(`<!DOCTYPE html>
+            <html lang="${currentLang}">
+            <head>
+              <meta charset="UTF-8">
+              <title>${escapeHtml(VC.title)} — ${escapeHtml(filterTitle)}</title>
+              <style>
+                @page { size: A4 portrait; margin: 12mm; }
+                body { font-family: 'Segoe UI', Arial, sans-serif; color: #1f2937; margin: 0; padding: 12px; }
+                .header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid #15803d; padding-bottom: 8px; margin-bottom: 14px; }
+                .header h1 { font-size: 18px; margin: 0; color: #14532d; }
+                .header .meta { font-size: 12px; color: #6b7280; }
+                .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+                .var-print-card { display: flex; gap: 10px; border: 1.5px solid #d1d5db; border-radius: 8px; padding: 8px; break-inside: avoid; page-break-inside: avoid; background: #fff; }
+                .var-print-photo { width: 78px; height: 78px; flex-shrink: 0; border-radius: 6px; overflow: hidden; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; background: #f9fafb; }
+                .var-print-photo img { width: 100%; height: 100%; object-fit: cover; }
+                .var-print-no-photo { font-size: 32px; }
+                .var-print-info { flex: 1; min-width: 0; }
+                .var-print-crop { font-size: 11px; color: #15803d; font-weight: 700; margin-bottom: 2px; }
+                .var-print-name { font-size: 14px; font-weight: 800; color: #111827; margin-bottom: 4px; }
+                .var-print-notes { font-size: 11.5px; color: #374151; line-height: 1.35; }
+                .var-print-notes.muted { color: #9ca3af; }
+                .no-print { text-align: right; margin-bottom: 10px; }
+                .no-print button { padding: 6px 14px; font-size: 13px; font-weight: 700; background: #16a34a; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+                @media print { .no-print { display: none; } body { padding: 0; } }
+              </style>
+            </head>
+            <body>
+              <div class="no-print"><button onclick="window.print()">🖨️ Распечатать (A4)</button></div>
+              <div class="header">
+                <h1>🌿 Каталог сортов: ${escapeHtml(filterTitle)}</h1>
+                <div class="meta">Всего сортов: ${varieties.length} • ${new Date().toLocaleDateString('ru-RU')}</div>
+              </div>
+              <div class="grid">${cardsHtml}</div>
+            </body>
+            </html>`);
+          printWin.document.close();
+          setTimeout(() => { try { printWin.print(); } catch (e) {} }, 350);
+        };
+      }
 
       modalContent.querySelectorAll('.delete-variety-btn').forEach(btn => {
         btn.onclick = async () => {

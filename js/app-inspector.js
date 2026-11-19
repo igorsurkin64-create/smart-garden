@@ -180,6 +180,13 @@
                                  `📸 Фотографии урожая (${activeYear} г.)`;
       const photosAddBtnLbl = currentLang === 'et' ? '📷 Lisa foto' : currentLang === 'lv' ? '📷 Pievienot foto' : currentLang === 'lt' ? '📷 Pridėti nuotrauką' : '📷 Добавить фото';
 
+      const isAdvancedMode = localStorage.getItem('smart_garden_advanced_mode') === '1';
+      document.body.classList.toggle('inspector-advanced-mode', isAdvancedMode);
+      const advToggleLbl = currentLang === 'et' ? (isAdvancedMode ? '⚙️ Lihtne vaade' : '⚙️ Agronoom')
+        : currentLang === 'lv' ? (isAdvancedMode ? '⚙️ Vienkāršs skats' : '⚙️ Agronoms')
+        : currentLang === 'lt' ? (isAdvancedMode ? '⚙️ Paprastas vaizdas' : '⚙️ Agronomas')
+        : (isAdvancedMode ? '⚙️ Простой режим' : '⚙️ Агроном');
+
       drawer.innerHTML = `
         <div class="inspector-header">
           <div>
@@ -187,11 +194,12 @@
             <h2 class="inspector-title" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
               <span>${escapeHtml(bedTitle)}</span>
               ${rotationEval ? `
-                <span class="status-pill status-${rotationEval.status}" style="font-size: 0.72rem; font-weight: 800; padding: 1px 7px; border-radius: 4px;">
+                <span class="status-pill status-${rotationEval.status} inspector-advanced-only" style="font-size: 0.72rem; font-weight: 800; padding: 1px 7px; border-radius: 4px;">
                   ${rotationEval.status === 'optimal' ? '✓ Идеально' : (rotationEval.status === 'warning' ? '⚠️ Внимание' : '✕ Нарушение')}
                 </span>
               ` : ''}
               <button class="btn-rename-pill" id="btn-quick-rename-header" title="Быстро изменить название этой грядки">✏️ ${nameSubLabel}</button>
+              <button class="btn-rename-pill ${isAdvancedMode ? 'is-active' : ''}" id="btn-toggle-advanced-mode" title="Показать/скрыть расширенные блоки агронома (севооборот, полив, калькулятор семян, союзники)">${advToggleLbl}</button>
             </h2>
             <span class="text-xs text-muted">${dimText}</span>
           </div>
@@ -199,62 +207,67 @@
         </div>
 
         <div class="inspector-body">
-          <!-- 1. Основные параметры грядки: Название, размеры, тип и ориентация (сразу сверху) -->
-          <div class="inspector-section inspector-params-section" style="border-left: 3px solid #0284c7; background: rgba(2, 132, 199, 0.03);">
-            <label class="section-label">${paramsTitle}</label>
-            <div class="form-group">
-              <label class="form-sublabel">${nameSubLabel}</label>
-              <input type="text" id="inspector-bed-name" class="form-input" value="${escapeHtml(bed.name)}">
-            </div>
-            <div class="form-row-2 mt-2">
-              <div>
-                <label class="form-sublabel">${wSubLabel}</label>
-                <input type="number" id="inspector-bed-w" class="form-input" step="0.1" min="0.5" max="30" value="${bed.width}">
+          <!-- 1. Основные параметры грядки (свёрнуто по умолчанию, чтобы сразу видеть посадки и лунки) -->
+          <details class="inspector-section inspector-params-section" style="border-left: 3px solid #0284c7; background: rgba(2, 132, 199, 0.03);">
+            <summary class="section-label" style="cursor: pointer; user-select: none; margin-bottom: 0; list-style: none; display: flex; align-items: center; justify-content: space-between;">
+              <span>${paramsTitle}</span>
+              <span class="text-xs text-muted">▾</span>
+            </summary>
+            <div class="mt-2">
+              <div class="form-group">
+                <label class="form-sublabel">${nameSubLabel}</label>
+                <input type="text" id="inspector-bed-name" class="form-input" value="${escapeHtml(bed.name)}">
               </div>
-              <div>
-                <label class="form-sublabel">${lSubLabel}</label>
-                <input type="number" id="inspector-bed-h" class="form-input" step="0.1" min="0.5" max="30" value="${bed.height}">
+              <div class="form-row-2 mt-2">
+                <div>
+                  <label class="form-sublabel">${wSubLabel}</label>
+                  <input type="number" id="inspector-bed-w" class="form-input" step="0.1" min="0.5" max="30" value="${bed.width}">
+                </div>
+                <div>
+                  <label class="form-sublabel">${lSubLabel}</label>
+                  <input type="number" id="inspector-bed-h" class="form-input" step="0.1" min="0.5" max="30" value="${bed.height}">
+                </div>
               </div>
-            </div>
-            <div class="form-group mt-2">
-              <label class="form-sublabel">${typeSubLabel}</label>
-              <select id="inspector-bed-type" class="form-select">
-                <option value="greenhouse" ${bed.type === 'greenhouse' ? 'selected' : ''}>🏡 ${window.t ? window.t('type_greenhouse') : 'Теплица'}</option>
-                <option value="raised" ${bed.type === 'raised' ? 'selected' : ''}>🪵 ${window.t ? window.t('type_raised') : 'Приподнятая грядка'}</option>
-                <option value="ground" ${bed.type === 'ground' ? 'selected' : ''}>🌱 ${window.t ? window.t('type_ground') : 'Открытый грунт'}</option>
-                <option value="berry" ${bed.type === 'berry' ? 'selected' : ''}>🍓 ${window.t ? window.t('type_berry') : 'Клубничник'}</option>
-                <option value="warm" ${bed.type === 'warm' ? 'selected' : ''}>🔥 ${window.t ? window.t('type_warm') : 'Тёплая грядка'}</option>
-              </select>
-            </div>
-            <div class="btn-group-row mt-2">
-              <button class="btn btn-outline btn-sm" id="inspector-rotate-bed-btn" title="${rotBtnText}">
-                ${rotBtnText}
+              <div class="form-group mt-2">
+                <label class="form-sublabel">${typeSubLabel}</label>
+                <select id="inspector-bed-type" class="form-select">
+                  <option value="greenhouse" ${bed.type === 'greenhouse' ? 'selected' : ''}>🏡 ${window.t ? window.t('type_greenhouse') : 'Теплица'}</option>
+                  <option value="raised" ${bed.type === 'raised' ? 'selected' : ''}>🪵 ${window.t ? window.t('type_raised') : 'Приподнятая грядка'}</option>
+                  <option value="ground" ${bed.type === 'ground' ? 'selected' : ''}>🌱 ${window.t ? window.t('type_ground') : 'Открытый грунт'}</option>
+                  <option value="berry" ${bed.type === 'berry' ? 'selected' : ''}>🍓 ${window.t ? window.t('type_berry') : 'Клубничник'}</option>
+                  <option value="warm" ${bed.type === 'warm' ? 'selected' : ''}>🔥 ${window.t ? window.t('type_warm') : 'Тёплая грядка'}</option>
+                </select>
+              </div>
+              <div class="btn-group-row mt-2">
+                <button class="btn btn-outline btn-sm" id="inspector-rotate-bed-btn" title="${rotBtnText}">
+                  ${rotBtnText}
+                </button>
+                <button class="btn btn-outline btn-sm" id="inspector-clone-bed-btn" title="${cloneBtnText}">
+                  ${cloneBtnText}
+                </button>
+              </div>
+              <button class="btn btn-primary btn-block mt-2" id="inspector-save-params-btn">
+                💾 ${updateBtnText}
               </button>
-              <button class="btn btn-outline btn-sm" id="inspector-clone-bed-btn" title="${cloneBtnText}">
-                ${cloneBtnText}
-              </button>
             </div>
-            <button class="btn btn-primary btn-block mt-2" id="inspector-save-params-btn">
-              💾 ${updateBtnText}
-            </button>
-          </div>
+          </details>
 
-          <!-- 2. Блок разделения грядки на рядки (1, 2 или 3) -->
+          <!-- 2. Блок разделения грядки на рядки (от 1 до 10 рядков!) -->
           <div class="inspector-section inspector-split-section" style="border-left: 3px solid var(--primary);">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
               <label class="section-label" style="margin-bottom: 0;">${splitLabel}</label>
-              <span class="text-xs" style="color: var(--primary); font-weight: 700;">${sectionsCount}</span>
+              <span class="text-xs" style="color: var(--primary); font-weight: 800;">${sectionsCount}</span>
             </div>
-            <div class="bed-section-split-selector">
-              <button type="button" class="split-tab-btn ${sectionsCount === 1 ? 'active' : ''}" data-split-count="1">
-                ${sec1Btn}
-              </button>
-              <button type="button" class="split-tab-btn ${sectionsCount === 2 ? 'active' : ''}" data-split-count="2">
-                ${sec2Btn}
-              </button>
-              <button type="button" class="split-tab-btn ${sectionsCount === 3 ? 'active' : ''}" data-split-count="3">
-                ${sec3Btn}
-              </button>
+            <div class="bed-section-split-selector" style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
+              ${[1, 2, 3, 4, 5].map(n => `
+                <button type="button" class="split-tab-btn ${sectionsCount === n ? 'active' : ''}" data-split-count="${n}" style="flex: 1; min-width: 42px; padding: 5px 6px;">
+                  ${n}
+                </button>
+              `).join('')}
+              <div style="display: flex; align-items: center; gap: 3px; margin-left: 2px;">
+                <button type="button" class="split-tab-btn" id="split-rows-minus" title="Уменьшить рядки" style="padding: 5px 8px;">−</button>
+                <button type="button" class="split-tab-btn" id="split-rows-plus" title="Добавить рядок (до 10)" style="padding: 5px 8px;">+</button>
+              </div>
             </div>
           </div>
 
@@ -345,13 +358,13 @@
               ${savePlantingBtnText}
             </button>
 
-            <!-- 4.1 Вместимость грядки / калькулятор семян и рассады -->
-            <div id="inspector-capacity-container">
+            <!-- 4.1 Вместимость грядки / калькулятор семян и рассады (только в режиме Агронома) -->
+            <div id="inspector-capacity-container" class="inspector-advanced-only">
               ${this.renderInspectorCapacity(currentPlanting.cropId, targetArea, currentLang)}
             </div>
 
-            <!-- 4.2 Растения-союзники и добрососедство -->
-            <div id="inspector-companions-container">
+            <!-- 4.2 Растения-союзники и добрососедство (только в режиме Агронома) -->
+            <div id="inspector-companions-container" class="inspector-advanced-only">
               ${this.renderInspectorCompanions(currentPlanting.cropId, neighborCropIds, currentLang)}
             </div>
           </div>
@@ -365,13 +378,13 @@
             <div id="inspector-holes-content"></div>
           </div>
 
-          <!-- 5. Анализ севооборота -->
-          <div class="inspector-section rotation-analysis-box inspector-rotation-section" id="rotation-status-box">
+          <!-- 5. Анализ севооборота (только в режиме Агронома) -->
+          <div class="inspector-section rotation-analysis-box inspector-rotation-section inspector-advanced-only" id="rotation-status-box">
             ${this.renderInspectorRotationStatus(rotationEval)}
           </div>
 
-          <!-- 5.1 Калькулятор полива для этой грядки -->
-          <div class="inspector-section inspector-water-section" id="inspector-water-box" style="border-left: 3px solid #0284c7; background: rgba(2, 132, 199, 0.03);">
+          <!-- 5.1 Калькулятор полива для этой грядки (только в режиме Агронома) -->
+          <div class="inspector-section inspector-water-section inspector-advanced-only" id="inspector-water-box" style="border-left: 3px solid #0284c7; background: rgba(2, 132, 199, 0.03);">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
               <label class="section-label" style="margin-bottom: 0;">${waterSectionTitle}</label>
               <span class="badge-mini" id="bed-water-rate" style="font-size: 0.76rem; background: #e0f2fe; color: #0284c7; padding: 2px 7px; border-radius: 4px; font-weight: 800;"></span>
@@ -443,8 +456,8 @@
             <div id="photos-gallery-grid" class="photos-grid-wrap"></div>
           </div>
 
-          <!-- 6. Умные рекомендации агронома -->
-          <div class="inspector-section inspector-recs-section">
+          <!-- 6. Умные рекомендации агронома (только в режиме Агронома) -->
+          <div class="inspector-section inspector-recs-section inspector-advanced-only">
             <label class="section-label">${topRecTitle}</label>
             <p class="text-xs text-muted">${topRecDesc}</p>
             <div class="recommended-crops-list">
@@ -507,20 +520,42 @@
         });
       }
 
-      // Переключение разделения грядки на 1, 2 или 3 рядка
-      drawer.querySelectorAll('.split-tab-btn').forEach(splitBtn => {
+      // Переключатель «Простой режим / Агроном (подробно)»
+      const advToggleBtn = document.getElementById('btn-toggle-advanced-mode');
+      if (advToggleBtn) {
+        advToggleBtn.addEventListener('click', () => {
+          const nextAdv = !document.body.classList.contains('inspector-advanced-mode');
+          document.body.classList.toggle('inspector-advanced-mode', nextAdv);
+          try {
+            localStorage.setItem('smart_garden_advanced_mode', nextAdv ? '1' : '0');
+          } catch (e) {}
+          this.showToast(nextAdv ? '⚙️ Включён расширенный режим «Агроном»' : '✨ Включён чистый простой режим карточки');
+          this.openBedInspector(bedId, activeSection ? activeSection.id : null);
+        });
+      }
+
+      // Переключение разделения грядки от 1 до 10 рядков
+      const applySplitCount = (count) => {
+        const clamped = Math.max(1, Math.min(10, parseInt(count, 10) || 1));
+        if (clamped === sectionsCount) return;
+        const updatedBed = this.storage.setBedSectionsCount(bedId, clamped);
+        this.showToast(clamped <= 1
+          ? `Грядка «${bed.name}» объединена в одну цельную`
+          : `Грядка «${bed.name}» разделена на ${clamped} рядков!`
+        );
+        this.gardenMap.render();
+        const firstSecId = (clamped > 1 && updatedBed?.sections?.[0]) ? updatedBed.sections[0].id : null;
+        this.openBedInspector(bedId, firstSecId);
+      };
+
+      drawer.querySelectorAll('.split-tab-btn[data-split-count]').forEach(splitBtn => {
         splitBtn.addEventListener('click', () => {
-          const count = parseInt(splitBtn.getAttribute('data-split-count'), 10);
-          if (count === sectionsCount) return;
-          this.storage.setBedSectionsCount(bedId, count);
-          this.showToast(count <= 1 
-            ? `Грядка «${bed.name}» объединена в одну цельную` 
-            : `Грядка «${bed.name}» разделена на ${count} автономных рядка!`
-          );
-          this.gardenMap.render();
-          this.openBedInspector(bedId, count > 1 ? 'sec-1' : null);
+          applySplitCount(splitBtn.getAttribute('data-split-count'));
         });
       });
+
+      document.getElementById('split-rows-minus')?.addEventListener('click', () => applySplitCount(sectionsCount - 1));
+      document.getElementById('split-rows-plus')?.addEventListener('click', () => applySplitCount(sectionsCount + 1));
 
       // Переключение активного рядка внутри грядки / теплицы
       if (hasSections && sectionsCount > 1) {

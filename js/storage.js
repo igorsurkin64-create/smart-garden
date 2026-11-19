@@ -881,7 +881,7 @@ class GardenStorage {
     const bed = this.getBedById(bedId);
     if (!bed) return null;
 
-    count = parseInt(count, 10);
+    count = Math.max(1, Math.min(10, parseInt(count, 10) || 1));
     const isGh = bed.type === 'greenhouse';
     const defaultNames2 = isGh ? ['Левая грядка', 'Правая грядка'] : ['Рядок 1 (Левый)', 'Рядок 2 (Правый)'];
     const defaultNames3 = isGh ? ['Левая грядка', 'Центральная грядка', 'Правая грядка'] : ['Рядок 1 (Левый)', 'Рядок 2 (Центр)', 'Рядок 3 (Правый)'];
@@ -898,16 +898,17 @@ class GardenStorage {
       bed.sectionsCount = 1;
       delete bed.sections;
     } else {
-      // 2 или 3 раздельных рядка/секции
+      // От 2 до 10 раздельных рядков/секций
       const prevSections = bed.sections || [];
       const newSections = [];
-      const names = count === 2 ? defaultNames2 : defaultNames3;
+      const names = count === 2 ? defaultNames2 : (count === 3 ? defaultNames3 : []);
 
       for (let i = 0; i < count; i++) {
         const existing = prevSections[i];
+        const fallbackName = names[i] || (isGh ? `Грядка ${i + 1}` : `Рядок ${i + 1}`);
         if (existing) {
-          const isStandardName = !existing.name || /^(?:Рядок \d+|Левая грядка|Правая грядка|Центральная грядка|Рядок \d+ \((?:Левый|Правый|Центр)\))$/i.test(existing.name.trim());
-          const newName = isStandardName ? names[i] : existing.name;
+          const isStandardName = !existing.name || /^(?:Рядок \d+|Грядка \d+|Левая грядка|Правая грядка|Центральная грядка|Рядок \d+ \((?:Левый|Правый|Центр)\))$/i.test(existing.name.trim());
+          const newName = isStandardName ? fallbackName : existing.name;
           newSections.push({
             ...existing,
             name: newName
@@ -917,7 +918,7 @@ class GardenStorage {
           const initialHistory = (i === 0 && bed.history) ? JSON.parse(JSON.stringify(bed.history)) : {};
           newSections.push({
             id: `sec-${i + 1}-${Date.now()}`,
-            name: names[i] || `Рядок ${i + 1}`,
+            name: fallbackName,
             history: initialHistory
           });
         }

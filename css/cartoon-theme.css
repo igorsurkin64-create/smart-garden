@@ -730,9 +730,88 @@ body.theme-cartoon .inspector-section {
 .decor-item.decor-z-mid { z-index: 3; }
 .decor-item.decor-z-high { z-index: 5; }
 
+/* Простой режим инспектора (по умолчанию скрыты «шумные» блоки агронома) */
+body:not(.inspector-advanced-mode) .inspector-advanced-only {
+  display: none !important;
+}
+
+#btn-toggle-advanced-mode.is-active {
+  background: #16a34a !important;
+  color: #ffffff !important;
+  border-color: #15803d !important;
+}
+
+/* Ускорение перетаскивания карты без тормозов */
+#garden-transform-plane {
+  will-change: transform;
+}
+
+/* Кнопки-стрелки прокрутки участка (D-pad) */
+.map-pan-dpad {
+  position: absolute;
+  right: 16px;
+  bottom: 18px;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px;
+  background: rgba(255, 253, 245, 0.94);
+  border: 2px solid #8c5e3a;
+  border-radius: 16px;
+  box-shadow: 0 4px 0 rgba(74, 38, 13, 0.4), 0 8px 18px rgba(0, 0, 0, 0.18);
+  user-select: none;
+}
+
+.dpad-mid-row {
+  display: flex;
+  gap: 3px;
+}
+
+.dpad-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #c4a484;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff 0%, #f5ebd6 100%);
+  color: #4a260d;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 2px 0 rgba(74, 38, 13, 0.3);
+  transition: transform 0.1s ease, background 0.12s ease;
+}
+
+.dpad-btn:hover {
+  background: #fef08a;
+  transform: translateY(-1px);
+}
+
+.dpad-btn:active {
+  transform: translateY(1px);
+}
+
+.dpad-fit {
+  background: linear-gradient(180deg, #dcfce7 0%, #86efac 100%);
+  border-color: #16a34a;
+  color: #14532d;
+  font-size: 0.9rem;
+}
+
 .decor-item:hover {
   filter: drop-shadow(0 6px 14px rgba(24, 52, 10, 0.35));
   z-index: 20;
+}
+
+.decor-item.decor-selected {
+  outline: 3px dashed #facc15;
+  outline-offset: 4px;
+  border-radius: 14px;
+  z-index: 28;
 }
 
 .decor-item.dragging {
@@ -749,28 +828,61 @@ body.theme-cartoon .inspector-section {
   pointer-events: none;
 }
 
+/* Крупная понятная панель действий с текстом (Повернуть / Копия / Удалить) */
 .decor-item-tools {
   position: absolute;
-  top: -32px;
+  top: -46px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 4px;
-  padding: 3px 5px;
-  background: rgba(255, 253, 245, 0.96);
-  border: 2px solid #78421b;
-  border-radius: 10px;
-  box-shadow: 0 3px 0 rgba(74, 38, 13, 0.4), 0 6px 12px rgba(0, 0, 0, 0.18);
+  gap: 6px;
+  padding: 5px 8px;
+  background: rgba(255, 253, 245, 0.98);
+  border: 2.5px solid #78421b;
+  border-radius: 12px;
+  box-shadow: 0 4px 0 rgba(74, 38, 13, 0.45), 0 10px 22px rgba(0, 0, 0, 0.24);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.16s ease, transform 0.16s ease;
-  z-index: 40;
+  transition: opacity 0.16s ease;
+  white-space: nowrap;
+  z-index: 45;
 }
 
 .decor-item:hover .decor-item-tools,
+.decor-item.decor-selected .decor-item-tools,
 .decor-item:focus-within .decor-item-tools {
   opacity: 1;
   pointer-events: auto;
+}
+
+.decor-action-btn {
+  padding: 5px 10px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #3e220e;
+  background: linear-gradient(180deg, #ffffff 0%, #f5e6c8 100%);
+  border: 1.8px solid #8c5e3a;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 0 rgba(74, 38, 13, 0.35);
+  transition: transform 0.1s ease, background 0.12s ease;
+}
+
+.decor-action-btn:hover {
+  background: #fef08a;
+  transform: translateY(-1px);
+}
+
+.decor-action-btn.decor-action-danger {
+  color: #991b1b;
+  background: linear-gradient(180deg, #fff1f2 0%, #fecdd3 100%);
+  border-color: #dc2626;
+  box-shadow: 0 2px 0 rgba(153, 27, 27, 0.4);
+}
+
+.decor-action-btn.decor-action-danger:hover {
+  background: #ef4444;
+  color: #ffffff;
 }
 
 /* Модальное окно выбора декора */
