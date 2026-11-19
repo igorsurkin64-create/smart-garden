@@ -592,12 +592,25 @@ class GardenMap {
     this.updateTransform(smooth);
   }
 
+  getTopSafePaddingPx() {
+    const vRect = this.viewportEl ? this.viewportEl.getBoundingClientRect() : null;
+    const floatingBar = this.container ? this.container.querySelector('.map-controls-floating') : null;
+    if (vRect && floatingBar) {
+      const fRect = floatingBar.getBoundingClientRect();
+      // Нижний край плавающего меню относительно верха вьюпорта + 46px под закладку-хвостик грядки и воздух
+      const barBottom = Math.max(0, fRect.bottom - vRect.top);
+      return Math.ceil(barBottom + 46);
+    }
+    return 116;
+  }
+
   centerPlotInView(smooth = false) {
     if (!this.viewportEl) return;
     const beds = this.storage.getBeds();
+    const topSafePx = this.getTopSafePaddingPx();
     if (!beds.length) {
       this.panX = 80;
-      this.panY = 80;
+      this.panY = topSafePx;
       this.updateTransform(smooth);
       return;
     }
@@ -610,27 +623,18 @@ class GardenMap {
     const vw = (vRect.width && vRect.width > 200) ? vRect.width : window.innerWidth;
     const vh = (vRect.height && vRect.height > 200) ? vRect.height : (window.innerHeight - 150);
 
-    // Центрирование по горизонтали (X):
-    // При ширине меньше экрана центрируем ровно посередине.
-    // Если огород шире экрана, центрируем середину, но не даем левому краю уйти дальше левого отступа
+    // Центрирование по горизонтали (X)
     const centeredPanX = Math.round((vw - plotPxW) / 2 - (bbox.minX * this.meterPixels * this.zoom));
     const leftMarginPanX = Math.round(50 - (bbox.minX * this.meterPixels * this.zoom));
     this.panX = (plotPxW <= vw) ? centeredPanX : Math.max(leftMarginPanX, centeredPanX);
 
-    // Центрирование по вертикали (Y):
-    // У каждой грядки сверху есть закладка-хвостик высотой 28px (top: -26px),
-    // поэтому минимальный комфортный отступ сверху от края карты — 40px.
-    const topTabPaddingPx = 40;
-    const centeredPanY = Math.round((vh - plotPxH) / 2 - (bbox.minY * this.meterPixels * this.zoom));
-    const topAlignedPanY = Math.round(topTabPaddingPx - (bbox.minY * this.meterPixels * this.zoom));
+    // Центрирование по вертикали (Y) строго НИЖЕ плавающего верхнего меню (.map-controls-floating)!
+    const bottomMarginPx = 28;
+    const usableH = Math.max(120, vh - topSafePx - bottomMarginPx);
+    const centeredPanY = Math.round(topSafePx + (usableH - plotPxH) / 2 - (bbox.minY * this.meterPixels * this.zoom));
+    const topAlignedPanY = Math.round(topSafePx - (bbox.minY * this.meterPixels * this.zoom));
 
-    // КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ:
-    // Если огород по высоте помещается в экран, centeredPanY > topAlignedPanY и огород центрируется.
-    // Если зум увеличен (например 87%-120%) и огород выше экрана (plotPxH > vh),
-    // centeredPanY становится отрицательным, из-за чего верхние грядки (1-3 ряды)
-    // улетали высоко вверх за экран, и пользователю показывался «самый низ»!
-    // С помощью Math.max верхний край огорода ВСЕГДА начинается с отступа 40px,
-    // и пользователь сразу видит свои первые грядки, теплицы и начало огорода!
+    // Верхний край участка и закладки грядок НИКОГДА не уходят под верхнее меню
     this.panY = Math.max(topAlignedPanY, centeredPanY);
 
     this.updateTransform(smooth);
@@ -639,10 +643,11 @@ class GardenMap {
   fitPlotToView(smooth = false) {
     if (!this.viewportEl) return;
     const beds = this.storage.getBeds();
+    const topSafePx = this.getTopSafePaddingPx();
     if (!beds.length) {
       this.zoom = 1.0;
       this.panX = 80;
-      this.panY = 80;
+      this.panY = topSafePx;
       this.updateTransform(smooth);
       return;
     }
@@ -652,8 +657,8 @@ class GardenMap {
     const vw = (vRect.width && vRect.width > 200) ? vRect.width : (window.innerWidth - 60);
     const vh = (vRect.height && vRect.height > 200) ? vRect.height : (window.innerHeight - 160);
 
-    const availW = Math.max(300, vw - 120);
-    const availH = Math.max(300, vh - 120);
+    const availW = Math.max(300, vw - 110);
+    const availH = Math.max(240, vh - topSafePx - 44);
 
     const targetPxW = Math.max(1, bbox.width * this.meterPixels);
     const targetPxH = Math.max(1, bbox.height * this.meterPixels);
@@ -665,12 +670,15 @@ class GardenMap {
   }
 
   calculateBedsBoundingBox(beds) {
-    if (!beds || !beds.length) {
+    const decorItems = (this.storage && typeof this.storage.getDecorItems === 'function')
+      ? this.storage.getDecorItems()
+      : [];
+    if ((!beds || !beds.length) && !decorItems.length) {
       return { minX: 0, minY: 0, maxX: 20, maxY: 15, width: 20, height: 15 };
     }
 
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    beds.forEach(b => {
+    (beds || []).forEach(b => {
       const isGh = b.type === 'greenhouse';
       const hasSections = (b.sections && b.sections.length > 1) || (isGh && b.sections && b.sections.length > 0);
       let effectiveW = b.width || 4.0;
@@ -695,6 +703,16 @@ class GardenMap {
       minY = Math.min(minY, b.y);
       maxX = Math.max(maxX, b.x + effectiveW);
       maxY = Math.max(maxY, b.y + effectiveH);
+    });
+
+    // Учитываем также объекты декора (забор, домик, деревья), чтобы они тоже не уезжали под меню!
+    decorItems.forEach(d => {
+      const dw = d.width || 2;
+      const dh = d.height || 2;
+      minX = Math.min(minX, d.x);
+      minY = Math.min(minY, d.y);
+      maxX = Math.max(maxX, d.x + dw);
+      maxY = Math.max(maxY, d.y + dh);
     });
 
     if (minX === Infinity) {
