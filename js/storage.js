@@ -1245,6 +1245,91 @@ class GardenStorage {
     this.saveData();
     return true;
   }
+
+  // ==================== Интерактивный календарь сезона (отметки, даты, свои дела) ====================
+  getCalendarProgressMap(year) {
+    if (!this.data.calendarProgress || typeof this.data.calendarProgress !== 'object') {
+      this.data.calendarProgress = {};
+    }
+    const yStr = String(year);
+    if (!this.data.calendarProgress[yStr] || typeof this.data.calendarProgress[yStr] !== 'object') {
+      this.data.calendarProgress[yStr] = {};
+    }
+    return this.data.calendarProgress[yStr];
+  }
+
+  getCalendarTaskState(year, taskKey) {
+    const map = this.getCalendarProgressMap(year);
+    return map[taskKey] || { done: false, date: '' };
+  }
+
+  setCalendarTaskState(year, taskKey, done, date = '') {
+    const map = this.getCalendarProgressMap(year);
+    const prev = map[taskKey] || { done: false, date: '' };
+    const finalDone = Boolean(done);
+    const finalDate = date !== undefined && date !== null
+      ? String(date)
+      : (finalDone && !prev.date ? new Date().toISOString().split('T')[0] : prev.date);
+    map[taskKey] = { done: finalDone, date: finalDate };
+    this.saveData();
+    return map[taskKey];
+  }
+
+  getCustomCalendarTasks(year) {
+    if (!this.data.customCalendarTasks || typeof this.data.customCalendarTasks !== 'object') {
+      this.data.customCalendarTasks = {};
+    }
+    const yStr = String(year);
+    if (!Array.isArray(this.data.customCalendarTasks[yStr])) {
+      this.data.customCalendarTasks[yStr] = [];
+    }
+    return this.data.customCalendarTasks[yStr];
+  }
+
+  addCustomCalendarTask(year, { date, title, bedName = '' }) {
+    const list = this.getCustomCalendarTasks(year);
+    const safeDate = date || new Date().toISOString().split('T')[0];
+    const parsedMonth = parseInt(safeDate.split('-')[1], 10);
+    const monthNum = (parsedMonth >= 1 && parsedMonth <= 12) ? parsedMonth : (new Date().getMonth() + 1);
+    const item = {
+      id: 'cal-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+      date: safeDate,
+      month: monthNum,
+      title: String(title || '').trim(),
+      bedName: String(bedName || '').trim(),
+      done: false,
+      doneDate: ''
+    };
+    if (!item.title) return null;
+    list.push(item);
+    this.saveData();
+    return item;
+  }
+
+  updateCustomCalendarTask(year, taskId, patch = {}) {
+    const list = this.getCustomCalendarTasks(year);
+    const item = list.find(t => t.id === taskId);
+    if (!item) return null;
+    if (patch.done !== undefined) item.done = Boolean(patch.done);
+    if (patch.date !== undefined) {
+      item.date = String(patch.date || '');
+      const m = parseInt(item.date.split('-')[1], 10);
+      if (m >= 1 && m <= 12) item.month = m;
+    }
+    if (patch.doneDate !== undefined) item.doneDate = String(patch.doneDate || '');
+    this.saveData();
+    return item;
+  }
+
+  deleteCustomCalendarTask(year, taskId) {
+    const list = this.getCustomCalendarTasks(year);
+    const yStr = String(year);
+    const next = list.filter(t => t.id !== taskId);
+    if (next.length === list.length) return false;
+    this.data.customCalendarTasks[yStr] = next;
+    this.saveData();
+    return true;
+  }
 }
 
 /**

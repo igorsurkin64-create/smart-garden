@@ -791,114 +791,366 @@
     const modalContent = document.getElementById('modal-dynamic-content');
     if (!modal || !modalContent) return;
 
-    const monthsData = typeof getSeasonalCalendarEvents === 'function'
-      ? getSeasonalCalendarEvents(activeYear, beds, currentLang)
-      : [];
-
-    const renderEvents = (filter = 'all') => {
-      if (monthsData.length === 0) {
-        return `
-          <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
-            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🌱</div>
-            <h3>На ${activeYear} год пока не назначено ни одной посадки</h3>
-            <p style="font-size: 0.88rem; margin-top: 0.35rem;">Откройте любую грядку на карте или воспользуйтесь «✨ Авто-севооборотом», чтобы сформировать календарь работ!</p>
-          </div>
-        `;
-      }
-
-      let html = '';
-      monthsData.forEach(m => {
-        const filteredEvents = filter === 'all' ? m.events : m.events.filter(e => e.stage === filter);
-        if (filteredEvents.length === 0) return;
-
-        html += `
-          <div class="calendar-month-card">
-            <div class="calendar-month-header">
-              <span class="calendar-month-title">${m.monthName}</span>
-              <span class="calendar-month-count">${filteredEvents.length} задач</span>
-            </div>
-            <div class="calendar-events-list">
-              ${filteredEvents.map(e => `
-                <div class="calendar-event-row">
-                  <div class="cal-event-crop">
-                    <span style="font-size: 1.25rem;">${e.cropEmoji}</span>
-                    <div>
-                      <strong>${escapeHtml(e.cropName)}</strong>
-                      ${e.variety ? `<span class="text-xs text-muted" style="display:block;">${escapeHtml(e.variety)}</span>` : ''}
-                    </div>
-                  </div>
-                  <div style="flex: 1; padding: 0 0.5rem;">
-                    <span class="cal-event-stage stage-${e.stage}">${e.icon} ${escapeHtml(e.action)}</span>
-                  </div>
-                  <div class="cal-event-bed">
-                    📍 ${escapeHtml(e.bedName)}
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      });
-
-      return html || `
-        <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
-          Нет задач в выбранной категории.
-        </div>
-      `;
+    const allMonthNames = {
+      1: { ru: 'Январь', et: 'Jaanuar', lv: 'Janvāris', lt: 'Sausis' },
+      2: { ru: 'Февраль', et: 'Veebruar', lv: 'Februāris', lt: 'Vasaris' },
+      3: { ru: 'Март', et: 'Märts', lv: 'Marts', lt: 'Kovas' },
+      4: { ru: 'Апрель', et: 'Aprill', lv: 'Aprīlis', lt: 'Balandis' },
+      5: { ru: 'Май', et: 'Mai', lv: 'Maijs', lt: 'Gegužė' },
+      6: { ru: 'Июнь', et: 'Juuni', lv: 'Jūnijs', lt: 'Birželis' },
+      7: { ru: 'Июль', et: 'Juuli', lv: 'Jūlijs', lt: 'Liepa' },
+      8: { ru: 'Август', et: 'August', lv: 'Augusts', lt: 'Rugpjūtis' },
+      9: { ru: 'Сентябрь', et: 'September', lv: 'Septembris', lt: 'Rugsėjis' },
+      10: { ru: 'Октябрь', et: 'Oktoober', lv: 'Oktobris', lt: 'Spalis' },
+      11: { ru: 'Ноябрь', et: 'November', lv: 'Novembris', lt: 'Lapkritis' },
+      12: { ru: 'Декабрь', et: 'Detsember', lv: 'Decembris', lt: 'Gruodis' }
     };
 
-    modalContent.innerHTML = `
-      <div class="modal-card calendar-modal-content">
-        <div class="modal-header">
-          <div>
-            <h3>📅 Календарь огородного сезона (${activeYear} г.)</h3>
-            <span class="text-xs text-muted">Индивидуальный график работ, составленный под посадки вашего огорода</span>
+    const todayIso = new Date().toISOString().split('T')[0];
+    let currentFilter = 'all';
+    let showAddForm = false;
+
+    const buildMergedMonths = () => {
+      const autoMonths = typeof getSeasonalCalendarEvents === 'function'
+        ? getSeasonalCalendarEvents(activeYear, beds, currentLang)
+        : [];
+      const customTasks = this.storage.getCustomCalendarTasks(activeYear);
+
+      const monthMap = new Map();
+      autoMonths.forEach(m => {
+        monthMap.set(m.monthNumber, {
+          monthNumber: m.monthNumber,
+          monthName: m.monthName,
+          events: m.events.map((e, idx) => {
+            const taskKey = `${m.monthNumber}|${e.stage}|${e.bedName}|${e.cropName}|${idx}`;
+            const st = this.storage.getCalendarTaskState(activeYear, taskKey);
+            return {
+              ...e,
+              isCustom: false,
+              taskKey,
+              done: Boolean(st.done),
+              date: st.date || ''
+            };
+          })
+        });
+      });
+
+      customTasks.forEach(ct => {
+        const mNum = ct.month || 5;
+        if (!monthMap.has(mNum)) {
+          monthMap.set(mNum, {
+            monthNumber: mNum,
+            monthName: allMonthNames[mNum]?.[currentLang] || allMonthNames[mNum]?.ru || `Месяц ${mNum}`,
+            events: []
+          });
+        }
+        monthMap.get(mNum).events.push({
+          isCustom: true,
+          id: ct.id,
+          stage: 'custom',
+          cropEmoji: '📌',
+          cropName: ct.title,
+          variety: '',
+          icon: '📝',
+          action: 'Своя работа',
+          bedName: ct.bedName || 'Весь участок',
+          done: Boolean(ct.done),
+          date: ct.date || ''
+        });
+      });
+
+      return Array.from(monthMap.values())
+        .sort((a, b) => a.monthNumber - b.monthNumber)
+        .filter(m => m.events.length > 0);
+    };
+
+    const formatRuDate = (iso) => {
+      if (!iso || !iso.includes('-')) return '';
+      const [y, m, d] = iso.split('-');
+      return `${d}.${m}.${y}`;
+    };
+
+    const renderCalendarModal = () => {
+      const mergedMonths = buildMergedMonths();
+      let totalTasks = 0;
+      let doneTasks = 0;
+      mergedMonths.forEach(m => {
+        m.events.forEach(ev => {
+          totalTasks++;
+          if (ev.done) doneTasks++;
+        });
+      });
+      const pct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+
+      const renderEventsHtml = () => {
+        if (mergedMonths.length === 0) {
+          return `
+            <div style="text-align: center; padding: 2.2rem 1rem; color: var(--text-muted);">
+              <div style="font-size: 2.4rem; margin-bottom: 0.5rem;">🌱</div>
+              <h3>На ${activeYear} год пока нет задач</h3>
+              <p style="font-size: 0.88rem; margin-top: 0.35rem;">Назначьте посадки на грядках или нажмите <b>«➕ Добавить свою работу»</b> выше!</p>
+            </div>
+          `;
+        }
+
+        let html = '';
+        mergedMonths.forEach(m => {
+          const filtered = m.events.filter(ev => {
+            if (currentFilter === 'all') return true;
+            if (currentFilter === 'pending') return !ev.done;
+            if (currentFilter === 'done') return ev.done;
+            return ev.stage === currentFilter;
+          });
+          if (filtered.length === 0) return;
+
+          const monthDone = filtered.filter(ev => ev.done).length;
+
+          html += `
+            <div class="calendar-month-card">
+              <div class="calendar-month-header">
+                <span class="calendar-month-title">${escapeHtml(m.monthName)}</span>
+                <span class="calendar-month-count">${monthDone}/${filtered.length} выполнено</span>
+              </div>
+              <div class="calendar-events-list">
+                ${filtered.map(ev => `
+                  <div class="calendar-event-row ${ev.done ? 'cal-row-done' : ''}" style="display: flex; align-items: center; gap: 0.55rem; flex-wrap: wrap; padding: 0.55rem 0.7rem; border-radius: 8px; transition: background 0.15s ease; ${ev.done ? 'background: rgba(22, 163, 74, 0.09);' : ''}">
+                    <label style="display: flex; align-items: center; cursor: pointer; flex-shrink: 0;" title="Отметить работу выполненной">
+                      <input type="checkbox"
+                             class="cal-task-checkbox"
+                             data-is-custom="${ev.isCustom ? '1' : '0'}"
+                             data-task-id="${escapeHtml(ev.isCustom ? ev.id : ev.taskKey)}"
+                             ${ev.done ? 'checked' : ''}
+                             style="width: 19px; height: 19px; accent-color: #16a34a; cursor: pointer;">
+                    </label>
+                    <div class="cal-event-crop" style="min-width: 145px; ${ev.done ? 'opacity: 0.72; text-decoration: line-through;' : ''}">
+                      <span style="font-size: 1.2rem;">${ev.cropEmoji}</span>
+                      <div>
+                        <strong>${escapeHtml(ev.cropName)}</strong>
+                        ${ev.variety ? `<span class="text-xs text-muted" style="display:block;">${escapeHtml(ev.variety)}</span>` : ''}
+                      </div>
+                    </div>
+                    <div style="flex: 1; min-width: 140px;">
+                      <span class="cal-event-stage stage-${ev.stage}">${ev.icon} ${escapeHtml(ev.action)}</span>
+                      <div class="text-xs text-muted" style="margin-top: 2px;">📍 ${escapeHtml(ev.bedName)}</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px; flex-shrink: 0;">
+                      <input type="date"
+                             class="cal-task-date-input"
+                             data-is-custom="${ev.isCustom ? '1' : '0'}"
+                             data-task-id="${escapeHtml(ev.isCustom ? ev.id : ev.taskKey)}"
+                             value="${escapeHtml(ev.date || '')}"
+                             title="Указать точную дату выполнения или плана"
+                             style="padding: 3px 6px; font-size: 0.78rem; border: 1px solid var(--border-subtle); border-radius: 6px; background: var(--bg-primary); color: var(--text-main);">
+                      ${ev.isCustom ? `
+                        <button type="button" class="btn btn-sm btn-outline cal-delete-custom-btn" data-task-id="${escapeHtml(ev.id)}" title="Удалить эту запись" style="padding: 2px 6px; color: #dc2626; border-color: #fca5a5;">🗑️</button>
+                      ` : ''}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        });
+
+        return html || `
+          <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+            Нет задач в выбранной категории.
           </div>
-          <button class="modal-close-btn">&times;</button>
-        </div>
+        `;
+      };
 
-        <div class="calendar-filters-bar">
-          <button class="calendar-filter-btn active" data-filter="all">Все работы</button>
-          <button class="calendar-filter-btn" data-filter="seedling">🪴 Посев на рассаду</button>
-          <button class="calendar-filter-btn" data-filter="greenhouse">🏡 В теплицу</button>
-          <button class="calendar-filter-btn" data-filter="ground">🌱 Открытый грунт</button>
-          <button class="calendar-filter-btn" data-filter="harvest">🧺 Сбор урожая</button>
-        </div>
+      const bedOptionsHtml = beds.map(b => `<option value="${escapeHtml(b.name)}">${escapeHtml(b.name)}</option>`).join('');
 
-        <div class="calendar-timeline-body" id="calendar-timeline-body">
-          ${renderEvents('all')}
-        </div>
+      modalContent.innerHTML = `
+        <div class="modal-card calendar-modal-content" style="max-width: 820px; width: 96%;">
+          <div class="modal-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+            <div>
+              <h3 style="margin: 0;">📅 Календарь работ (${activeYear} г.)</h3>
+              <span class="text-xs text-muted">Отмечайте галочкой выполненные работы, ставьте точную дату и добавляйте свои дела</span>
+              <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+                <div style="flex: 1; max-width: 240px; height: 8px; background: var(--bg-tertiary, #e5e7eb); border-radius: 999px; overflow: hidden;">
+                  <div style="width: ${pct}%; height: 100%; background: #16a34a; transition: width 0.25s ease;"></div>
+                </div>
+                <span style="font-size: 0.78rem; font-weight: 800; color: #15803d;">✅ Выполнено: ${doneTasks} из ${totalTasks} (${pct}%)</span>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <button type="button" class="btn btn-sm btn-primary" id="cal-toggle-add-btn" style="white-space: nowrap;">
+                ${showAddForm ? '✕ Скрыть форму' : '➕ Добавить работу'}
+              </button>
+              <button class="modal-close-btn">&times;</button>
+            </div>
+          </div>
 
-        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
-          <button class="btn btn-outline btn-sm" id="calendar-print-btn">
-            🖨️ Распечатать план А4
-          </button>
-          <button class="btn btn-primary btn-sm" id="calendar-close-ok-btn">
-            Закрыть
-          </button>
+          ${showAddForm ? `
+            <div style="padding: 0.85rem 1.2rem; background: rgba(22, 163, 74, 0.07); border-bottom: 1px solid var(--border-subtle);">
+              <div style="font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #15803d;">📌 Новая запись в календарь:</div>
+              <div style="display: grid; grid-template-columns: 145px 1fr 180px auto; gap: 6px; align-items: center;">
+                <input type="date" id="cal-new-date" class="form-input" value="${todayIso}" style="padding: 6px 8px; font-size: 0.84rem;">
+                <input type="text" id="cal-new-title" class="form-input" placeholder="Например: Пропикировать томаты, купить грунт..." style="padding: 6px 8px; font-size: 0.84rem;">
+                <select id="cal-new-bed" class="form-input" style="padding: 6px 8px; font-size: 0.84rem;">
+                  <option value="Весь участок">🏡 Весь участок</option>
+                  ${bedOptionsHtml}
+                </select>
+                <button type="button" class="btn btn-sm btn-primary" id="cal-save-new-btn" style="padding: 6px 12px;">💾 Добавить</button>
+              </div>
+            </div>
+          ` : ''}
+
+          <div class="calendar-filters-bar">
+            <button class="calendar-filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all">Все (${totalTasks})</button>
+            <button class="calendar-filter-btn ${currentFilter === 'pending' ? 'active' : ''}" data-filter="pending">⏳ Осталось (${totalTasks - doneTasks})</button>
+            <button class="calendar-filter-btn ${currentFilter === 'done' ? 'active' : ''}" data-filter="done">✅ Выполнено (${doneTasks})</button>
+            <button class="calendar-filter-btn ${currentFilter === 'seedling' ? 'active' : ''}" data-filter="seedling">🪴 Рассада</button>
+            <button class="calendar-filter-btn ${currentFilter === 'greenhouse' ? 'active' : ''}" data-filter="greenhouse">🏡 Теплица</button>
+            <button class="calendar-filter-btn ${currentFilter === 'ground' ? 'active' : ''}" data-filter="ground">🌱 Грунт</button>
+            <button class="calendar-filter-btn ${currentFilter === 'harvest' ? 'active' : ''}" data-filter="harvest">🧺 Урожай</button>
+            <button class="calendar-filter-btn ${currentFilter === 'custom' ? 'active' : ''}" data-filter="custom">📌 Мои дела</button>
+          </div>
+
+          <div class="calendar-timeline-body" id="calendar-timeline-body">
+            ${renderEventsHtml()}
+          </div>
+
+          <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+            <button class="btn btn-outline btn-sm" id="calendar-print-btn">
+              🖨️ Распечатать календарь (A4)
+            </button>
+            <button class="btn btn-primary btn-sm" id="calendar-close-ok-btn">
+              Готово
+            </button>
+          </div>
         </div>
-      </div>
-    `;
+      `;
+
+      const closeModal = () => modal.classList.remove('active');
+      modalContent.querySelector('.modal-close-btn')?.addEventListener('click', closeModal);
+      document.getElementById('calendar-close-ok-btn')?.addEventListener('click', closeModal);
+
+      document.getElementById('cal-toggle-add-btn')?.addEventListener('click', () => {
+        showAddForm = !showAddForm;
+        renderCalendarModal();
+        if (showAddForm) document.getElementById('cal-new-title')?.focus();
+      });
+
+      document.getElementById('cal-save-new-btn')?.addEventListener('click', () => {
+        const title = document.getElementById('cal-new-title')?.value.trim();
+        const date = document.getElementById('cal-new-date')?.value || todayIso;
+        const bedName = document.getElementById('cal-new-bed')?.value || 'Весь участок';
+        if (!title) {
+          this.showToast('⚠️ Напишите название работы!');
+          return;
+        }
+        this.storage.addCustomCalendarTask(activeYear, { date, title, bedName });
+        showAddForm = false;
+        this.showToast(`📌 Работа «${title}» добавлена на ${formatRuDate(date)}!`);
+        renderCalendarModal();
+      });
+
+      modalContent.querySelectorAll('.calendar-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentFilter = btn.getAttribute('data-filter');
+          renderCalendarModal();
+        });
+      });
+
+      // Отметка галочки «Выполнено»
+      modalContent.querySelectorAll('.cal-task-checkbox').forEach(chk => {
+        chk.addEventListener('change', () => {
+          const isCustom = chk.getAttribute('data-is-custom') === '1';
+          const id = chk.getAttribute('data-task-id');
+          const done = chk.checked;
+          if (isCustom) {
+            this.storage.updateCustomCalendarTask(activeYear, id, { done, doneDate: done ? todayIso : '' });
+          } else {
+            const prev = this.storage.getCalendarTaskState(activeYear, id);
+            this.storage.setCalendarTaskState(activeYear, id, done, done ? (prev.date || todayIso) : prev.date);
+          }
+          renderCalendarModal();
+        });
+      });
+
+      // Изменение точной даты работы
+      modalContent.querySelectorAll('.cal-task-date-input').forEach(inp => {
+        inp.addEventListener('change', () => {
+          const isCustom = inp.getAttribute('data-is-custom') === '1';
+          const id = inp.getAttribute('data-task-id');
+          const val = inp.value;
+          if (isCustom) {
+            this.storage.updateCustomCalendarTask(activeYear, id, { date: val });
+          } else {
+            const prev = this.storage.getCalendarTaskState(activeYear, id);
+            this.storage.setCalendarTaskState(activeYear, id, prev.done, val);
+          }
+          renderCalendarModal();
+        });
+      });
+
+      // Удаление своей работы
+      modalContent.querySelectorAll('.cal-delete-custom-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-task-id');
+          this.storage.deleteCustomCalendarTask(activeYear, id);
+          this.showToast('🗑️ Запись удалена из календаря');
+          renderCalendarModal();
+        });
+      });
+
+      // Печать самого календаря на А4
+      document.getElementById('calendar-print-btn')?.addEventListener('click', () => {
+        const printWin = window.open('', '_blank', 'width=900,height=700');
+        if (!printWin) {
+          this.showToast('⚠️ Разрешите всплывающие окна для печати А4');
+          return;
+        }
+        const monthsHtml = mergedMonths.map(m => `
+          <div class="m-block">
+            <h2>${escapeHtml(m.monthName)}</h2>
+            <table>
+              <thead><tr><th style="width:32px;">✓</th><th style="width:90px;">Дата</th><th>Культура / Дело</th><th>Действие</th><th>Грядка</th></tr></thead>
+              <tbody>
+                ${m.events.map(ev => `
+                  <tr class="${ev.done ? 'done' : ''}">
+                    <td style="text-align:center; font-size:15px;">${ev.done ? '☑' : '☐'}</td>
+                    <td>${escapeHtml(formatRuDate(ev.date) || '—')}</td>
+                    <td><strong>${escapeHtml(ev.cropName)}</strong>${ev.variety ? ` (${escapeHtml(ev.variety)})` : ''}</td>
+                    <td>${escapeHtml(ev.action)}</td>
+                    <td>${escapeHtml(ev.bedName)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `).join('');
+
+        printWin.document.write(`<!DOCTYPE html>
+          <html lang="ru"><head><meta charset="UTF-8"><title>Календарь работ ${activeYear}</title>
+          <style>
+            @page { size: A4 portrait; margin: 12mm; }
+            body { font-family: 'Segoe UI', Arial, sans-serif; color: #1f2937; margin: 0; padding: 12px; }
+            h1 { font-size: 18px; color: #14532d; border-bottom: 2px solid #15803d; padding-bottom: 6px; margin: 0 0 12px 0; }
+            h2 { font-size: 14px; color: #15803d; margin: 12px 0 4px 0; }
+            .m-block { break-inside: avoid; page-break-inside: avoid; margin-bottom: 10px; }
+            table { width: 100%; border-collapse: collapse; font-size: 12px; }
+            th, td { border: 1px solid #d1d5db; padding: 4px 7px; text-align: left; }
+            th { background: #f3f4f6; }
+            tr.done td { background: #f0fdf4; color: #166534; }
+            .no-print { text-align: right; margin-bottom: 8px; }
+            .no-print button { padding: 6px 14px; background: #16a34a; color: #fff; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; }
+            @media print { .no-print { display: none; } body { padding: 0; } }
+          </style></head>
+          <body>
+            <div class="no-print"><button onclick="window.print()">🖨️ Распечатать (A4)</button></div>
+            <h1>📅 Календарь огородных работ — ${activeYear} г. (выполнено ${doneTasks} из ${totalTasks})</h1>
+            ${monthsHtml}
+          </body></html>`);
+        printWin.document.close();
+        setTimeout(() => { try { printWin.print(); } catch (e) {} }, 300);
+      });
+    };
 
     modal.classList.add('active');
-
-    const closeModal = () => modal.classList.remove('active');
-    modalContent.querySelector('.modal-close-btn').addEventListener('click', closeModal);
-    document.getElementById('calendar-close-ok-btn').addEventListener('click', closeModal);
-
-    document.getElementById('calendar-print-btn').addEventListener('click', () => {
-      closeModal();
-      this.printGardenPlan();
-    });
-
-    modalContent.querySelectorAll('.calendar-filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        modalContent.querySelectorAll('.calendar-filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const filter = btn.getAttribute('data-filter');
-        document.getElementById('calendar-timeline-body').innerHTML = renderEvents(filter);
-      });
-    });
+    renderCalendarModal();
   },
 
   openAutoPlanModal() {
