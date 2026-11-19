@@ -1311,6 +1311,7 @@
     let activeFilterCrop = initialCropId || 'all';
     let searchQuery = '';
     let editingId = null;
+    let isAddingCustomCrop = false;
     let formCropId = (initialCropId && initialCropId !== 'all')
       ? initialCropId
       : ((typeof window !== 'undefined' && window._lastSelectedHoleCropId) ? window._lastSelectedHoleCropId : 'tomato');
@@ -1318,7 +1319,6 @@
     let formNotes = '';
     let formPhotoUrl = null;
 
-    const allCrops = (typeof window !== 'undefined' && window.CROPS_DATABASE) ? window.CROPS_DATABASE : [];
     const currentLang = window.i18n ? window.i18n.getLanguage() : 'ru';
 
     const VC = {
@@ -1361,6 +1361,11 @@
     document.addEventListener('paste', handlePaste);
 
     const render = async () => {
+      const allCrops = (typeof window !== 'undefined' && window.CROPS_DATABASE) ? window.CROPS_DATABASE : [];
+      const customCropIds = (this.storage && typeof this.storage.getCustomCrops === 'function')
+        ? this.storage.getCustomCrops().map(c => c.id)
+        : [];
+
       let allVarieties = [];
       if (window.photoStorage) {
         allVarieties = await window.photoStorage.getVarieties(null);
@@ -1383,7 +1388,7 @@
       });
 
       const priorityCropIds = ['tomato', 'cucumber', 'pepper', 'eggplant', 'strawberry', 'carrot', 'onion', 'garlic', 'cabbage_white', 'zucchini', 'pumpkin', 'beet', 'potato'];
-      const usedCropIds = [...new Set([...priorityCropIds, ...cropCounts.keys()])]
+      const usedCropIds = [...new Set([...priorityCropIds, ...customCropIds, ...cropCounts.keys()])]
         .filter(id => id !== 'fallow' && getCropById(id));
 
       const popVars = getCropById(formCropId)?.popularVarieties || [];
@@ -1416,12 +1421,41 @@
               </div>
 
               <div class="form-group mb-2">
-                <label class="form-sublabel" style="font-weight: 700; font-size: 0.82rem;">${VC.cropLbl}</label>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                  <label class="form-sublabel" style="font-weight: 700; font-size: 0.82rem; margin: 0;">${VC.cropLbl}</label>
+                  <button type="button" class="btn-text" id="vc-toggle-custom-crop-btn" style="font-size: 0.76rem; font-weight: 800; color: #15803d; cursor: pointer; padding: 1px 6px; border-radius: 6px; background: #dcfce7; border: 1px solid #86efac;">
+                    ${isAddingCustomCrop ? '✕ Отмена' : '➕ Своя культура'}
+                  </button>
+                </div>
                 <select id="vc-crop-select" class="form-input" style="font-weight: 600;">
                   ${allCrops.filter(c => c.id !== 'fallow').map(c => `
                     <option value="${c.id}" ${formCropId === c.id ? 'selected' : ''}>${c.emoji} ${escapeHtml(getCropName(c, currentLang))}</option>
                   `).join('')}
                 </select>
+                ${isAddingCustomCrop ? `
+                  <div style="margin-top: 6px; padding: 8px; border-radius: 8px; background: #f0fdf4; border: 1.5px solid #22c55e;">
+                    <div style="font-size: 0.74rem; font-weight: 700; color: #15803d; margin-bottom: 5px;">✨ Добавить новое растение (появится и на грядках!):</div>
+                    <div style="display: flex; gap: 5px; align-items: center;">
+                      <select id="vc-custom-crop-emoji" class="form-input" style="width: 58px; padding: 5px 4px; font-size: 1rem;">
+                        <option value="🌿">🌿</option>
+                        <option value="🍉">🍉</option>
+                        <option value="🍈">🍈</option>
+                        <option value="🍇">🍇</option>
+                        <option value="🫐">🫐</option>
+                        <option value="🍓">🍓</option>
+                        <option value="🍒">🍒</option>
+                        <option value="🍎">🍎</option>
+                        <option value="🌽">🌽</option>
+                        <option value="🌻">🌻</option>
+                        <option value="🌹">🌹</option>
+                        <option value="🌸">🌸</option>
+                        <option value="🌱">🌱</option>
+                      </select>
+                      <input type="text" id="vc-custom-crop-name" class="form-input" placeholder="Арбуз, Малина, Розы..." style="flex: 1; padding: 5px 8px; font-size: 0.84rem;">
+                      <button type="button" class="btn btn-sm btn-primary" id="vc-save-custom-crop-btn" style="padding: 5px 10px; font-weight: 800;">✓</button>
+                    </div>
+                  </div>
+                ` : ''}
               </div>
 
               <div class="form-group mb-2">
@@ -1488,11 +1522,15 @@
                 ${usedCropIds.map(cId => {
                   const c = getCropById(cId);
                   const cnt = cropCounts.get(cId) || 0;
-                  if (cnt === 0 && !['tomato', 'cucumber', 'pepper', 'eggplant', 'strawberry', 'carrot', 'onion'].includes(cId)) return '';
+                  const isCustom = customCropIds.includes(cId);
+                  if (cnt === 0 && !isCustom && !['tomato', 'cucumber', 'pepper', 'eggplant', 'strawberry', 'carrot', 'onion'].includes(cId)) return '';
                   return `<button type="button" class="btn-pattern-pill vc-filter-pill ${activeFilterCrop === cId ? 'active' : ''}" data-crop="${cId}">
                     ${escapeHtml(c.emoji)} ${escapeHtml(getCropName(c, currentLang))}${cnt > 0 ? ` (${cnt})` : ''}
                   </button>`;
                 }).join('')}
+                <button type="button" class="btn-pattern-pill" id="vc-filter-add-crop-btn" style="border-style: dashed; border-color: #16a34a; color: #15803d; font-weight: 700;" title="Добавить своё растение (арбуз, малина, цветы и т.д.)">
+                  ➕ Своя культура
+                </button>
               </div>
 
               ${filteredVarieties.length === 0 ? `
@@ -1555,6 +1593,47 @@
           render();
         };
       }
+
+      // Добавление своей новой культуры прямо из картотеки сортов
+      const openCustomCropCreator = () => {
+        formName = modalContent.querySelector('#vc-name-input')?.value || formName;
+        formNotes = modalContent.querySelector('#vc-notes-input')?.value || formNotes;
+        isAddingCustomCrop = !isAddingCustomCrop;
+        render().then(() => {
+          if (isAddingCustomCrop) modalContent.querySelector('#vc-custom-crop-name')?.focus();
+        });
+      };
+
+      modalContent.querySelector('#vc-toggle-custom-crop-btn')?.addEventListener('click', openCustomCropCreator);
+      modalContent.querySelector('#vc-filter-add-crop-btn')?.addEventListener('click', () => {
+        if (!isAddingCustomCrop) openCustomCropCreator();
+        else modalContent.querySelector('#vc-custom-crop-name')?.focus();
+      });
+
+      const saveCustomCrop = () => {
+        const nameVal = modalContent.querySelector('#vc-custom-crop-name')?.value.trim();
+        const emojiVal = modalContent.querySelector('#vc-custom-crop-emoji')?.value || '🌿';
+        if (!nameVal) {
+          this.showToast('⚠️ Введите название растения (например: Арбуз, Малина, Розы)');
+          return;
+        }
+        const created = this.storage.addCustomCrop({ name: nameVal, emoji: emojiVal, family: 'custom' });
+        if (created) {
+          formCropId = created.id;
+          activeFilterCrop = created.id;
+          isAddingCustomCrop = false;
+          this.showToast(`✓ Новое растение «${created.emoji} ${created.name}» добавлено!`);
+          render().then(() => modalContent.querySelector('#vc-name-input')?.focus());
+        }
+      };
+
+      modalContent.querySelector('#vc-save-custom-crop-btn')?.addEventListener('click', saveCustomCrop);
+      modalContent.querySelector('#vc-custom-crop-name')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          saveCustomCrop();
+        }
+      });
 
       // Клик по чипсу популярного сорта
       modalContent.querySelectorAll('.vc-pop-chip').forEach(chip => {
