@@ -98,11 +98,11 @@ body.theme-cartoon .garden-pan-viewport {
 body.theme-cartoon .infinite-grid-layer {
   background-color: transparent !important;
   background-image:
-    /* Лужайка: мягкие скошенные полосы, травинки, клевер, ромашки и одуванчики */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Crect width='120' height='240' fill='%23ffffff' fill-opacity='0.06'/%3E%3Cg stroke='%23478f20' stroke-width='2.3' stroke-linecap='round' fill='none' opacity='0.58'%3E%3Cpath d='M28 42 Q26 32 20 28 M28 42 Q30 31 35 27 M28 42 Q28 34 28 30'/%3E%3Cpath d='M148 92 Q145 83 140 79 M148 92 Q150 82 155 78'/%3E%3Cpath d='M82 168 Q79 158 74 155 M82 168 Q84 157 89 153 M82 168 Q82 160 82 156'/%3E%3Cpath d='M202 198 Q199 189 194 186 M202 198 Q204 188 209 185'/%3E%3Cpath d='M188 46 Q185 37 180 34 M188 46 Q190 36 195 33'/%3E%3Cpath d='M42 212 Q39 203 34 200 M42 212 Q44 202 49 199'/%3E%3C/g%3E%3Cg opacity='0.9'%3E%3Ccircle cx='106' cy='58' r='3.6' fill='%23ffffff'/%3E%3Ccircle cx='111' cy='61' r='3.6' fill='%23ffffff'/%3E%3Ccircle cx='106' cy='64' r='3.6' fill='%23ffffff'/%3E%3Ccircle cx='101' cy='61' r='3.6' fill='%23ffffff'/%3E%3Ccircle cx='106' cy='61' r='2.4' fill='%23facc15'/%3E%3C/g%3E%3Cg opacity='0.86'%3E%3Ccircle cx='206' cy='128' r='3.2' fill='%23fef08a'/%3E%3Ccircle cx='210' cy='131' r='3.2' fill='%23fef08a'/%3E%3Ccircle cx='206' cy='134' r='3.2' fill='%23fef08a'/%3E%3Ccircle cx='202' cy='131' r='3.2' fill='%23fef08a'/%3E%3Ccircle cx='206' cy='131' r='2.1' fill='%23f59e0b'/%3E%3C/g%3E%3Cg opacity='0.86'%3E%3Ccircle cx='54' cy='126' r='2.9' fill='%23ffffff'/%3E%3Ccircle cx='58' cy='129' r='2.9' fill='%23ffffff'/%3E%3Ccircle cx='54' cy='132' r='2.9' fill='%23ffffff'/%3E%3Ccircle cx='50' cy='129' r='2.9' fill='%23ffffff'/%3E%3Ccircle cx='54' cy='129' r='2' fill='%23facc15'/%3E%3C/g%3E%3Cg fill='%23509624' opacity='0.4'%3E%3Ccircle cx='168' cy='170' r='3.5'/%3E%3Ccircle cx='174' cy='173' r='3.5'/%3E%3Ccircle cx='168' cy='176' r='3.5'/%3E%3C/g%3E%3C/svg%3E"),
-    linear-gradient(to right, rgba(255, 255, 255, 0.11) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.11) 1px, transparent 1px) !important;
-  background-size: 240px 240px, 80px 80px, 80px 80px !important;
+    /* Крупная бесшовная лужайка 480×480 без эффекта «обоев»: мягкие пятна солнца, редкие ромашки, клевер и травинки */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='480' viewBox='0 0 480 480'%3E%3Crect width='160' height='480' fill='%23ffffff' fill-opacity='0.045'/%3E%3Crect x='320' width='160' height='480' fill='%23000000' fill-opacity='0.025'/%3E%3Cellipse cx='120' cy='110' rx='65' ry='42' fill='%23bbf7d0' opacity='0.14'/%3E%3Cellipse cx='370' cy='310' rx='80' ry='48' fill='%23fef08a' opacity='0.1'/%3E%3Cellipse cx='260' cy='420' rx='55' ry='32' fill='%234d9424' opacity='0.08'/%3E%3Cg stroke='%23458b1f' stroke-width='2.1' stroke-linecap='round' fill='none' opacity='0.48'%3E%3Cpath d='M38 64 Q35 55 30 51 M38 64 Q40 54 44 50 M38 64 Q38 57 38 53'/%3E%3Cpath d='M214 148 Q211 140 207 137 M214 148 Q216 139 220 135'/%3E%3Cpath d='M412 86 Q409 78 405 75 M412 86 Q414 77 418 74 M412 86 Q412 79 412 76'/%3E%3Cpath d='M104 294 Q101 286 97 283 M104 294 Q106 285 110 282'/%3E%3Cpath d='M318 238 Q315 229 311 226 M318 238 Q320 228 324 225 M318 238 Q318 231 318 228'/%3E%3Cpath d='M436 378 Q433 370 429 367 M436 378 Q438 369 442 366'/%3E%3Cpath d='M178 432 Q175 424 171 421 M178 432 Q180 423 184 420'/%3E%3C/g%3E%3Cg opacity='0.88'%3E%3Ccircle cx='146' cy='78' r='3.5' fill='%23ffffff'/%3E%3Ccircle cx='151' cy='81' r='3.5' fill='%23ffffff'/%3E%3Ccircle cx='146' cy='84' r='3.5' fill='%23ffffff'/%3E%3Ccircle cx='141' cy='81' r='3.5' fill='%23ffffff'/%3E%3Ccircle cx='146' cy='81' r='2.3' fill='%23facc15'/%3E%3C/g%3E%3Cg opacity='0.82'%3E%3Ccircle cx='356' cy='168' r='3.1' fill='%23fef08a'/%3E%3Ccircle cx='360' cy='171' r='3.1' fill='%23fef08a'/%3E%3Ccircle cx='356' cy='174' r='3.1' fill='%23fef08a'/%3E%3Ccircle cx='352' cy='171' r='3.1' fill='%23fef08a'/%3E%3Ccircle cx='356' cy='171' r='2' fill='%23f59e0b'/%3E%3C/g%3E%3Cg opacity='0.84'%3E%3Ccircle cx='78' cy='396' r='2.9' fill='%23ffffff'/%3E%3Ccircle cx='82' cy='399' r='2.9' fill='%23ffffff'/%3E%3Ccircle cx='78' cy='402' r='2.9' fill='%23ffffff'/%3E%3Ccircle cx='74' cy='399' r='2.9' fill='%23ffffff'/%3E%3Ccircle cx='78' cy='399' r='1.9' fill='%23facc15'/%3E%3C/g%3E%3Cg fill='%234c9122' opacity='0.34'%3E%3Ccircle cx='274' cy='342' r='3.6'/%3E%3Ccircle cx='280' cy='345' r='3.6'/%3E%3Ccircle cx='274' cy='348' r='3.6'/%3E%3Ccircle cx='424' cy='218' r='3.2'/%3E%3Ccircle cx='429' cy='221' r='3.2'/%3E%3Ccircle cx='424' cy='224' r='3.2'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px) !important;
+  background-size: 480px 480px, 80px 80px, 80px 80px !important;
 }
 
 /* ---------- 2. НАСТОЯЩИЕ 3D-ГРЯДКИ (объёмный короб + передняя стенка + глубокая тень) ---------- */
@@ -248,12 +248,35 @@ body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-family="brassicacea
   background-size: 68px 54px;
 }
 
-/* 🥕 Морковь, свёкла, лук, чеснок: пучки сочной зелёной ботвы в рядках! */
+/* 🍆 Баклажаны: пышные кустики с глянцевыми фиолетовыми баклажанами! */
+body.theme-cartoon .bed-item.is-planted-bed[data-crop-id="eggplant"]::before,
+body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-id="eggplant"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='56' viewBox='0 0 72 56'%3E%3Cg transform='translate(5,6)'%3E%3Cellipse cx='16' cy='26' rx='13' ry='4.5' fill='%232b170a' opacity='0.48'/%3E%3Ccircle cx='10' cy='18' r='8.5' fill='%232e7d32' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='22' cy='18' r='8.5' fill='%23388e3c' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='12' r='9.5' fill='%2343a047' stroke='%23163d18' stroke-width='1.5'/%3E%3Cellipse cx='11.5' cy='18' rx='3.2' ry='4.8' transform='rotate(-16 11.5 18)' fill='%237b1fa2' stroke='%2338006b' stroke-width='1.2'/%3E%3Cellipse cx='10.6' cy='16.6' rx='0.9' ry='2' transform='rotate(-16 10.6 16.6)' fill='%23e1bee7' opacity='0.8'/%3E%3Cellipse cx='21' cy='16' rx='2.8' ry='4.2' transform='rotate(14 21 16)' fill='%236a1b9a' stroke='%2338006b' stroke-width='1.2'/%3E%3C/g%3E%3Cg transform='translate(40,22)'%3E%3Cellipse cx='14' cy='24' rx='11' ry='4' fill='%232b170a' opacity='0.45'/%3E%3Ccircle cx='9' cy='17' r='7.5' fill='%232e7d32' stroke='%23163d18' stroke-width='1.4'/%3E%3Ccircle cx='19' cy='17' r='7.5' fill='%23388e3c' stroke='%23163d18' stroke-width='1.4'/%3E%3Ccircle cx='14' cy='11' r='8.5' fill='%234caf50' stroke='%23163d18' stroke-width='1.4'/%3E%3Cellipse cx='16' cy='17' rx='3' ry='4.4' transform='rotate(-10 16 17)' fill='%237b1fa2' stroke='%2338006b' stroke-width='1.2'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 72px 56px;
+}
+
+/* 🫑 Перцы: кустики с красными и жёлтыми перчиками! */
+body.theme-cartoon .bed-item.is-planted-bed[data-crop-id="pepper"]::before,
+body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-id="pepper"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='56' viewBox='0 0 72 56'%3E%3Cg transform='translate(5,6)'%3E%3Cellipse cx='16' cy='26' rx='13' ry='4.5' fill='%232b170a' opacity='0.48'/%3E%3Ccircle cx='10' cy='18' r='8.5' fill='%232e7d32' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='22' cy='18' r='8.5' fill='%23388e3c' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='12' r='9' fill='%234caf50' stroke='%23163d18' stroke-width='1.5'/%3E%3Crect x='8' y='13.5' width='6.2' height='8' rx='3' fill='%23ef4444' stroke='%237f1d1d' stroke-width='1.1'/%3E%3Crect x='18.5' y='12.5' width='5.8' height='7.5' rx='2.8' fill='%23facc15' stroke='%23854d0e' stroke-width='1.1'/%3E%3C/g%3E%3Cg transform='translate(40,22)'%3E%3Ccircle cx='10' cy='16' r='7.5' fill='%232e7d32' stroke='%23163d18' stroke-width='1.4'/%3E%3Ccircle cx='19' cy='16' r='7.5' fill='%2343a047' stroke='%23163d18' stroke-width='1.4'/%3E%3Crect x='12' y='13' width='6' height='7.5' rx='3' fill='%23f97316' stroke='%237c2d12' stroke-width='1.1'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 72px 56px;
+}
+
+/* 🎃 Тыква: широкие листья с оранжевыми тыковками! */
+body.theme-cartoon .bed-item.is-planted-bed[data-crop-id="pumpkin"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='76' height='58' viewBox='0 0 76 58'%3E%3Cg transform='translate(5,6)'%3E%3Ccircle cx='10' cy='16' r='8.5' fill='%232e7d32' stroke='%23143d17' stroke-width='1.5'/%3E%3Ccircle cx='23' cy='15' r='8.5' fill='%2343a047' stroke='%23143d17' stroke-width='1.5'/%3E%3Cellipse cx='16' cy='21' rx='7.5' ry='6' fill='%23f97316' stroke='%237c2d12' stroke-width='1.4'/%3E%3Cellipse cx='16' cy='21' rx='3.2' ry='6' fill='%23fb923c' stroke='%239a3412' stroke-width='1'/%3E%3C/g%3E%3Cg transform='translate(42,22)'%3E%3Ccircle cx='10' cy='14' r='7.5' fill='%23388e3c' stroke='%23143d17' stroke-width='1.4'/%3E%3Cellipse cx='17' cy='18' rx='6.8' ry='5.2' fill='%23f97316' stroke='%237c2d12' stroke-width='1.4'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 76px 58px;
+}
+
+/* 🥕 Морковь, свёкла, лук, чеснок: яркие пучки сочной зелёной ботвы в рядках! */
 body.theme-cartoon .bed-item.is-planted-bed[data-crop-family="apiaceae"]::before,
 body.theme-cartoon .bed-item.is-planted-bed[data-crop-family="amaryllidaceae"]::before,
-body.theme-cartoon .bed-item.is-planted-bed[data-crop-family="chenopodiaceae"]::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='46' viewBox='0 0 56 46'%3E%3Cg stroke='%23164d1a' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M14 26 Q11 16 7 12 Q13 15 14 26 Z' fill='%2343a047'/%3E%3Cpath d='M14 26 Q15 14 16 9 Q18 15 14 26 Z' fill='%2366bb6a'/%3E%3Cpath d='M14 26 Q19 16 23 13 Q18 19 14 26 Z' fill='%2381c784'/%3E%3Cpath d='M42 40 Q39 30 35 26 Q41 29 42 40 Z' fill='%2343a047'/%3E%3Cpath d='M42 40 Q43 28 44 23 Q46 29 42 40 Z' fill='%2366bb6a'/%3E%3Cpath d='M42 40 Q47 30 51 27 Q46 33 42 40 Z' fill='%2381c784'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 56px 46px;
+body.theme-cartoon .bed-item.is-planted-bed[data-crop-family="chenopodiaceae"]::before,
+body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-family="apiaceae"]::before,
+body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-family="amaryllidaceae"]::before {
+  opacity: 0.9;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='48' viewBox='0 0 58 48'%3E%3Cg stroke='%23144519' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cellipse cx='15' cy='27' rx='7' ry='2.5' fill='%232e1a0c' stroke='none' opacity='0.45'/%3E%3Cpath d='M15 26 Q11 15 6 10 Q13 13 15 26 Z' fill='%234ade80'/%3E%3Cpath d='M15 26 Q16 12 17 6 Q20 14 15 26 Z' fill='%2386efac'/%3E%3Cpath d='M15 26 Q21 15 26 11 Q20 18 15 26 Z' fill='%2322c55e'/%3E%3Cellipse cx='43' cy='41' rx='7' ry='2.5' fill='%232e1a0c' stroke='none' opacity='0.45'/%3E%3Cpath d='M43 40 Q39 29 34 24 Q41 27 43 40 Z' fill='%234ade80'/%3E%3Cpath d='M43 40 Q44 26 45 20 Q48 28 43 40 Z' fill='%2386efac'/%3E%3Cpath d='M43 40 Q49 29 54 25 Q48 32 43 40 Z' fill='%2322c55e'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 58px 48px;
 }
 
 /* Контент грядки всегда лежит ПОВЕРХ декоративных кустиков */
@@ -367,34 +390,65 @@ body.theme-cartoon .gh-internal-bed.gh-sec-selected {
     inset 0 4px 10px rgba(30, 14, 4, 0.35) !important;
 }
 
-/* ---------- 5. Резная 3D деревянная табличка-закладка сверху ---------- */
+/* ---------- 5. Резная 3D деревянная табличка-закладка сверху (кристально чёткий текст!) ---------- */
 body.theme-cartoon .bed-tab-handle {
   background: linear-gradient(180deg, #ebb067 0%, #c87d38 55%, #b36a27 100%) !important;
   border: 2.5px solid #4a260d !important;
   border-bottom: none !important;
   border-radius: 13px 13px 0 0 !important;
   color: #ffffff !important;
-  text-shadow: 0 1.8px 0 rgba(74, 38, 13, 0.9);
+  text-shadow: none !important;
   box-shadow:
-    inset 0 2.5px 0 rgba(255, 244, 214, 0.6),
+    inset 0 2px 0 rgba(255, 244, 214, 0.6),
     0 -3px 10px rgba(0, 0, 0, 0.14) !important;
-  padding: 5px 13px !important;
+  padding: 4px 12px !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body.theme-cartoon .greenhouse-structure .bed-tab-handle {
   background: linear-gradient(180deg, #52ccff 0%, #0ea5e9 55%, #0284c7 100%) !important;
   border-color: #0c4a6e !important;
-  text-shadow: 0 1.8px 0 rgba(12, 74, 110, 0.9);
+  text-shadow: none !important;
 }
 
 body.theme-cartoon .bed-tab-title {
   color: #ffffff !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.01em;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.25 !important;
+  text-shadow: 0 1px 1px rgba(45, 20, 4, 0.45) !important;
+}
+
+body.theme-cartoon .greenhouse-structure .bed-tab-title {
+  text-shadow: 0 1px 1px rgba(8, 47, 73, 0.45) !important;
+}
+
+/* Статус-бейджи внутри верхней таблички — без размытой тени, идеально чёткие */
+body.theme-cartoon .bed-tab-rot-wrap,
+body.theme-cartoon .bed-tab-rot-wrap * {
+  text-shadow: none !important;
 }
 
 body.theme-cartoon .bed-tab-grip {
   color: rgba(255, 255, 255, 0.85) !important;
+  text-shadow: none !important;
+}
+
+/* Убираем дублирующийся статус-бейдж внутри обычной грядки (он уже красиво висит в верхней табличке!) */
+body.theme-cartoon .bed-item:not(.greenhouse-structure) .bed-top-row .bed-badge-wrap {
+  display: none !important;
+}
+
+/* Делаем кнопки действий (повернуть/клонировать/удалить) чётко видимыми на тёмной земле */
+body.theme-cartoon .bed-inline-tools {
+  opacity: 0.88 !important;
+}
+
+body.theme-cartoon .bed-item:hover .bed-inline-tools,
+body.theme-cartoon .bed-item.selected .bed-inline-tools {
+  opacity: 1 !important;
 }
 
 /* ---------- 6. Глянцевые кремовые плашки и живые 3D-аватары овощей ---------- */
