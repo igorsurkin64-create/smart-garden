@@ -1230,15 +1230,16 @@ class GardenStorage {
     let nextX = item.x + 0.75;
     let nextY = item.y + 0.75;
 
-    // Для забора и садовой дорожки — ставим следующую секцию РОВНО ВСТЫК по направлению!
+    // Для забора и садовой дорожки — ставим следующую секцию РОВНО ВСТЫК без зазора!
     if (item.type === 'fence' || item.type === 'path_stone') {
       const rot = ((item.rotation || 0) % 360 + 360) % 360;
-      const step = Math.max(0.5, (item.width || 3.0) - 0.15);
+      // Учитываем реальную ширину рисунка SVG внутри контейнера (viewBox 210x52 для забора, 210x64 для дорожки)
+      const step = item.type === 'fence' ? 2.45 : 2.75;
       if (rot === 90 || rot === 270) {
         nextX = item.x;
-        nextY = Math.round((item.y + step) * 20) / 20;
+        nextY = Math.round((item.y + step) * 100) / 100;
       } else {
-        nextX = Math.round((item.x + step) * 20) / 20;
+        nextX = Math.round((item.x + step) * 100) / 100;
         nextY = item.y;
       }
     }
