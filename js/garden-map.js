@@ -305,13 +305,28 @@ class GardenMap {
     modalContent.querySelectorAll('.decor-picker-card').forEach(card => {
       card.addEventListener('click', () => {
         const type = card.getAttribute('data-decor-type');
-        // Вычисляем центр видимой области карты в метрах
-        const rect = this.viewportEl ? this.viewportEl.getBoundingClientRect() : { width: 900, height: 600 };
-        const centerX = ((rect.width / 2 - this.panX) / this.zoom) / this.meterPixels;
-        const centerY = ((rect.height / 2 - this.panY) / this.zoom) / this.meterPixels;
         const tpl = getDecorTemplate(type);
-        const x = Math.max(0.5, centerX - (tpl.width || 2) / 2);
-        const y = Math.max(0.5, centerY - (tpl.height || 2) / 2);
+        // Размещаем новый объект на видном месте — справа от кнопки «Живой сад» (рядом с верхним меню!)
+        const vRect = this.viewportEl ? this.viewportEl.getBoundingClientRect() : { left: 0, top: 0, width: 1000, height: 650 };
+        const floatingBar = this.container ? this.container.querySelector('.map-controls-floating') : null;
+        let targetScreenX = vRect.width - 180;
+        let targetScreenY = 72;
+        if (floatingBar) {
+          const fRect = floatingBar.getBoundingClientRect();
+          const barRightInVp = fRect.right - vRect.left;
+          const barBottomInVp = fRect.bottom - vRect.top;
+          if (barRightInVp + 140 < vRect.width) {
+            // Справа от «Живого сада» есть место — ставим прямо рядом с ним!
+            targetScreenX = barRightInVp + 36;
+            targetScreenY = Math.max(48, (fRect.top - vRect.top) + 12);
+          } else {
+            // Если экран узкий — ставим в правом верхнем углу сразу под меню
+            targetScreenX = Math.max(120, vRect.width - 170);
+            targetScreenY = barBottomInVp + 46;
+          }
+        }
+        const x = ((targetScreenX - this.panX) / this.zoom) / this.meterPixels;
+        const y = ((targetScreenY - this.panY) / this.zoom) / this.meterPixels;
 
         const added = this.storage.addDecorItem(type, x, y);
         if (added) this.selectedDecorId = added.id;
@@ -320,8 +335,8 @@ class GardenMap {
         if (window.app) {
           const isLine = type === 'fence' || type === 'path_stone';
           window.app.showToast(isLine
-            ? `${tpl.icon} «${getDecorName(tpl, lang)}» добавлен! Нажимайте «➕ Продлить» сверху, чтобы выложить в ряд.`
-            : `${tpl.icon} «${getDecorName(tpl, lang)}» добавлен на участок! Перетащите его куда нужно.`);
+            ? `${tpl.icon} «${getDecorName(tpl, lang)}» появился справа от меню! Перетащите и нажимайте «➕ Продлить».`
+            : `${tpl.icon} «${getDecorName(tpl, lang)}» появился справа от меню! Перетащите его на участок.`);
         }
       });
     });
