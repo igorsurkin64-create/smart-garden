@@ -1007,6 +1007,166 @@ body.theme-cartoon.season-autumn .al-5 { left: 86%; animation-duration: 17s; ani
   100% { transform: translate(35px, 108vh) rotate(390deg); opacity: 0; }
 }
 
+/* ==========================================================================
+   🏷️ 11. ПРОСТОРНАЯ КАРТОТЕКА СОРТОВ С ФОТО (2-колоночный альбом)
+   ========================================================================== */
+.vc-split-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.vc-left-form-col {
+  padding: 1rem 1.15rem;
+  background: var(--bg-secondary, #f8fafc);
+  border-right: 1.5px solid var(--border-subtle, #e2e8f0);
+  overflow-y: auto;
+}
+
+.vc-right-gallery-col {
+  padding: 1rem 1.25rem;
+  overflow-y: auto;
+  background: var(--bg-primary, #ffffff);
+}
+
+.vc-photo-dropzone {
+  border: 2px dashed #16a34a;
+  border-radius: 10px;
+  background: rgba(22, 163, 74, 0.04);
+  padding: 8px;
+  text-align: center;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.vc-photo-dropzone.drag-over {
+  background: rgba(22, 163, 74, 0.15);
+  border-color: #15803d;
+}
+
+.vc-pop-chip {
+  font-size: 0.72rem;
+  padding: 2px 7px;
+  background: var(--bg-primary, #ffffff);
+  border: 1px solid var(--border-subtle, #cbd5e1);
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--text-main);
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.vc-pop-chip:hover {
+  background: #dcfce7;
+  border-color: #16a34a;
+  color: #14532d;
+}
+
+.vc-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+  gap: 12px;
+}
+
+.vc-variety-card {
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border-subtle, #e2e8f0);
+  background: var(--bg-secondary, #ffffff);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+}
+
+.vc-variety-card:hover {
+  transform: translateY(-2px);
+  border-color: #16a34a;
+  box-shadow: 0 6px 14px rgba(21, 128, 61, 0.12);
+}
+
+.vc-variety-card.is-editing {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+}
+
+.vc-card-photo-box {
+  width: 92px;
+  height: 92px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  background: var(--bg-primary, #f1f5f9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vc-card-photo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vc-card-photo-empty {
+  font-size: 2.3rem;
+}
+
+.vc-card-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.vc-card-crop-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #15803d;
+  margin-bottom: 2px;
+}
+
+.vc-card-title {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.vc-card-notes {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.vc-card-actions {
+  margin-top: auto;
+  display: flex;
+  gap: 6px;
+}
+
+@media (max-width: 780px) {
+  .vc-split-layout {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+  .vc-left-form-col {
+    border-right: none;
+    border-bottom: 1.5px solid var(--border-subtle, #e2e8f0);
+    overflow-y: visible;
+  }
+  .vc-right-gallery-col {
+    overflow-y: visible;
+  }
+}
+
 /* При печати на А4 возвращаем чистый белый фон без бабочек, листьев и 3D-стен */
 @media print {
   body.theme-cartoon .cartoon-atmosphere-layer,

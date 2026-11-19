@@ -1309,267 +1309,405 @@
     }
 
     let activeFilterCrop = initialCropId || 'all';
-    let isAdding = false;
-    let newCropId = (initialCropId && initialCropId !== 'all') 
-      ? initialCropId 
+    let searchQuery = '';
+    let editingId = null;
+    let formCropId = (initialCropId && initialCropId !== 'all')
+      ? initialCropId
       : ((typeof window !== 'undefined' && window._lastSelectedHoleCropId) ? window._lastSelectedHoleCropId : 'tomato');
-    let newPhotoUrl = null;
+    let formName = '';
+    let formNotes = '';
+    let formPhotoUrl = null;
 
     const allCrops = (typeof window !== 'undefined' && window.CROPS_DATABASE) ? window.CROPS_DATABASE : [];
     const currentLang = window.i18n ? window.i18n.getLanguage() : 'ru';
 
     const VC = {
-      ru: { title: '🏷️ Картотека сортов с фото', closeForm: '✕ Закрыть форму', addVarBtn: '➕ Добавить сорт', formTitle: '🌱 Добавить новый сорт в картотеку', cropLbl: 'Культура (растение):', nameLbl: 'Название сорта или гибрида:', namePlh: 'Например: Бычье сердце, Кураж F1...', popLbl: 'Популярные:', photoLbl: '📸 Фотография сорта (пакетик семян или плод):', photoHint: 'Сфотографируйте пакетик с семенами или урожай', replacePhoto: 'Заменить фото', uploadPhoto: 'Загрузить / сфотографировать сорт', notesLbl: 'Описание / вкусовые качества (необязательно):', notesPlh: 'Например: крупноплодный, мясистый, до 450г, ранний', cancel: 'Отмена', save: '💾 Сохранить в картотеку', sub: 'Хранилище сортов с эталонными фотографиями семян и плодов. Привязываются к лункам на грядках и хранятся в IndexedDB.', allCrops: 'Все культуры', emptyTitle: 'В картотеке пока нет сортов', emptySub: 'Здесь сохраняются ваши проверенные сорта с фотографиями пакетиков семян и урожая. Вы можете добавить сорт прямо сейчас или выбрать один из популярных:', noCrop: 'Культура не указана', delTitle: 'Удалить из каталога', done: 'Готово', enterNameAlert: 'Пожалуйста, введите название сорта.', savedToast: (n) => `✓ Сорт «${n}» сохранён в картотеку!`, delConfirm: 'Удалить этот сорт из картотеки?' },
-      et: { title: '🏷️ Sortide kataloog fotodega', closeForm: '✕ Sulge vorm', addVarBtn: '➕ Lisa sort', formTitle: '🌱 Lisa uus sort kataloogi', cropLbl: 'Kultuur (taim):', nameLbl: 'Sordi või hübriidi nimetus:', namePlh: 'Nt: Härjasüda, Kuraaž F1...', popLbl: 'Populaarsed:', photoLbl: '📸 Sordi foto (seemnepakk või vili):', photoHint: 'Pildistage seemnepakki või saaki', replacePhoto: 'Asenda foto', uploadPhoto: 'Laadi üles / pildista sorti', notesLbl: 'Kirjeldus / maitseomadused (valikuline):', notesPlh: 'Nt: suureviljaline, lihakas, kuni 450g, varajane', cancel: 'Tühista', save: '💾 Salvesta kataloogi', sub: 'Sortide hoidla seemnepakkide ja viljade fotodega. Seotakse peenarde istutuspesadega ja salvestatakse IndexedDB-sse.', allCrops: 'Kõik kultuurid', emptyTitle: 'Kataloogis pole veel sorte', emptySub: 'Siia salvestatakse teie kontrollitud sordid koos fotodega. Võite lisada sordi kohe või valida populaarsete hulgast:', noCrop: 'Kultuur määramata', delTitle: 'Kustuta kataloogist', done: 'Valmis', enterNameAlert: 'Palun sisestage sordi nimetus.', savedToast: (n) => `✓ Sort «${n}» salvestatud kataloogi!`, delConfirm: 'Kas kustutada see sort kataloogist?' },
-      lv: { title: '🏷️ Šķirņu katalogs ar foto', closeForm: '✕ Aizvērt formu', addVarBtn: '➕ Pievienot šķirni', formTitle: '🌱 Pievienot jaunu šķirni katalogam', cropLbl: 'Kultūra (augs):', nameLbl: 'Šķirnes vai hibrīda nosaukums:', namePlh: 'Piem.: Vērša sirds, Kurāža F1...', popLbl: 'Populārās:', photoLbl: '📸 Šķirnes fotogrāfija (sēklu paciņa vai auglis):', photoHint: 'Nofotografējiet sēklu paciņu vai ražu', replacePhoto: 'Nomainīt foto', uploadPhoto: 'Augšupielādēt / nofotografēt šķirni', notesLbl: 'Apraksts / garšas īpašības (neobligāti):', notesPlh: 'Piem.: lielaugļu, gaļīgs, līdz 450g, agrīns', cancel: 'Atcelt', save: '💾 Saglabāt katalogā', sub: 'Šķirņu krātuve ar sēklu un augļu fotogrāfijām. Tiek piesaistītas dobju bedrītēm un glabājas IndexedDB.', allCrops: 'Visas kultūras', emptyTitle: 'Katalogā vēl nav šķirņu', emptySub: 'Šeit glabājas jūsu pārbaudītās šķirnes ar fotogrāfijām. Varat pievienot šķirni tūlīt vai izvēlēties kādu no populārākajām:', noCrop: 'Kultūra nav norādīta', delTitle: 'Dzēst no kataloga', done: 'Gatavs', enterNameAlert: 'Lūdzu, ievadiet šķirnes nosaukumu.', savedToast: (n) => `✓ Šķirne «${n}» saglabāta katalogā!`, delConfirm: 'Vai dzēst šo šķirni no kataloga?' },
-      lt: { title: '🏷️ Veislių katalogas su nuotraukomis', closeForm: '✕ Uždaryti formą', addVarBtn: '➕ Pridėti veislę', formTitle: '🌱 Pridėti naują veislę į katalogą', cropLbl: 'Kultūra (augalas):', nameLbl: 'Veislės arba hibrido pavadinimas:', namePlh: 'Pvz.: Jaučio širdis, Kuraž F1...', popLbl: 'Populiarios:', photoLbl: '📸 Veislės nuotrauka (sėklų pakelis ar vaisius):', photoHint: 'Nufotografuokite sėklų pakelį ar derlių', replacePhoto: 'Pakeisti nuotrauką', uploadPhoto: 'Įkelti / nufotografuoti veislę', notesLbl: 'Aprašymas / skonio savybės (nebūtina):', notesPlh: 'Pvz.: stambiavaisis, mėsingas, iki 450g, ankstyvas', cancel: 'Atšaukti', save: '💾 Išsaugoti kataloge', sub: 'Veislių saugykla su sėklų ir vaisių nuotraukomis. Priskiriamos lysvių duobutėms ir saugomos IndexedDB.', allCrops: 'Visos kultūros', emptyTitle: 'Kataloge dar nėra veislių', emptySub: 'Čia saugomos jūsų patikrintos veislės su nuotraukomis. Galite pridėti veislę dabar arba pasirinkti iš populiarių:', noCrop: 'Kultūra nenurodyta', delTitle: 'Ištrinti iš katalogo', done: 'Atlikta', enterNameAlert: 'Įveskite veislės pavadinimą.', savedToast: (n) => `✓ Veislė «${n}» išsaugota kataloge!`, delConfirm: 'Ištrinti šią veislę iš katalogo?' }
+      ru: { title: '🏷️ Картотека сортов с фото', formTitleAdd: '🌱 Новый сорт', formTitleEdit: '✏️ Редактирование сорта', cropLbl: '1. Культура:', nameLbl: '2. Название сорта:', namePlh: 'Например: Бычье сердце, Кураж F1...', popLbl: 'Быстрый выбор:', photoLbl: '3. Фото пакетика или плода:', photoHint: 'Нажмите, перетащите фото сюда или вставьте через Ctrl+V', replacePhoto: 'Заменить фото', removePhoto: 'Убрать фото', notesLbl: '4. Краткое описание (вкус, высота, сроки):', notesPlh: 'Например: крупноплодный, сладкий, до 450г, для теплицы', cancelEdit: 'Отмена', save: '💾 Сохранить сорт', saveEdit: '💾 Обновить сорт', allCrops: 'Все', searchPlh: '🔍 Поиск сорта или описания...', emptyTitle: 'В этом разделе пока нет сортов', emptySub: 'Заполните карточку слева — укажите название, описание и добавьте фото пакетика семян!', noCrop: 'Культура не указана', delTitle: 'Удалить', editTitle: 'Редактировать', done: 'Закрыть', enterNameAlert: 'Пожалуйста, введите название сорта.', savedToast: (n) => `✓ Сорт «${n}» сохранён в картотеку!`, delConfirm: 'Удалить этот сорт из картотеки?' },
+      et: { title: '🏷️ Sortide kataloog fotodega', formTitleAdd: '🌱 Uus sort', formTitleEdit: '✏️ Sordi muutmine', cropLbl: '1. Kultuur:', nameLbl: '2. Sordi nimetus:', namePlh: 'Nt: Härjasüda, Kuraaž F1...', popLbl: 'Kiirvalik:', photoLbl: '3. Seemnepaki või vilja foto:', photoHint: 'Klõpsake, lohistage foto siia või kleepige Ctrl+V', replacePhoto: 'Asenda foto', removePhoto: 'Eemalda foto', notesLbl: '4. Lühikirjeldus (maitse, kõrgus, aeg):', notesPlh: 'Nt: suureviljaline, magus, kuni 450g', cancelEdit: 'Tühista', save: '💾 Salvesta sort', saveEdit: '💾 Uuenda sorti', allCrops: 'Kõik', searchPlh: '🔍 Otsi sorti või kirjeldust...', emptyTitle: 'Selles jaotises pole veel sorte', emptySub: 'Täitke vasakul olev kaart — lisage nimetus, kirjeldus ja foto!', noCrop: 'Kultuur määramata', delTitle: 'Kustuta', editTitle: 'Muuda', done: 'Sulge', enterNameAlert: 'Palun sisestage sordi nimetus.', savedToast: (n) => `✓ Sort «${n}» salvestatud!`, delConfirm: 'Kas kustutada see sort kataloogist?' },
+      lv: { title: '🏷️ Šķirņu katalogs ar foto', formTitleAdd: '🌱 Jauna šķirne', formTitleEdit: '✏️ Rediģēt šķirni', cropLbl: '1. Kultūra:', nameLbl: '2. Šķirnes nosaukums:', namePlh: 'Piem.: Vērša sirds, Kurāža F1...', popLbl: 'Ātrā izvēle:', photoLbl: '3. Sēklu paciņas vai augļa foto:', photoHint: 'Noklikšķiniet, ievelciet foto šeit vai ielīmējiet ar Ctrl+V', replacePhoto: 'Nomainīt foto', removePhoto: 'Noņemt foto', notesLbl: '4. Īss apraksts (garša, augstums):', notesPlh: 'Piem.: lielaugļu, salds, līdz 450g', cancelEdit: 'Atcelt', save: '💾 Saglabāt šķirni', saveEdit: '💾 Atjaunināt šķirni', allCrops: 'Visas', searchPlh: '🔍 Meklēt šķirni vai aprakstu...', emptyTitle: 'Šajā sadaļā vēl nav šķirņu', emptySub: 'Aizpildiet kartīti kreisajā pusē — pievienojiet nosaukumu, aprakstu un foto!', noCrop: 'Kultūra nav norādīta', delTitle: 'Dzēst', editTitle: 'Rediģēt', done: 'Aizvērt', enterNameAlert: 'Lūdzu, ievadiet šķirnes nosaukumu.', savedToast: (n) => `✓ Šķirne «${n}» saglabāta!`, delConfirm: 'Vai dzēst šo šķirni no kataloga?' },
+      lt: { title: '🏷️ Veislių katalogas su nuotraukomis', formTitleAdd: '🌱 Nauja veislė', formTitleEdit: '✏️ Redaguoti veislę', cropLbl: '1. Kultūra:', nameLbl: '2. Veislės pavadinimas:', namePlh: 'Pvz.: Jaučio širdis, Kuraž F1...', popLbl: 'Greitas pasirinkimas:', photoLbl: '3. Sėklų pakelio ar vaisiaus foto:', photoHint: 'Spustelėkite, įtempkite foto čia arba įklijuokite Ctrl+V', replacePhoto: 'Pakeisti foto', removePhoto: 'Pašalinti foto', notesLbl: '4. Trumpas aprašymas (skonis, aukštis):', notesPlh: 'Pvz.: stambiavaisis, saldus, iki 450g', cancelEdit: 'Atšaukti', save: '💾 Išsaugoti veislę', saveEdit: '💾 Atnaujinti veislę', allCrops: 'Visos', searchPlh: '🔍 Ieškoti veislės ar aprašymo...', emptyTitle: 'Šiame skyriuje dar nėra veislių', emptySub: 'Užpildykite kortelę kairėje — įrašykite pavadinimą, aprašymą ir pridėkite foto!', noCrop: 'Kultūra nenurodyta', delTitle: 'Trinti', editTitle: 'Redaguoti', done: 'Uždaryti', enterNameAlert: 'Įveskite veislės pavadinimą.', savedToast: (n) => `✓ Veislė «${n}» išsaugota!`, delConfirm: 'Ištrinti šią veislę iš katalogo?' }
     }[currentLang] || {};
 
+    // Обработчик вставки картинки через Ctrl+V, пока открыта картотека
+    const handlePaste = async (e) => {
+      if (!modal.classList.contains('active')) return;
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of items) {
+        if (item.type && item.type.startsWith('image/')) {
+          const file = item.getAsFile();
+          if (file) {
+            e.preventDefault();
+            try {
+              formName = modalContent.querySelector('#vc-name-input')?.value || formName;
+              formNotes = modalContent.querySelector('#vc-notes-input')?.value || formNotes;
+              formPhotoUrl = await this.compressPhotoFile(file, 1024, 0.8);
+              this.showToast('📸 Фото вставлено из буфера обмена!');
+              render();
+            } catch (err) {
+              console.warn('Paste photo failed:', err);
+            }
+          }
+          break;
+        }
+      }
+    };
+
+    const closeModal = () => {
+      modal.classList.remove('active');
+      document.removeEventListener('paste', handlePaste);
+    };
+
+    document.addEventListener('paste', handlePaste);
+
     const render = async () => {
-      let varieties = [];
+      let allVarieties = [];
       if (window.photoStorage) {
-        varieties = await window.photoStorage.getVarieties(activeFilterCrop === 'all' ? null : activeFilterCrop);
+        allVarieties = await window.photoStorage.getVarieties(null);
       }
 
+      // Подсчёт сортов по культурам для удобных вкладок
+      const cropCounts = new Map();
+      allVarieties.forEach(v => {
+        if (v.cropId) cropCounts.set(v.cropId, (cropCounts.get(v.cropId) || 0) + 1);
+      });
+
+      const q = searchQuery.trim().toLowerCase();
+      const filteredVarieties = allVarieties.filter(v => {
+        if (activeFilterCrop !== 'all' && v.cropId !== activeFilterCrop) return false;
+        if (q) {
+          const hay = `${v.name || ''} ${v.notes || ''}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      const priorityCropIds = ['tomato', 'cucumber', 'pepper', 'eggplant', 'strawberry', 'carrot', 'onion', 'garlic', 'cabbage_white', 'zucchini', 'pumpkin', 'beet', 'potato'];
+      const usedCropIds = [...new Set([...priorityCropIds, ...cropCounts.keys()])]
+        .filter(id => id !== 'fallow' && getCropById(id));
+
+      const popVars = getCropById(formCropId)?.popularVarieties || [];
+
       modalContent.innerHTML = `
-        <div class="modal-card modal-content" style="max-width: 680px; max-height: 85vh; display: flex; flex-direction: column;">
-          <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between;">
-            <h3 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1.15rem;">
-              ${VC.title}
-            </h3>
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <button type="button" class="btn btn-sm btn-outline" id="btn-print-varieties-a4" style="padding: 4px 10px; font-size: 0.8rem; font-weight: 700;" title="Распечатать выбранные сорта с фото и описаниями на листе A4">
-                🖨️ Печать A4
-              </button>
-              <button type="button" class="btn btn-sm btn-primary" id="btn-toggle-add-variety" style="padding: 4px 10px; font-size: 0.8rem; font-weight: 700;">
-                ${isAdding ? VC.closeForm : VC.addVarBtn}
+        <div class="modal-card modal-content vc-large-modal" style="max-width: 1080px; width: 95vw; height: 88vh; max-height: 88vh; display: flex; flex-direction: column;">
+          <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 1.25rem; flex-shrink: 0;">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <h3 style="margin: 0; font-size: 1.2rem;">${VC.title}</h3>
+              <span class="badge-mini" style="background: #dcfce7; color: #15803d; padding: 3px 9px; border-radius: 999px; font-weight: 800; font-size: 0.78rem;">
+                ${allVarieties.length} шт.
+              </span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" class="btn btn-sm btn-primary" id="btn-print-varieties-a4" style="padding: 6px 14px; font-size: 0.85rem; font-weight: 700;" title="Распечатать выбранные сорта с фото и описаниями на листе A4">
+                🖨️ Распечатать каталог (A4)
               </button>
               <button class="modal-close-btn">&times;</button>
             </div>
           </div>
-          <div class="modal-body" style="padding: 1rem; overflow-y: auto; flex: 1;">
-            
-            ${isAdding ? `
-              <!-- Форма добавления нового сорта -->
-              <div class="card p-3 mb-3" style="background: var(--bg-secondary); border: 2px solid #10b981; border-radius: 8px;">
-                <h4 style="margin: 0 0 10px 0; font-size: 0.95rem; color: #10b981; display: flex; align-items: center; gap: 6px;">
-                  ${VC.formTitle}
+
+          <div class="vc-split-layout">
+            <!-- ЛЕВАЯ КОЛОНКА: Всегда открытая, понятная карточка добавления/редактирования -->
+            <div class="vc-left-form-col">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <h4 style="margin: 0; font-size: 1rem; color: #15803d; font-weight: 800;">
+                  ${editingId ? VC.formTitleEdit : VC.formTitleAdd}
                 </h4>
-                
-                <div class="form-group mb-2">
-                  <label class="form-sublabel" style="font-weight: 700; font-size: 0.8rem;">${VC.cropLbl}</label>
-                  <select id="new-variety-crop" class="form-input">
-                    ${allCrops.filter(c => c.id !== 'fallow').map(c => `
-                      <option value="${c.id}" ${newCropId === c.id ? 'selected' : ''}>${c.emoji} ${escapeHtml(getCropName(c, currentLang))}</option>
-                    `).join('')}
-                  </select>
-                </div>
+                ${editingId ? `<button type="button" class="btn btn-sm btn-outline" id="vc-cancel-edit-btn" style="padding: 2px 8px; font-size: 0.75rem;">${VC.cancelEdit}</button>` : ''}
+              </div>
 
-                <div class="form-group mb-2">
-                  <label class="form-sublabel" style="font-weight: 700; font-size: 0.8rem;">${VC.nameLbl}</label>
-                  <input type="text" id="new-variety-name" class="form-input" list="new-variety-datalist" placeholder="${VC.namePlh}">
-                  <datalist id="new-variety-datalist">
-                    ${(getCropById(newCropId)?.popularVarieties || []).map(v => `<option value="${escapeHtml(v)}">`).join('')}
-                  </datalist>
-                  <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; align-items: center;">
+              <div class="form-group mb-2">
+                <label class="form-sublabel" style="font-weight: 700; font-size: 0.82rem;">${VC.cropLbl}</label>
+                <select id="vc-crop-select" class="form-input" style="font-weight: 600;">
+                  ${allCrops.filter(c => c.id !== 'fallow').map(c => `
+                    <option value="${c.id}" ${formCropId === c.id ? 'selected' : ''}>${c.emoji} ${escapeHtml(getCropName(c, currentLang))}</option>
+                  `).join('')}
+                </select>
+              </div>
+
+              <div class="form-group mb-2">
+                <label class="form-sublabel" style="font-weight: 700; font-size: 0.82rem;">${VC.nameLbl}</label>
+                <input type="text" id="vc-name-input" class="form-input" list="vc-name-datalist" placeholder="${VC.namePlh}" value="${escapeHtml(formName)}" style="font-size: 0.92rem; font-weight: 600;">
+                <datalist id="vc-name-datalist">
+                  ${popVars.map(v => `<option value="${escapeHtml(v)}">`).join('')}
+                </datalist>
+                ${popVars.length > 0 ? `
+                  <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; align-items: center;">
                     <span style="font-size: 0.7rem; color: var(--text-muted);">${VC.popLbl}</span>
-                    ${(getCropById(newCropId)?.popularVarieties || []).slice(0, 5).map(v => `
-                      <button type="button" class="btn-text new-var-chip" data-var="${escapeHtml(v)}" style="font-size: 0.7rem; padding: 2px 5px; background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer;">
-                        + ${escapeHtml(v)}
-                      </button>
+                    ${popVars.slice(0, 6).map(v => `
+                      <button type="button" class="vc-pop-chip" data-var="${escapeHtml(v)}">+ ${escapeHtml(v)}</button>
                     `).join('')}
                   </div>
-                </div>
-
-                <div class="form-group mb-2" style="background: var(--bg-primary); padding: 8px; border-radius: 6px; border: 1px dashed var(--border-subtle);">
-                  <div style="font-weight: 700; font-size: 0.8rem; margin-bottom: 4px;">${VC.photoLbl}</div>
-                  <div id="new-variety-photo-preview" style="margin: 4px 0; text-align: center;">
-                    ${newPhotoUrl ? `
-                      <img src="${newPhotoUrl}" style="max-height: 100px; max-width: 100%; border-radius: 6px;" alt="Фото">
-                    ` : `
-                      <span class="text-xs text-muted">${VC.photoHint}</span>
-                    `}
-                  </div>
-                  <label class="btn btn-sm btn-outline mt-1" style="cursor: pointer; text-align: center; display: block; font-size: 0.78rem;">
-                    📷 ${newPhotoUrl ? VC.replacePhoto : VC.uploadPhoto}
-                    <input type="file" id="new-variety-photo-file" accept="image/*" style="display: none;">
-                  </label>
-                </div>
-
-                <div class="form-group mb-3">
-                  <label class="form-sublabel" style="font-size: 0.8rem;">${VC.notesLbl}</label>
-                  <input type="text" id="new-variety-notes" class="form-input" placeholder="${VC.notesPlh}">
-                </div>
-
-                <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                  <button type="button" class="btn btn-sm btn-outline" id="btn-cancel-add-variety">${VC.cancel}</button>
-                  <button type="button" class="btn btn-sm btn-primary" id="btn-save-new-variety" style="background: #10b981; border-color: #059669; font-weight: 700;">
-                    ${VC.save}
-                  </button>
-                </div>
+                ` : ''}
               </div>
-            ` : ''}
 
-            <p class="text-xs text-muted" style="margin-top: 0;">
-              ${VC.sub}
-            </p>
-
-            <div style="display: flex; gap: 4px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 10px;">
-              <button type="button" class="btn-pattern-pill ${activeFilterCrop === 'all' ? 'active' : ''}" data-crop="all">${VC.allCrops}</button>
-              ${['tomato', 'cucumber', 'pepper', 'eggplant', 'strawberry', 'cabbage_white', 'carrot'].map(cId => {
-                const c = getCropById(cId);
-                return c ? `<button type="button" class="btn-pattern-pill ${activeFilterCrop === cId ? 'active' : ''}" data-crop="${cId}">${escapeHtml(c.emoji)} ${escapeHtml(getCropName(c, currentLang))}</button>` : '';
-              }).join('')}
-            </div>
-
-            ${varieties.length === 0 ? `
-              <div style="text-align: center; padding: 1.5rem 1rem; color: var(--text-muted); background: var(--bg-secondary); border-radius: 8px; border: 1px dashed var(--border-subtle);">
-                <div style="font-size: 2.2rem; margin-bottom: 6px;">🌱</div>
-                <h4 style="margin: 0 0 6px 0; color: var(--text-primary); font-size: 0.95rem;">${VC.emptyTitle}</h4>
-                <p class="text-xs" style="max-width: 480px; margin: 0 auto 12px auto; line-height: 1.4;">
-                  ${VC.emptySub}
-                </p>
-                <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
-                  <button type="button" class="btn btn-sm btn-outline quick-add-var-btn" data-crop="tomato" data-name="Бычье сердце">
-                    🍅 + Бычье сердце
-                  </button>
-                  <button type="button" class="btn btn-sm btn-outline quick-add-var-btn" data-crop="cucumber" data-name="Кураж F1">
-                    🥒 + Кураж F1
-                  </button>
-                  <button type="button" class="btn btn-sm btn-outline quick-add-var-btn" data-crop="pepper" data-name="Калифорнийское чудо">
-                    🫑 + Калифорнийское чудо
-                  </button>
-                </div>
-              </div>
-            ` : `
-              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px;">
-                ${varieties.map(v => {
-                  const c = getCropById(v.cropId);
-                  return `
-                    <div class="holes-variety-card">
-                      ${v.photoUrl ? `
-                        <img src="${v.photoUrl}" class="holes-variety-img" alt="${escapeHtml(v.name)}">
-                      ` : `
-                        <div class="holes-variety-img-placeholder">${c ? escapeHtml(c.emoji) : '🌱'}</div>
-                      `}
-                      <div style="flex: 1; min-width: 0;">
-                        <div style="font-weight: 700; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                          ${escapeHtml(v.name)}
-                        </div>
-                        <div class="text-xs text-muted">
-                          ${c ? `${escapeHtml(c.emoji)} ${escapeHtml(getCropName(c, currentLang))}` : VC.noCrop}
-                        </div>
-                        ${v.notes ? `<div class="text-xs text-secondary mt-1">${escapeHtml(v.notes)}</div>` : ''}
-                      </div>
-                      <button type="button" class="btn-text text-danger delete-variety-btn" data-var-id="${v.id}" title="${VC.delTitle}" style="font-size: 1rem; padding: 4px;">
-                        🗑️
+              <div class="form-group mb-2">
+                <label class="form-sublabel" style="font-weight: 700; font-size: 0.82rem;">${VC.photoLbl}</label>
+                <div id="vc-photo-dropzone" class="vc-photo-dropzone ${formPhotoUrl ? 'has-photo' : ''}">
+                  ${formPhotoUrl ? `
+                    <img src="${formPhotoUrl}" alt="Фото сорта" style="max-height: 140px; max-width: 100%; border-radius: 8px; object-fit: contain; display: block; margin: 0 auto 6px;">
+                    <div style="display: flex; gap: 6px; justify-content: center;">
+                      <label class="btn btn-sm btn-outline" style="cursor: pointer; font-size: 0.76rem; padding: 3px 8px;">
+                        📷 ${VC.replacePhoto}
+                        <input type="file" id="vc-photo-file" accept="image/*" style="display: none;">
+                      </label>
+                      <button type="button" class="btn btn-sm btn-outline" id="vc-remove-photo-btn" style="font-size: 0.76rem; padding: 3px 8px; color: #dc2626; border-color: #fca5a5;">
+                        ✕ ${VC.removePhoto}
                       </button>
                     </div>
-                  `;
+                  ` : `
+                    <label style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 14px 8px; width: 100%;">
+                      <span style="font-size: 2rem;">📸</span>
+                      <span style="font-size: 0.8rem; font-weight: 700; color: #15803d;">Выбрать фото или перетащить сюда</span>
+                      <span style="font-size: 0.72rem; color: var(--text-muted); text-align: center;">${VC.photoHint}</span>
+                      <input type="file" id="vc-photo-file" accept="image/*" style="display: none;">
+                    </label>
+                  `}
+                </div>
+              </div>
+
+              <div class="form-group mb-3">
+                <label class="form-sublabel" style="font-weight: 700; font-size: 0.82rem;">${VC.notesLbl}</label>
+                <textarea id="vc-notes-input" class="form-input" rows="3" placeholder="${VC.notesPlh}" style="resize: vertical; font-size: 0.85rem;">${escapeHtml(formNotes)}</textarea>
+              </div>
+
+              <button type="button" class="btn btn-primary btn-block" id="vc-save-btn" style="padding: 0.65rem; font-size: 0.95rem; font-weight: 800;">
+                ${editingId ? VC.saveEdit : VC.save}
+              </button>
+            </div>
+
+            <!-- ПРАВАЯ КОЛОНКА: Просторная галерея сортов с поиском и фильтрами -->
+            <div class="vc-right-gallery-col">
+              <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap;">
+                <input type="text" id="vc-search-input" class="form-input" placeholder="${VC.searchPlh}" value="${escapeHtml(searchQuery)}" style="flex: 1; min-width: 180px; padding: 7px 10px; font-size: 0.88rem;">
+              </div>
+
+              <div style="display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px;">
+                <button type="button" class="btn-pattern-pill vc-filter-pill ${activeFilterCrop === 'all' ? 'active' : ''}" data-crop="all">
+                  ${VC.allCrops} (${allVarieties.length})
+                </button>
+                ${usedCropIds.map(cId => {
+                  const c = getCropById(cId);
+                  const cnt = cropCounts.get(cId) || 0;
+                  if (cnt === 0 && !['tomato', 'cucumber', 'pepper', 'eggplant', 'strawberry', 'carrot', 'onion'].includes(cId)) return '';
+                  return `<button type="button" class="btn-pattern-pill vc-filter-pill ${activeFilterCrop === cId ? 'active' : ''}" data-crop="${cId}">
+                    ${escapeHtml(c.emoji)} ${escapeHtml(getCropName(c, currentLang))}${cnt > 0 ? ` (${cnt})` : ''}
+                  </button>`;
                 }).join('')}
               </div>
-            `}
+
+              ${filteredVarieties.length === 0 ? `
+                <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); background: var(--bg-secondary); border-radius: 12px; border: 1.5px dashed var(--border-subtle);">
+                  <div style="font-size: 2.6rem; margin-bottom: 8px;">🌱</div>
+                  <h4 style="margin: 0 0 6px 0; color: var(--text-main); font-size: 1rem;">${VC.emptyTitle}</h4>
+                  <p class="text-xs" style="max-width: 420px; margin: 0 auto; line-height: 1.45;">
+                    ${VC.emptySub}
+                  </p>
+                </div>
+              ` : `
+                <div class="vc-cards-grid">
+                  ${filteredVarieties.map(v => {
+                    const c = getCropById(v.cropId);
+                    const isEd = editingId === v.id;
+                    return `
+                      <div class="vc-variety-card ${isEd ? 'is-editing' : ''}">
+                        <div class="vc-card-photo-box">
+                          ${v.photoUrl ? `
+                            <img src="${v.photoUrl}" alt="${escapeHtml(v.name)}">
+                          ` : `
+                            <div class="vc-card-photo-empty">${c ? escapeHtml(c.emoji) : '🌱'}</div>
+                          `}
+                        </div>
+                        <div class="vc-card-info">
+                          <div class="vc-card-crop-badge">
+                            ${c ? `${escapeHtml(c.emoji)} ${escapeHtml(getCropName(c, currentLang))}` : VC.noCrop}
+                          </div>
+                          <div class="vc-card-title" title="${escapeHtml(v.name)}">${escapeHtml(v.name)}</div>
+                          ${v.notes ? `<div class="vc-card-notes">${escapeHtml(v.notes)}</div>` : ''}
+                          <div class="vc-card-actions">
+                            <button type="button" class="btn btn-sm btn-outline vc-edit-btn" data-var-id="${v.id}" style="padding: 3px 8px; font-size: 0.74rem;">✏️ ${VC.editTitle}</button>
+                            <button type="button" class="btn btn-sm btn-outline vc-delete-btn" data-var-id="${v.id}" style="padding: 3px 8px; font-size: 0.74rem; color: #dc2626; border-color: #fca5a5;">🗑️ ${VC.delTitle}</button>
+                          </div>
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              `}
+            </div>
           </div>
-          <div class="modal-footer" style="display: flex; justify-content: flex-end; padding: 10px 16px;">
+
+          <div class="modal-footer" style="display: flex; justify-content: flex-end; padding: 10px 18px; flex-shrink: 0;">
             <button class="btn btn-primary" id="variety-cat-close-btn">${VC.done}</button>
           </div>
         </div>
       `;
 
-      modalContent.querySelector('.modal-close-btn').onclick = () => modal.classList.remove('active');
-      modalContent.querySelector('#variety-cat-close-btn').onclick = () => modal.classList.remove('active');
+      modalContent.querySelector('.modal-close-btn').onclick = closeModal;
+      modalContent.querySelector('#variety-cat-close-btn').onclick = closeModal;
 
-      const toggleAddBtn = modalContent.querySelector('#btn-toggle-add-variety');
-      if (toggleAddBtn) {
-        toggleAddBtn.onclick = () => {
-          isAdding = !isAdding;
+      // Смена культуры в форме
+      const cropSel = modalContent.querySelector('#vc-crop-select');
+      if (cropSel) {
+        cropSel.onchange = () => {
+          formName = modalContent.querySelector('#vc-name-input')?.value || '';
+          formNotes = modalContent.querySelector('#vc-notes-input')?.value || '';
+          formCropId = cropSel.value;
           render();
         };
       }
 
-      if (isAdding) {
-        const cropSelect = modalContent.querySelector('#new-variety-crop');
-        if (cropSelect) {
-          cropSelect.onchange = () => {
-            newCropId = cropSelect.value;
-            render();
-          };
-        }
+      // Клик по чипсу популярного сорта
+      modalContent.querySelectorAll('.vc-pop-chip').forEach(chip => {
+        chip.onclick = () => {
+          const val = chip.getAttribute('data-var');
+          formName = val;
+          const inp = modalContent.querySelector('#vc-name-input');
+          if (inp) {
+            inp.value = val;
+            inp.focus();
+          }
+        };
+      });
 
-        modalContent.querySelectorAll('.new-var-chip').forEach(chip => {
-          chip.onclick = () => {
-            const val = chip.getAttribute('data-var');
-            const input = modalContent.querySelector('#new-variety-name');
-            if (input) input.value = val;
-          };
-        });
-
-        const fileInput = modalContent.querySelector('#new-variety-photo-file');
-        if (fileInput) {
-          fileInput.onchange = async (e) => {
-            const f = e.target.files[0];
-            if (!f) return;
-            try {
-              newPhotoUrl = await this.compressPhotoFile(f, 1024, 0.8);
-              render();
-            } catch (err) {
-              alert('Ошибка обработки фото: ' + err.message);
-            }
-          };
+      // Загрузка фото (кнопка + drag-and-drop)
+      const handlePhotoFile = async (f) => {
+        if (!f || !f.type.startsWith('image/')) return;
+        try {
+          formName = modalContent.querySelector('#vc-name-input')?.value || formName;
+          formNotes = modalContent.querySelector('#vc-notes-input')?.value || formNotes;
+          formPhotoUrl = await this.compressPhotoFile(f, 1024, 0.8);
+          render();
+        } catch (err) {
+          alert('Ошибка обработки фото: ' + err.message);
         }
+      };
 
-        const cancelBtn = modalContent.querySelector('#btn-cancel-add-variety');
-        if (cancelBtn) {
-          cancelBtn.onclick = () => {
-            isAdding = false;
-            newPhotoUrl = null;
-            render();
-          };
-        }
-
-        const saveBtn = modalContent.querySelector('#btn-save-new-variety');
-        if (saveBtn) {
-          saveBtn.onclick = async () => {
-            const name = modalContent.querySelector('#new-variety-name')?.value.trim();
-            if (!name) {
-              alert(VC.enterNameAlert);
-              return;
-            }
-            const notes = modalContent.querySelector('#new-variety-notes')?.value.trim() || '';
-            if (window.photoStorage) {
-              await window.photoStorage.saveVariety(newCropId, name, newPhotoUrl, notes);
-            }
-            this.showToast(VC.savedToast(name));
-            isAdding = false;
-            newPhotoUrl = null;
-            render();
-          };
-        }
+      const fileInput = modalContent.querySelector('#vc-photo-file');
+      if (fileInput) {
+        fileInput.onchange = (e) => handlePhotoFile(e.target.files[0]);
       }
 
-      modalContent.querySelectorAll('.quick-add-var-btn').forEach(btn => {
-        btn.onclick = () => {
-          newCropId = btn.getAttribute('data-crop');
-          const name = btn.getAttribute('data-name');
-          isAdding = true;
+      const dropzone = modalContent.querySelector('#vc-photo-dropzone');
+      if (dropzone) {
+        dropzone.ondragover = (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); };
+        dropzone.ondragleave = () => dropzone.classList.remove('drag-over');
+        dropzone.ondrop = (e) => {
+          e.preventDefault();
+          dropzone.classList.remove('drag-over');
+          if (e.dataTransfer?.files?.[0]) handlePhotoFile(e.dataTransfer.files[0]);
+        };
+      }
+
+      modalContent.querySelector('#vc-remove-photo-btn')?.addEventListener('click', () => {
+        formName = modalContent.querySelector('#vc-name-input')?.value || formName;
+        formNotes = modalContent.querySelector('#vc-notes-input')?.value || formNotes;
+        formPhotoUrl = null;
+        render();
+      });
+
+      modalContent.querySelector('#vc-cancel-edit-btn')?.addEventListener('click', () => {
+        editingId = null;
+        formName = '';
+        formNotes = '';
+        formPhotoUrl = null;
+        render();
+      });
+
+      // Сохранение нового или редактируемого сорта
+      const saveBtn = modalContent.querySelector('#vc-save-btn');
+      if (saveBtn) {
+        saveBtn.onclick = async () => {
+          const nameVal = modalContent.querySelector('#vc-name-input')?.value.trim();
+          const notesVal = modalContent.querySelector('#vc-notes-input')?.value.trim() || '';
+          if (!nameVal) {
+            alert(VC.enterNameAlert);
+            modalContent.querySelector('#vc-name-input')?.focus();
+            return;
+          }
+          if (window.photoStorage) {
+            if (editingId) {
+              await window.photoStorage.deleteVariety(editingId);
+            }
+            await window.photoStorage.saveVariety(formCropId, nameVal, formPhotoUrl, notesVal);
+          }
+          this.showToast(VC.savedToast(nameVal));
+          editingId = null;
+          formName = '';
+          formNotes = '';
+          formPhotoUrl = null;
+          if (activeFilterCrop !== 'all' && activeFilterCrop !== formCropId) {
+            activeFilterCrop = formCropId;
+          }
+          render();
+        };
+      }
+
+      // Поиск
+      const searchInput = modalContent.querySelector('#vc-search-input');
+      if (searchInput) {
+        searchInput.oninput = (e) => {
+          searchQuery = e.target.value;
+          const pos = searchInput.selectionStart;
           render().then(() => {
-            const nameInput = modalContent.querySelector('#new-variety-name');
-            if (nameInput) nameInput.value = name;
+            const nextInput = modalContent.querySelector('#vc-search-input');
+            if (nextInput) {
+              nextInput.focus();
+              nextInput.setSelectionRange(pos, pos);
+            }
           });
         };
-      });
+      }
 
-      modalContent.querySelectorAll('.btn-pattern-pill').forEach(btn => {
+      // Фильтры по культуре (авто-подставляют культуру в форму слева!)
+      modalContent.querySelectorAll('.vc-filter-pill').forEach(btn => {
         btn.onclick = () => {
           activeFilterCrop = btn.getAttribute('data-crop');
+          if (activeFilterCrop !== 'all' && !editingId) {
+            formCropId = activeFilterCrop;
+          }
           render();
         };
       });
 
+      // Редактирование карточки
+      modalContent.querySelectorAll('.vc-edit-btn').forEach(btn => {
+        btn.onclick = () => {
+          const varId = btn.getAttribute('data-var-id');
+          const found = allVarieties.find(v => v.id === varId);
+          if (!found) return;
+          editingId = found.id;
+          formCropId = found.cropId || 'tomato';
+          formName = found.name || '';
+          formNotes = found.notes || '';
+          formPhotoUrl = found.photoUrl || null;
+          render();
+        };
+      });
+
+      // Удаление карточки
+      modalContent.querySelectorAll('.vc-delete-btn').forEach(btn => {
+        btn.onclick = async () => {
+          const varId = btn.getAttribute('data-var-id');
+          if (confirm(VC.delConfirm)) {
+            if (window.photoStorage) {
+              await window.photoStorage.deleteVariety(varId);
+            }
+            if (editingId === varId) {
+              editingId = null;
+              formName = '';
+              formNotes = '';
+              formPhotoUrl = null;
+            }
+            render();
+          }
+        };
+      });
+
+      // Печать каталога сортов на A4
       const printVarBtn = modalContent.querySelector('#btn-print-varieties-a4');
       if (printVarBtn) {
         printVarBtn.onclick = () => {
-          if (!varieties || varieties.length === 0) {
+          if (!filteredVarieties || filteredVarieties.length === 0) {
             this.showToast('⚠️ Сначала добавьте хотя бы один сорт в каталог, чтобы распечатать лист А4!');
             return;
           }
@@ -1580,7 +1718,7 @@
             this.showToast('⚠️ Разрешите всплывающие окна в браузере для печати А4');
             return;
           }
-          const cardsHtml = varieties.map((v, idx) => {
+          const cardsHtml = filteredVarieties.map((v, idx) => {
             const c = v.cropId ? getCropById(v.cropId) : null;
             const cName = c ? `${c.emoji} ${escapeHtml(getCropName(c, currentLang))}` : escapeHtml(VC.noCrop);
             return `
@@ -1610,7 +1748,7 @@
                 .header .meta { font-size: 12px; color: #6b7280; }
                 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
                 .var-print-card { display: flex; gap: 10px; border: 1.5px solid #d1d5db; border-radius: 8px; padding: 8px; break-inside: avoid; page-break-inside: avoid; background: #fff; }
-                .var-print-photo { width: 78px; height: 78px; flex-shrink: 0; border-radius: 6px; overflow: hidden; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; background: #f9fafb; }
+                .var-print-photo { width: 82px; height: 82px; flex-shrink: 0; border-radius: 6px; overflow: hidden; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; background: #f9fafb; }
                 .var-print-photo img { width: 100%; height: 100%; object-fit: cover; }
                 .var-print-no-photo { font-size: 32px; }
                 .var-print-info { flex: 1; min-width: 0; }
@@ -1627,7 +1765,7 @@
               <div class="no-print"><button onclick="window.print()">🖨️ Распечатать (A4)</button></div>
               <div class="header">
                 <h1>🌿 Каталог сортов: ${escapeHtml(filterTitle)}</h1>
-                <div class="meta">Всего сортов: ${varieties.length} • ${new Date().toLocaleDateString('ru-RU')}</div>
+                <div class="meta">Всего сортов: ${filteredVarieties.length} • ${new Date().toLocaleDateString('ru-RU')}</div>
               </div>
               <div class="grid">${cardsHtml}</div>
             </body>
@@ -1636,25 +1774,13 @@
           setTimeout(() => { try { printWin.print(); } catch (e) {} }, 350);
         };
       }
-
-      modalContent.querySelectorAll('.delete-variety-btn').forEach(btn => {
-        btn.onclick = async () => {
-          const varId = btn.getAttribute('data-var-id');
-          if (confirm(VC.delConfirm)) {
-            if (window.photoStorage) {
-              await window.photoStorage.deleteVariety(varId);
-            }
-            render();
-          }
-        };
-      });
     };
 
     render().then(() => {
       modal.classList.add('active');
     }).catch(err => {
       console.error('Error rendering variety catalog modal:', err);
-      modal.classList.remove('active');
+      closeModal();
     });
   }
   });
