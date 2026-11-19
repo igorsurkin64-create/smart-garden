@@ -74,6 +74,8 @@ class GardenMap {
         <button class="nav-control-btn" id="map-center-btn" data-i18n-title="btn_center_title" title="${tr('btn_center_title') || 'Центрировать'}"><span class="nav-control-icon">📍</span><span class="nav-control-label" data-i18n="btn_center_label"> ${tr('btn_center_label') || 'Центр'}</span></button>
         <div class="nav-divider"></div>
         <button class="nav-control-btn" id="map-arrange-btn" data-i18n-title="btn_arrange_title" title="${tr('btn_arrange_title') || 'Разровнять грядки и выстроить ровные проходы без наложений'}"><span class="nav-control-icon">📏</span><span class="nav-control-label" data-i18n="btn_arrange_label"> ${tr('btn_arrange_label') || 'Расставить дорожки'}</span></button>
+        <div class="nav-divider"></div>
+        <button class="nav-control-btn" id="map-style-toggle-btn" title="Переключить оформление: «Живой сад» или «Схема»"><span class="nav-control-icon" id="map-style-icon">🎨</span><span class="nav-control-label" id="map-style-label"> Живой сад</span></button>
       </div>
 
       <!-- Вьюпорт на весь экран -->
@@ -125,7 +127,52 @@ class GardenMap {
       }
     });
 
+    // Переключатель стиля: «🎨 Живой сад» (мультяшный) ⇄ «📐 Схема» (классический)
+    const savedStyle = localStorage.getItem('smart_garden_visual_style') || 'cartoon';
+    this.applyVisualStyle(savedStyle, false);
+
+    document.getElementById('map-style-toggle-btn')?.addEventListener('click', () => {
+      const isCartoon = document.body.classList.contains('theme-cartoon');
+      const nextStyle = isCartoon ? 'classic' : 'cartoon';
+      this.applyVisualStyle(nextStyle, true);
+    });
+
     this.updateControlsLanguage();
+  }
+
+  applyVisualStyle(style, showNotification = false) {
+    const isCartoon = style !== 'classic';
+    document.body.classList.toggle('theme-cartoon', isCartoon);
+    try {
+      localStorage.setItem('smart_garden_visual_style', isCartoon ? 'cartoon' : 'classic');
+    } catch (e) {}
+
+    this.updateStyleToggleButton();
+
+    if (showNotification && window.app) {
+      const lang = (typeof window !== 'undefined' && window.i18n) ? window.i18n.getLanguage() : 'ru';
+      const msg = isCartoon
+        ? (lang === 'et' ? '🎨 «Elav aed» stiil on sisse lülitatud!' : lang === 'lv' ? '🎨 Ieslēgts «Dzīvais dārzs» stils!' : lang === 'lt' ? '🎨 Įjungtas «Gyvas sodas» stilius!' : '🎨 Включён мультяшный стиль «Живой сад»!')
+        : (lang === 'et' ? '📐 «Skeem» stiil on sisse lülitatud' : lang === 'lv' ? '📐 Ieslēgts «Shēma» stils' : lang === 'lt' ? '📐 Įjungtas «Schema» stilius' : '📐 Включён классический стиль «Схема»');
+      window.app.showToast(msg);
+    }
+  }
+
+  updateStyleToggleButton() {
+    const btn = document.getElementById('map-style-toggle-btn');
+    if (!btn) return;
+    const isCartoon = document.body.classList.contains('theme-cartoon');
+    const lang = (typeof window !== 'undefined' && window.i18n) ? window.i18n.getLanguage() : 'ru';
+    const cartoonLabel = lang === 'et' ? 'Elav aed' : lang === 'lv' ? 'Dzīvais dārzs' : lang === 'lt' ? 'Gyvas sodas' : 'Живой сад';
+    const classicLabel = lang === 'et' ? 'Skeem' : lang === 'lv' ? 'Shēma' : lang === 'lt' ? 'Schema' : 'Схема';
+
+    btn.classList.toggle('style-toggle-active', isCartoon);
+    btn.innerHTML = isCartoon
+      ? `<span class="nav-control-icon">🎨</span><span class="nav-control-label"> ${cartoonLabel}</span>`
+      : `<span class="nav-control-icon">📐</span><span class="nav-control-label"> ${classicLabel}</span>`;
+    btn.title = isCartoon
+      ? 'Нажмите, чтобы переключить на классическую схему'
+      : 'Нажмите, чтобы включить мультяшный «Живой сад»';
   }
 
   updateControlsLanguage() {
@@ -150,6 +197,7 @@ class GardenMap {
     }
     if (zoomInBtn) zoomInBtn.title = tr('zoom_in_title') || 'Приблизить (+)';
     if (zoomOutBtn) zoomOutBtn.title = tr('zoom_out_title') || 'Отдалить (-)';
+    this.updateStyleToggleButton();
   }
 
   setupGlobalEvents() {
