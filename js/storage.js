@@ -1226,11 +1226,28 @@ class GardenStorage {
   cloneDecorItem(id) {
     const item = this.getDecorItems().find(d => d.id === id);
     if (!item) return null;
+
+    let nextX = item.x + 0.75;
+    let nextY = item.y + 0.75;
+
+    // Для забора и садовой дорожки — ставим следующую секцию РОВНО ВСТЫК по направлению!
+    if (item.type === 'fence' || item.type === 'path_stone') {
+      const rot = ((item.rotation || 0) % 360 + 360) % 360;
+      const step = Math.max(0.5, (item.width || 3.0) - 0.15);
+      if (rot === 90 || rot === 270) {
+        nextX = item.x;
+        nextY = Math.round((item.y + step) * 20) / 20;
+      } else {
+        nextX = Math.round((item.x + step) * 20) / 20;
+        nextY = item.y;
+      }
+    }
+
     const clone = {
       ...item,
       id: 'decor-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-      x: item.x + 0.75,
-      y: item.y + 0.75
+      x: nextX,
+      y: nextY
     };
     this.getDecorItems().push(clone);
     this.saveData();

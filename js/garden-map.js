@@ -313,11 +313,15 @@ class GardenMap {
         const x = Math.max(0.5, centerX - (tpl.width || 2) / 2);
         const y = Math.max(0.5, centerY - (tpl.height || 2) / 2);
 
-        this.storage.addDecorItem(type, x, y);
+        const added = this.storage.addDecorItem(type, x, y);
+        if (added) this.selectedDecorId = added.id;
         this.renderDecorItems();
         modal.classList.remove('active');
         if (window.app) {
-          window.app.showToast(`${tpl.icon} «${getDecorName(tpl, lang)}» добавлен на участок! Перетащите его куда нужно.`);
+          const isLine = type === 'fence' || type === 'path_stone';
+          window.app.showToast(isLine
+            ? `${tpl.icon} «${getDecorName(tpl, lang)}» добавлен! Нажимайте «➕ Продлить» сверху, чтобы выложить в ряд.`
+            : `${tpl.icon} «${getDecorName(tpl, lang)}» добавлен на участок! Перетащите его куда нужно.`);
         }
       });
     });
@@ -328,7 +332,8 @@ class GardenMap {
     const items = this.storage.getDecorItems();
     const lang = (typeof window !== 'undefined' && window.i18n) ? window.i18n.getLanguage() : 'ru';
     const lblRotate = lang === 'et' ? 'Pööra' : lang === 'lv' ? 'Pagriezt' : lang === 'lt' ? 'Pasukti' : 'Повернуть';
-    const lblClone = lang === 'et' ? 'Kopeeri' : lang === 'lv' ? 'Kopēt' : lang === 'lt' ? 'Kopijuoti' : 'Копия';
+    const lblExtend = lang === 'et' ? 'Pikenda' : lang === 'lv' ? 'Pagarināt' : lang === 'lt' ? 'Pratęsti' : 'Продлить';
+    const lblMore = lang === 'et' ? 'Veel üks' : lang === 'lv' ? 'Vēl vienu' : lang === 'lt' ? 'Dar vieną' : 'Ещё';
     const lblDelete = lang === 'et' ? 'Kustuta' : lang === 'lv' ? 'Dzēst' : lang === 'lt' ? 'Trinti' : 'Удалить';
 
     this.decorLayerEl.innerHTML = items.map(item => {
@@ -340,6 +345,7 @@ class GardenMap {
       const rot = item.rotation || 0;
       const zClass = `decor-z-${tpl.zLayer || 'mid'}`;
       const isSelected = this.selectedDecorId === item.id;
+      const isLine = item.type === 'fence' || item.type === 'path_stone';
 
       return `
         <div class="decor-item ${zClass} ${isSelected ? 'decor-selected' : ''}"
@@ -350,8 +356,8 @@ class GardenMap {
             ${tpl.svg}
           </div>
           <div class="decor-item-tools">
+            <button type="button" class="decor-action-btn decor-action-primary decor-clone-btn" data-decor-id="${item.id}" title="${isLine ? 'Поставить следующую секцию ровно встык' : 'Поставить ещё один такой же объект рядом'}">➕ ${isLine ? lblExtend : lblMore}</button>
             <button type="button" class="decor-action-btn decor-rotate-btn" data-decor-id="${item.id}" title="${lblRotate} на 90°">↻ ${lblRotate}</button>
-            <button type="button" class="decor-action-btn decor-clone-btn" data-decor-id="${item.id}" title="${lblClone}">❐ ${lblClone}</button>
             <button type="button" class="decor-action-btn decor-action-danger decor-delete-btn" data-decor-id="${item.id}" title="${lblDelete} (клавиша Delete)">🗑️ ${lblDelete}</button>
           </div>
         </div>

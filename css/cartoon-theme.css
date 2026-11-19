@@ -906,6 +906,18 @@ body.rotation-check-off .inspector-planting-section .status-pill {
   transform: translateY(-1px);
 }
 
+.decor-action-btn.decor-action-primary {
+  color: #14532d;
+  background: linear-gradient(180deg, #dcfce7 0%, #86efac 100%);
+  border-color: #16a34a;
+  box-shadow: 0 2px 0 rgba(21, 128, 61, 0.45);
+}
+
+.decor-action-btn.decor-action-primary:hover {
+  background: #22c55e;
+  color: #ffffff;
+}
+
 .decor-action-btn.decor-action-danger {
   color: #991b1b;
   background: linear-gradient(180deg, #fff1f2 0%, #fecdd3 100%);
