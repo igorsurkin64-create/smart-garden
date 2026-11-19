@@ -88,6 +88,29 @@ class GardenMap {
           <div class="beds-layer" id="beds-layer"></div>
         </div>
 
+        <!-- Атмосфера живого сада (солнечные лучи и бабочки — только в теме «Живой сад») -->
+        <div class="cartoon-atmosphere-layer" aria-hidden="true">
+          <div class="cartoon-sunbeams"></div>
+          <div class="cartoon-butterfly bf-1">
+            <svg viewBox="0 0 32 32" width="24" height="24">
+              <ellipse cx="11" cy="13" rx="7" ry="5.5" transform="rotate(-22 11 13)" fill="#fde047" stroke="#78350f" stroke-width="1.4"/>
+              <ellipse cx="21" cy="13" rx="7" ry="5.5" transform="rotate(22 21 13)" fill="#fde047" stroke="#78350f" stroke-width="1.4"/>
+              <ellipse cx="12" cy="20" rx="5" ry="4" transform="rotate(18 12 20)" fill="#fb923c" stroke="#78350f" stroke-width="1.3"/>
+              <ellipse cx="20" cy="20" rx="5" ry="4" transform="rotate(-18 20 20)" fill="#fb923c" stroke="#78350f" stroke-width="1.3"/>
+              <ellipse cx="16" cy="16.5" rx="1.8" ry="6.5" fill="#451a03"/>
+            </svg>
+          </div>
+          <div class="cartoon-butterfly bf-2">
+            <svg viewBox="0 0 32 32" width="20" height="20">
+              <ellipse cx="11" cy="13" rx="7" ry="5.5" transform="rotate(-22 11 13)" fill="#7dd3fc" stroke="#0c4a6e" stroke-width="1.4"/>
+              <ellipse cx="21" cy="13" rx="7" ry="5.5" transform="rotate(22 21 13)" fill="#7dd3fc" stroke="#0c4a6e" stroke-width="1.4"/>
+              <ellipse cx="12" cy="20" rx="5" ry="4" transform="rotate(18 12 20)" fill="#bae6fd" stroke="#0c4a6e" stroke-width="1.3"/>
+              <ellipse cx="20" cy="20" rx="5" ry="4" transform="rotate(-18 20 20)" fill="#bae6fd" stroke="#0c4a6e" stroke-width="1.3"/>
+              <ellipse cx="16" cy="16.5" rx="1.8" ry="6.5" fill="#0f172a"/>
+            </svg>
+          </div>
+        </div>
+
         <!-- Оверлей чистого плана / Пустой огород (Onboarding Hero) -->
         <div class="empty-garden-overlay" id="empty-garden-overlay" style="display: none;"></div>
       </div>
@@ -734,9 +757,11 @@ class GardenMap {
             if (isInternalHorizontal) {
               // Горизонтальные полосы/рядки
               return `
-                <div class="gh-internal-bed gh-bed-horizontal ${isSectionSelected ? 'gh-sec-selected' : ''}"
+                <div class="gh-internal-bed gh-bed-horizontal ${isSectionSelected ? 'gh-sec-selected' : ''} ${currentCrop ? 'is-planted-bed' : ''}"
                      data-bed-id="${bed.id}"
                      data-section-id="${sec.id}"
+                     data-crop-id="${currentCrop ? currentCrop.id : ''}"
+                     data-crop-family="${currentCrop ? (currentCrop.family || '') : ''}"
                      title="${escapeHtml(secLocName)}: ${currentCrop ? escapeHtml(currentCropName) : escapeHtml(freeText)}">
                   
                   <div class="gh-bed-h-container">
@@ -830,9 +855,11 @@ class GardenMap {
             } else {
               // Вертикальные рядки-колонки
               return `
-                <div class="gh-internal-bed gh-internal-bed-vertical ${isSectionSelected ? 'gh-sec-selected' : ''}"
+                <div class="gh-internal-bed gh-internal-bed-vertical ${isSectionSelected ? 'gh-sec-selected' : ''} ${currentCrop ? 'is-planted-bed' : ''}"
                      data-bed-id="${bed.id}"
                      data-section-id="${sec.id}"
+                     data-crop-id="${currentCrop ? currentCrop.id : ''}"
+                     data-crop-family="${currentCrop ? (currentCrop.family || '') : ''}"
                      title="${escapeHtml(secLocName)}: ${currentCrop ? escapeHtml(currentCropName) : escapeHtml(freeText)}">
                   
                   <!-- Верх: Номер и название рядка -->
@@ -1027,9 +1054,11 @@ class GardenMap {
     const typeIcon = typeIcons[bed.type] || '🌱';
 
     return `
-      <div class="bed-item ${bedTypeClass} ${isVertical ? 'orient-vertical' : 'orient-horizontal'} ${isSelected ? 'selected' : ''}"
+      <div class="bed-item ${bedTypeClass} ${isVertical ? 'orient-vertical' : 'orient-horizontal'} ${isSelected ? 'selected' : ''} ${currentCrop ? 'is-planted-bed' : ''}"
            id="bed-el-${bed.id}"
            data-bed-id="${bed.id}"
+           data-crop-id="${currentCrop ? currentCrop.id : ''}"
+           data-crop-family="${currentCrop ? (currentCrop.family || '') : ''}"
            style="
              left: ${leftPx}px;
              top: ${topPx}px;

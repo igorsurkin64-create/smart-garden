@@ -1,202 +1,390 @@
 /* ==========================================================================
-   🎨 «Уютная ферма» — Мультяшная живая тема для «Умного Огорода»
-   Вдохновлена уютным стилем Hay Day / Весёлая ферма.
+   🎨 «Уютная ферма 3D» — Объёмная мультяшная тема (Hay Day / Диорама)
    Активируется классом body.theme-cartoon (переключается в 1 клик на карте).
    ========================================================================== */
 
 body.theme-cartoon {
-  --cartoon-wood-light: #e09f5a;
+  --cartoon-wood-light: #e5a55d;
   --cartoon-wood-mid: #b97034;
-  --cartoon-wood-dark: #78421b;
-  --cartoon-wood-outline: #4e2a10;
-  --cartoon-soil-dark: #5c3c24;
-  --cartoon-soil-mid: #734c2e;
-  --cartoon-soil-light: #8c5e3a;
-  --cartoon-grass-1: #8ad352;
-  --cartoon-grass-2: #7dc945;
+  --cartoon-wood-dark: #7a431b;
+  --cartoon-wood-outline: #4a260d;
+  --cartoon-soil-dark: #573820;
+  --cartoon-soil-mid: #6e482b;
+  --cartoon-soil-light: #8a5c38;
   --cartoon-cream: #fffdf5;
   --cartoon-cream-border: #e6d5b8;
-  --cartoon-green-btn: #22c55e;
-  --cartoon-green-btn-shadow: #15803d;
 }
 
-/* ---------- 1. Сочная мультяшная лужайка с травинками и ромашками ---------- */
+/* ---------- 0. Атмосфера живого сада: лучи солнца и порхающие бабочки ---------- */
+.cartoon-atmosphere-layer {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+  overflow: hidden;
+}
+
+body.theme-cartoon .cartoon-atmosphere-layer {
+  display: block;
+}
+
+body.theme-cartoon .cartoon-sunbeams {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(ellipse at 12% 8%, rgba(255, 251, 214, 0.42) 0%, rgba(255, 251, 214, 0.14) 28%, transparent 58%),
+    linear-gradient(128deg, rgba(255, 252, 220, 0.22) 0%, transparent 22%, rgba(255, 252, 220, 0.12) 36%, transparent 54%);
+  pointer-events: none;
+}
+
+body.theme-cartoon .cartoon-butterfly {
+  position: absolute;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 4px rgba(24, 52, 12, 0.28));
+  will-change: transform;
+}
+
+body.theme-cartoon .cartoon-butterfly svg {
+  animation: cartoon-wing-flap 0.42s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+
+body.theme-cartoon .cartoon-butterfly.bf-1 {
+  top: 18%;
+  left: -40px;
+  animation: cartoon-bf-path-1 28s linear infinite;
+}
+
+body.theme-cartoon .cartoon-butterfly.bf-2 {
+  top: 68%;
+  left: -40px;
+  animation: cartoon-bf-path-2 36s linear 8s infinite;
+}
+
+@keyframes cartoon-wing-flap {
+  0% { transform: scaleX(1) scaleY(1); }
+  100% { transform: scaleX(0.45) scaleY(1.06); }
+}
+
+@keyframes cartoon-bf-path-1 {
+  0%   { transform: translate(0, 0) rotate(12deg); opacity: 0; }
+  6%   { opacity: 0.92; }
+  28%  { transform: translate(32vw, -48px) rotate(-8deg); }
+  55%  { transform: translate(62vw, 34px) rotate(16deg); }
+  82%  { transform: translate(88vw, -28px) rotate(-6deg); opacity: 0.92; }
+  100% { transform: translate(112vw, 18px) rotate(10deg); opacity: 0; }
+}
+
+@keyframes cartoon-bf-path-2 {
+  0%   { transform: translate(0, 0) rotate(-10deg); opacity: 0; }
+  8%   { opacity: 0.85; }
+  35%  { transform: translate(38vw, 42px) rotate(14deg); }
+  68%  { transform: translate(74vw, -36px) rotate(-12deg); opacity: 0.85; }
+  100% { transform: translate(112vw, -10px) rotate(8deg); opacity: 0; }
+}
+
+@keyframes cartoon-foliage-sway {
+  0%, 100% { background-position: 0px 0px; }
+  50% { background-position: 2px 1px; }
+}
+
+/* ---------- 1. Сочная мультяшная лужайка с объёмом, цветами и дорожкой ---------- */
 body.theme-cartoon .garden-pan-viewport {
-  background: radial-gradient(circle at 50% 38%, #9be260 0%, #7cc942 62%, #68b434 100%) !important;
-  box-shadow: inset 0 0 80px rgba(34, 72, 14, 0.22);
+  background: radial-gradient(circle at 32% 24%, #a6e865 0%, #7fca44 52%, #63ad31 100%) !important;
+  box-shadow: inset 0 0 110px rgba(26, 62, 10, 0.28);
 }
 
 body.theme-cartoon .infinite-grid-layer {
   background-color: transparent !important;
   background-image:
-    /* Текстура лужайки: травинки, клевер, маленькие ромашки */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Crect width='120' height='240' fill='%23ffffff' fill-opacity='0.05'/%3E%3Cg stroke='%234d9424' stroke-width='2.2' stroke-linecap='round' fill='none' opacity='0.55'%3E%3Cpath d='M28 42 Q26 33 21 29 M28 42 Q30 32 34 28 M28 42 Q28 35 28 31'/%3E%3Cpath d='M148 92 Q145 83 141 80 M148 92 Q150 82 154 78'/%3E%3Cpath d='M82 168 Q79 159 75 156 M82 168 Q84 158 88 154 M82 168 Q82 161 82 157'/%3E%3Cpath d='M202 198 Q199 190 195 187 M202 198 Q204 189 208 186'/%3E%3Cpath d='M188 46 Q185 38 181 35 M188 46 Q190 37 194 34'/%3E%3Cpath d='M42 212 Q39 204 35 201 M42 212 Q44 203 48 200'/%3E%3C/g%3E%3Cg opacity='0.88'%3E%3Ccircle cx='106' cy='58' r='3.5' fill='%23ffffff'/%3E%3Ccircle cx='111' cy='61' r='3.5' fill='%23ffffff'/%3E%3Ccircle cx='106' cy='64' r='3.5' fill='%23ffffff'/%3E%3Ccircle cx='101' cy='61' r='3.5' fill='%23ffffff'/%3E%3Ccircle cx='106' cy='61' r='2.3' fill='%23facc15'/%3E%3C/g%3E%3Cg opacity='0.82'%3E%3Ccircle cx='206' cy='128' r='3' fill='%23fef08a'/%3E%3Ccircle cx='210' cy='131' r='3' fill='%23fef08a'/%3E%3Ccircle cx='206' cy='134' r='3' fill='%23fef08a'/%3E%3Ccircle cx='202' cy='131' r='3' fill='%23fef08a'/%3E%3Ccircle cx='206' cy='131' r='2' fill='%23f59e0b'/%3E%3C/g%3E%3Cg opacity='0.85'%3E%3Ccircle cx='54' cy='126' r='2.8' fill='%23ffffff'/%3E%3Ccircle cx='58' cy='129' r='2.8' fill='%23ffffff'/%3E%3Ccircle cx='54' cy='132' r='2.8' fill='%23ffffff'/%3E%3Ccircle cx='50' cy='129' r='2.8' fill='%23ffffff'/%3E%3Ccircle cx='54' cy='129' r='1.9' fill='%23facc15'/%3E%3C/g%3E%3Cg fill='%235ba62c' opacity='0.35'%3E%3Ccircle cx='168' cy='170' r='3.2'/%3E%3Ccircle cx='173' cy='173' r='3.2'/%3E%3Ccircle cx='168' cy='176' r='3.2'/%3E%3C/g%3E%3C/svg%3E"),
-    /* Очень мягкая едва заметная метровая сетка для удобства выравнивания */
-    linear-gradient(to right, rgba(255, 255, 255, 0.13) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.13) 1px, transparent 1px) !important;
+    /* Лужайка: мягкие скошенные полосы, травинки, клевер, ромашки и одуванчики */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Crect width='120' height='240' fill='%23ffffff' fill-opacity='0.06'/%3E%3Cg stroke='%23478f20' stroke-width='2.3' stroke-linecap='round' fill='none' opacity='0.58'%3E%3Cpath d='M28 42 Q26 32 20 28 M28 42 Q30 31 35 27 M28 42 Q28 34 28 30'/%3E%3Cpath d='M148 92 Q145 83 140 79 M148 92 Q150 82 155 78'/%3E%3Cpath d='M82 168 Q79 158 74 155 M82 168 Q84 157 89 153 M82 168 Q82 160 82 156'/%3E%3Cpath d='M202 198 Q199 189 194 186 M202 198 Q204 188 209 185'/%3E%3Cpath d='M188 46 Q185 37 180 34 M188 46 Q190 36 195 33'/%3E%3Cpath d='M42 212 Q39 203 34 200 M42 212 Q44 202 49 199'/%3E%3C/g%3E%3Cg opacity='0.9'%3E%3Ccircle cx='106' cy='58' r='3.6' fill='%23ffffff'/%3E%3Ccircle cx='111' cy='61' r='3.6' fill='%23ffffff'/%3E%3Ccircle cx='106' cy='64' r='3.6' fill='%23ffffff'/%3E%3Ccircle cx='101' cy='61' r='3.6' fill='%23ffffff'/%3E%3Ccircle cx='106' cy='61' r='2.4' fill='%23facc15'/%3E%3C/g%3E%3Cg opacity='0.86'%3E%3Ccircle cx='206' cy='128' r='3.2' fill='%23fef08a'/%3E%3Ccircle cx='210' cy='131' r='3.2' fill='%23fef08a'/%3E%3Ccircle cx='206' cy='134' r='3.2' fill='%23fef08a'/%3E%3Ccircle cx='202' cy='131' r='3.2' fill='%23fef08a'/%3E%3Ccircle cx='206' cy='131' r='2.1' fill='%23f59e0b'/%3E%3C/g%3E%3Cg opacity='0.86'%3E%3Ccircle cx='54' cy='126' r='2.9' fill='%23ffffff'/%3E%3Ccircle cx='58' cy='129' r='2.9' fill='%23ffffff'/%3E%3Ccircle cx='54' cy='132' r='2.9' fill='%23ffffff'/%3E%3Ccircle cx='50' cy='129' r='2.9' fill='%23ffffff'/%3E%3Ccircle cx='54' cy='129' r='2' fill='%23facc15'/%3E%3C/g%3E%3Cg fill='%23509624' opacity='0.4'%3E%3Ccircle cx='168' cy='170' r='3.5'/%3E%3Ccircle cx='174' cy='173' r='3.5'/%3E%3Ccircle cx='168' cy='176' r='3.5'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(to right, rgba(255, 255, 255, 0.11) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.11) 1px, transparent 1px) !important;
   background-size: 240px 240px, 80px 80px, 80px 80px !important;
 }
 
-/* ---------- 2. Объёмные деревянные грядки и рыхлая земля ---------- */
+/* ---------- 2. НАСТОЯЩИЕ 3D-ГРЯДКИ (объёмный короб + передняя стенка + глубокая тень) ---------- */
 body.theme-cartoon .bed-item {
   border-radius: 16px !important;
-  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease !important;
+  overflow: visible !important;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease !important;
 }
 
 body.theme-cartoon .bed-item:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
 }
 
-/* Деревянная высокая грядка (короб из досок + тёмная земля с бороздками) */
+/* Объёмная 3D-стенка спереди деревянной грядки (создаёт реальную высоту короба!) */
+body.theme-cartoon .bed-item.bed-type-raised::after,
+body.theme-cartoon .bed-item.bed-type-warm::after,
+body.theme-cartoon .bed-item.bed-type-berry::after {
+  content: '';
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  bottom: -21px;
+  height: 18px;
+  border-radius: 0 0 15px 15px;
+  border: 2.5px solid #4a260d;
+  border-top: 2px solid #5e3214;
+  background:
+    /* Вертикальные стыки и фактура деревянных досок */
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 224, 178, 0.12) 0px,
+      rgba(255, 224, 178, 0.12) 38px,
+      rgba(56, 26, 6, 0.38) 38px,
+      rgba(56, 26, 6, 0.38) 41px
+    ),
+    linear-gradient(180deg, #9c5824 0%, #7a4117 65%, #633310 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 220, 170, 0.25),
+    10px 14px 20px rgba(20, 48, 8, 0.44);
+  pointer-events: none;
+  z-index: -1;
+}
+
+body.theme-cartoon .bed-item.bed-type-warm::after {
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 220, 170, 0.12) 0px, rgba(255, 220, 170, 0.12) 38px, rgba(64, 24, 6, 0.38) 38px, rgba(64, 24, 6, 0.38) 41px),
+    linear-gradient(180deg, #b8531f 0%, #8a3a12 65%, #6e2d0c 100%);
+}
+
+body.theme-cartoon .bed-item.bed-type-berry::after {
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 225, 220, 0.12) 0px, rgba(255, 225, 220, 0.12) 38px, rgba(64, 18, 16, 0.38) 38px, rgba(64, 18, 16, 0.38) 41px),
+    linear-gradient(180deg, #9f443a 0%, #7a2f27 65%, #5e221c 100%);
+}
+
+/* Деревянный короб с 3D-углублением почвы и угловыми брусками */
 body.theme-cartoon .bed-item.bed-type-raised,
 body.theme-cartoon .bed-item.bed-type-warm,
 body.theme-cartoon .bed-item.bed-type-berry {
-  border: 6px solid #b56d32 !important;
-  outline: 2.5px solid #4e2a10;
-  background-color: #6b4528 !important;
+  border: 7px solid #c67c3b !important;
+  outline: 2.5px solid #4a260d;
+  background-color: #694326 !important;
+  /* Объёмные земляные валики с тенями в бороздках */
   background-image:
-    /* Бороздки рыхлой земли */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='32' viewBox='0 0 64 32'%3E%3Cpath d='M0 8 Q16 5 32 8 T64 8' stroke='%234d2f19' stroke-width='2' fill='none' opacity='0.45'/%3E%3Cpath d='M0 24 Q16 21 32 24 T64 24' stroke='%234d2f19' stroke-width='2' fill='none' opacity='0.45'/%3E%3Ccircle cx='12' cy='15' r='1.6' fill='%238c5e3a' opacity='0.55'/%3E%3Ccircle cx='44' cy='12' r='1.4' fill='%233d2312' opacity='0.45'/%3E%3Ccircle cx='28' cy='27' r='1.8' fill='%238c5e3a' opacity='0.5'/%3E%3Ccircle cx='54' cy='20' r='1.3' fill='%233d2312' opacity='0.4'/%3E%3C/svg%3E") !important;
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='36' viewBox='0 0 72 36'%3E%3Crect width='72' height='36' fill='%23694326'/%3E%3Cpath d='M0 7 Q18 3 36 7 T72 7 L72 15 Q54 11 36 15 T0 15 Z' fill='%237d5231' opacity='0.75'/%3E%3Cpath d='M0 25 Q18 21 36 25 T72 25 L72 33 Q54 29 36 33 T0 33 Z' fill='%237d5231' opacity='0.75'/%3E%3Cpath d='M0 16 Q18 13 36 16 T72 16' stroke='%233d2310' stroke-width='2.6' fill='none' opacity='0.58'/%3E%3Cpath d='M0 34 Q18 31 36 34 T72 34' stroke='%233d2310' stroke-width='2.6' fill='none' opacity='0.58'/%3E%3Ccircle cx='14' cy='11' r='1.7' fill='%23996a42' opacity='0.6'/%3E%3Ccircle cx='48' cy='28' r='1.8' fill='%23996a42' opacity='0.55'/%3E%3Ccircle cx='30' cy='20' r='1.5' fill='%233d2310' opacity='0.45'/%3E%3C/svg%3E") !important;
   box-shadow:
-    inset 0 0 0 2px rgba(255, 224, 178, 0.35),
-    inset 0 6px 14px rgba(32, 16, 5, 0.35),
-    0 7px 0 #78421b,
-    0 9px 0 #4e2a10,
-    0 15px 24px rgba(28, 54, 12, 0.36) !important;
+    inset 0 0 0 2.5px rgba(255, 230, 185, 0.42),
+    inset 0 10px 18px rgba(32, 16, 4, 0.46),
+    inset 0 -5px 10px rgba(32, 16, 4, 0.28) !important;
 }
 
-/* Тёплая грядка — рыжевато-кедровый короб */
 body.theme-cartoon .bed-item.bed-type-warm {
-  border-color: #c86428 !important;
-  box-shadow:
-    inset 0 0 0 2px rgba(255, 214, 165, 0.4),
-    inset 0 6px 14px rgba(45, 18, 5, 0.35),
-    0 7px 0 #8a3f15,
-    0 9px 0 #4e2209,
-    0 15px 24px rgba(28, 54, 12, 0.36) !important;
+  border-color: #d46d30 !important;
 }
 
-/* Клубничник / ягодник — уютная светлая мульча + вишнёво-деревянный бортик */
 body.theme-cartoon .bed-item.bed-type-berry {
-  border-color: #b45348 !important;
-  background-color: #7c5838 !important;
-  box-shadow:
-    inset 0 0 0 2px rgba(254, 226, 226, 0.35),
-    inset 0 6px 14px rgba(45, 18, 12, 0.32),
-    0 7px 0 #7d332b,
-    0 9px 0 #4a1c17,
-    0 15px 24px rgba(28, 54, 12, 0.36) !important;
+  border-color: #be5a4e !important;
+  background-color: #7c5636 !important;
 }
 
-/* Открытый грунт — мягкая земляная грядка прямо на газоне */
+/* Открытый грунт — объёмная земляная насыпь с мягким травяным краем */
 body.theme-cartoon .bed-item.bed-type-ground {
-  border: 4px solid #8c5e3a !important;
-  outline: 2.5px solid #4e2f16;
-  background-color: #6b472b !important;
+  border: 5px solid #8a5c37 !important;
+  outline: 2.5px solid #4a2a12;
+  background-color: #694326 !important;
   background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='32' viewBox='0 0 64 32'%3E%3Cpath d='M0 10 Q16 7 32 10 T64 10' stroke='%234d2f19' stroke-width='2' fill='none' opacity='0.48'/%3E%3Cpath d='M0 24 Q16 21 32 24 T64 24' stroke='%234d2f19' stroke-width='2' fill='none' opacity='0.48'/%3E%3Ccircle cx='18' cy='16' r='1.6' fill='%23996b45' opacity='0.5'/%3E%3Ccircle cx='48' cy='14' r='1.5' fill='%233d2312' opacity='0.4'/%3E%3C/svg%3E") !important;
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='36' viewBox='0 0 72 36'%3E%3Crect width='72' height='36' fill='%23694326'/%3E%3Cpath d='M0 8 Q18 4 36 8 T72 8 L72 16 Q54 12 36 16 T0 16 Z' fill='%237d5231' opacity='0.78'/%3E%3Cpath d='M0 26 Q18 22 36 26 T72 26 L72 34 Q54 30 36 34 T0 34 Z' fill='%237d5231' opacity='0.78'/%3E%3Cpath d='M0 17 Q18 14 36 17 T72 17' stroke='%233d2310' stroke-width='2.4' fill='none' opacity='0.55'/%3E%3C/svg%3E") !important;
   box-shadow:
-    inset 0 4px 12px rgba(28, 14, 4, 0.36),
-    0 5px 0 #52341c,
-    0 12px 20px rgba(28, 54, 12, 0.34) !important;
+    inset 0 7px 14px rgba(28, 14, 4, 0.45),
+    0 9px 0 #523219,
+    0 11px 0 #3d2310,
+    10px 18px 24px rgba(20, 48, 8, 0.42) !important;
 }
 
+/* Подсветка выбранной грядки */
 body.theme-cartoon .bed-item.selected {
-  outline: 3.5px solid #facc15 !important;
-  box-shadow:
-    0 0 0 6px rgba(250, 204, 21, 0.45),
-    0 7px 0 #78421b,
-    0 16px 30px rgba(28, 54, 12, 0.45) !important;
+  outline: 4px solid #fde047 !important;
+  filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.65));
 }
 
-/* ---------- 3. Мультяшная стеклянная теплица ---------- */
+/* ---------- 3. ЖИВЫЕ 3D-КУСТИКИ РАСТЕНИЙ ПРЯМО НА ЗАСАЖЕННЫХ ГРЯДКАХ! ---------- */
+body.theme-cartoon .bed-item.is-planted-bed::before,
+body.theme-cartoon .gh-internal-bed.is-planted-bed::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 10px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.72;
+  /* Базовые пушистые зелёные мультяшные кустики в рядках */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='68' height='54' viewBox='0 0 68 54'%3E%3Cg transform='translate(6,8)'%3E%3Cellipse cx='14' cy='24' rx='12' ry='4.5' fill='%232e1a0c' opacity='0.45'/%3E%3Ccircle cx='9' cy='18' r='8' fill='%232e7d32' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='20' cy='18' r='8' fill='%23388e3c' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='14' cy='12' r='9' fill='%234caf50' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='12' cy='9' r='3.2' fill='%23a5d6a7' opacity='0.8'/%3E%3C/g%3E%3Cg transform='translate(38,24)'%3E%3Cellipse cx='14' cy='22' rx='11' ry='4' fill='%232e1a0c' opacity='0.45'/%3E%3Ccircle cx='9' cy='16' r='7.5' fill='%232e7d32' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='19' cy='16' r='7.5' fill='%23388e3c' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='14' cy='11' r='8.5' fill='%2366bb6a' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='12' cy='8.5' r='3' fill='%23c8e6c9' opacity='0.8'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 68px 54px;
+  animation: cartoon-foliage-sway 5s ease-in-out infinite;
+}
+
+/* 🍅 Томаты: зелёные кусты с маленькими красными помидорками! */
+body.theme-cartoon .bed-item.is-planted-bed[data-crop-id="tomato"]::before,
+body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-id="tomato"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='56' viewBox='0 0 72 56'%3E%3Cg transform='translate(5,6)'%3E%3Cellipse cx='16' cy='26' rx='13' ry='4.5' fill='%232b170a' opacity='0.48'/%3E%3Ccircle cx='10' cy='18' r='8.5' fill='%232e7d32' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='22' cy='18' r='8.5' fill='%23388e3c' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='12' r='9.5' fill='%2343a047' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='11' cy='17' r='3.6' fill='%23ef4444' stroke='%237f1d1d' stroke-width='1.1'/%3E%3Ccircle cx='10' cy='15.8' r='1.1' fill='%23ffffff' opacity='0.75'/%3E%3Ccircle cx='21' cy='15' r='3.2' fill='%23ef4444' stroke='%237f1d1d' stroke-width='1.1'/%3E%3Ccircle cx='20.2' cy='14' r='0.9' fill='%23ffffff' opacity='0.75'/%3E%3C/g%3E%3Cg transform='translate(40,22)'%3E%3Cellipse cx='14' cy='24' rx='11' ry='4' fill='%232b170a' opacity='0.45'/%3E%3Ccircle cx='9' cy='17' r='7.5' fill='%232e7d32' stroke='%23163d18' stroke-width='1.4'/%3E%3Ccircle cx='19' cy='17' r='7.5' fill='%23388e3c' stroke='%23163d18' stroke-width='1.4'/%3E%3Ccircle cx='14' cy='11' r='8.5' fill='%234caf50' stroke='%23163d18' stroke-width='1.4'/%3E%3Ccircle cx='16' cy='16' r='3.3' fill='%23ef4444' stroke='%237f1d1d' stroke-width='1.1'/%3E%3Ccircle cx='15.2' cy='15' r='1' fill='%23ffffff' opacity='0.75'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 72px 56px;
+}
+
+/* 🥒 Огурцы, кабачки, тыквы: широкие резные листья с жёлтыми цветочками! */
+body.theme-cartoon .bed-item.is-planted-bed[data-crop-family="cucurbitaceae"]::before,
+body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-family="cucurbitaceae"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='56' viewBox='0 0 72 56'%3E%3Cg transform='translate(5,6)'%3E%3Cellipse cx='16' cy='26' rx='13' ry='4.5' fill='%232b170a' opacity='0.45'/%3E%3Ccircle cx='10' cy='18' r='9' fill='%232e7d32' stroke='%23143d17' stroke-width='1.5'/%3E%3Ccircle cx='22' cy='19' r='8.5' fill='%2343a047' stroke='%23143d17' stroke-width='1.5'/%3E%3Ccircle cx='16' cy='12' r='9' fill='%2366bb6a' stroke='%23143d17' stroke-width='1.5'/%3E%3Ccircle cx='19' cy='12' r='3.2' fill='%23facc15' stroke='%23a16207' stroke-width='1'/%3E%3Ccircle cx='19' cy='12' r='1.1' fill='%23f97316'/%3E%3C/g%3E%3Cg transform='translate(40,22)'%3E%3Cellipse cx='14' cy='24' rx='12' ry='4' fill='%232b170a' opacity='0.45'/%3E%3Ccircle cx='10' cy='17' r='8' fill='%23388e3c' stroke='%23143d17' stroke-width='1.4'/%3E%3Ccircle cx='19' cy='16' r='8' fill='%234caf50' stroke='%23143d17' stroke-width='1.4'/%3E%3Ccircle cx='12' cy='14' r='2.8' fill='%23fde047' stroke='%23a16207' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 72px 56px;
+}
+
+/* 🍓 Клубника: кустики с ягодками и белыми цветочками! */
+body.theme-cartoon .bed-item.is-planted-bed[data-crop-id="strawberry"]::before,
+body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-id="strawberry"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='68' height='54' viewBox='0 0 68 54'%3E%3Cg transform='translate(5,7)'%3E%3Cellipse cx='15' cy='24' rx='12' ry='4' fill='%232b170a' opacity='0.45'/%3E%3Ccircle cx='10' cy='17' r='7.5' fill='%232e7d32' stroke='%23143d17' stroke-width='1.4'/%3E%3Ccircle cx='20' cy='17' r='7.5' fill='%2343a047' stroke='%23143d17' stroke-width='1.4'/%3E%3Ccircle cx='15' cy='12' r='8' fill='%234caf50' stroke='%23143d17' stroke-width='1.4'/%3E%3Cpath d='M12 16 C10 16 9.5 18.5 12 21.5 C14.5 18.5 14 16 12 16 Z' fill='%23ef4444' stroke='%237f1d1d' stroke-width='1'/%3E%3Ccircle cx='20' cy='13' r='2.6' fill='%23ffffff' stroke='%23d1d5db' stroke-width='0.8'/%3E%3Ccircle cx='20' cy='13' r='1.1' fill='%23facc15'/%3E%3C/g%3E%3Cg transform='translate(38,22)'%3E%3Ccircle cx='10' cy='16' r='7' fill='%23388e3c' stroke='%23143d17' stroke-width='1.4'/%3E%3Ccircle cx='18' cy='15' r='7.5' fill='%2366bb6a' stroke='%23143d17' stroke-width='1.4'/%3E%3Cpath d='M16 16 C14 16 13.5 18.5 16 21 C18.5 18.5 18 16 16 16 Z' fill='%23ef4444' stroke='%237f1d1d' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 68px 54px;
+}
+
+/* 🥬 Капуста и салат: крупные объёмные кочаны-розетки! */
+body.theme-cartoon .bed-item.is-planted-bed[data-crop-family="brassicaceae"]::before,
+body.theme-cartoon .bed-item.is-planted-bed[data-crop-id="lettuce"]::before,
+body.theme-cartoon .gh-internal-bed.is-planted-bed[data-crop-family="brassicaceae"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='68' height='54' viewBox='0 0 68 54'%3E%3Cg transform='translate(6,8)'%3E%3Cellipse cx='14' cy='23' rx='12' ry='4.5' fill='%232b170a' opacity='0.45'/%3E%3Ccircle cx='14' cy='15' r='11' fill='%23388e3c' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='14' cy='15' r='7.5' fill='%2366bb6a' stroke='%232e7d32' stroke-width='1.2'/%3E%3Ccircle cx='14' cy='15' r='4.2' fill='%23c8e6c9'/%3E%3C/g%3E%3Cg transform='translate(38,22)'%3E%3Cellipse cx='13' cy='21' rx='11' ry='4' fill='%232b170a' opacity='0.45'/%3E%3Ccircle cx='13' cy='14' r='10' fill='%2343a047' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='13' cy='14' r='6.5' fill='%2381c784' stroke='%232e7d32' stroke-width='1.2'/%3E%3Ccircle cx='13' cy='14' r='3.5' fill='%23e8f5e9'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 68px 54px;
+}
+
+/* 🥕 Морковь, свёкла, лук, чеснок: пучки сочной зелёной ботвы в рядках! */
+body.theme-cartoon .bed-item.is-planted-bed[data-crop-family="apiaceae"]::before,
+body.theme-cartoon .bed-item.is-planted-bed[data-crop-family="amaryllidaceae"]::before,
+body.theme-cartoon .bed-item.is-planted-bed[data-crop-family="chenopodiaceae"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='46' viewBox='0 0 56 46'%3E%3Cg stroke='%23164d1a' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M14 26 Q11 16 7 12 Q13 15 14 26 Z' fill='%2343a047'/%3E%3Cpath d='M14 26 Q15 14 16 9 Q18 15 14 26 Z' fill='%2366bb6a'/%3E%3Cpath d='M14 26 Q19 16 23 13 Q18 19 14 26 Z' fill='%2381c784'/%3E%3Cpath d='M42 40 Q39 30 35 26 Q41 29 42 40 Z' fill='%2343a047'/%3E%3Cpath d='M42 40 Q43 28 44 23 Q46 29 42 40 Z' fill='%2366bb6a'/%3E%3Cpath d='M42 40 Q47 30 51 27 Q46 33 42 40 Z' fill='%2381c784'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 56px 46px;
+}
+
+/* Контент грядки всегда лежит ПОВЕРХ декоративных кустиков */
+body.theme-cartoon .bed-item > *:not(.bed-tab-handle):not(.greenhouse-roof-ridge),
+body.theme-cartoon .gh-internal-bed > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* ---------- 4. ОБЪЁМНАЯ 3D-ТЕПЛИЦА С ДУГАМИ, БЛИКАМИ И ФУНДАМЕНТОМ ---------- */
 body.theme-cartoon .bed-item.greenhouse-structure {
-  border: 5px solid #e0f2fe !important;
-  outline: 2.5px solid #0369a1;
-  border-radius: 22px !important;
+  border: 6px solid #f0f9ff !important;
+  outline: 3px solid #0369a1;
+  border-radius: 26px !important;
   background:
+    /* Поперечные металлические арочные дуги теплицы */
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 58px,
+      rgba(255, 255, 255, 0.72) 58px,
+      rgba(255, 255, 255, 0.72) 62px,
+      rgba(3, 105, 161, 0.28) 62px,
+      rgba(3, 105, 161, 0.28) 64px
+    ),
+    /* Стеклянный купольный блик солнца */
     linear-gradient(125deg,
-      rgba(255, 255, 255, 0.52) 0%,
-      rgba(224, 242, 254, 0.25) 28%,
-      rgba(255, 255, 255, 0.6) 44%,
-      rgba(186, 230, 253, 0.35) 62%,
-      rgba(255, 255, 255, 0.48) 100%) !important;
-  background-color: #d8f3fc !important;
+      rgba(255, 255, 255, 0.62) 0%,
+      rgba(224, 242, 254, 0.22) 24%,
+      rgba(255, 255, 255, 0.7) 40%,
+      rgba(186, 230, 253, 0.28) 58%,
+      rgba(255, 255, 255, 0.52) 100%) !important;
+  background-color: #d6f2fc !important;
   box-shadow:
-    inset 0 0 0 2px rgba(255, 255, 255, 0.85),
-    inset 0 8px 18px rgba(14, 165, 233, 0.16),
-    0 8px 0 #0284c7,
-    0 10px 0 #0c4a6e,
-    0 18px 28px rgba(20, 58, 30, 0.36) !important;
+    inset 0 0 0 2.5px rgba(255, 255, 255, 0.9),
+    inset 0 12px 24px rgba(255, 255, 255, 0.55),
+    inset 0 -10px 22px rgba(2, 132, 199, 0.2) !important;
+}
+
+/* Объёмный 3D-цоколь/фундамент снизу теплицы + глубокая солнечная тень на газон */
+body.theme-cartoon .bed-item.greenhouse-structure::after {
+  content: '';
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  bottom: -20px;
+  height: 18px;
+  border-radius: 0 0 24px 24px;
+  border: 2.5px solid #0c4a6e;
+  border-top: 2px solid #0284c7;
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 62%, #0369a1 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.45),
+    14px 18px 28px rgba(16, 48, 22, 0.45);
+  pointer-events: none;
+  z-index: -1;
 }
 
 body.theme-cartoon .bed-item.greenhouse-structure.selected {
-  outline: 3.5px solid #facc15 !important;
-  box-shadow:
-    0 0 0 6px rgba(250, 204, 21, 0.48),
-    0 8px 0 #0284c7,
-    0 18px 32px rgba(20, 58, 30, 0.44) !important;
+  outline: 4px solid #fde047 !important;
+  filter: drop-shadow(0 0 14px rgba(250, 204, 21, 0.7));
 }
 
-/* Конёк крыши теплицы */
 body.theme-cartoon .greenhouse-roof-ridge {
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(125, 211, 252, 0.85), rgba(255, 255, 255, 0.9)) !important;
-  box-shadow: 0 0 6px rgba(3, 105, 161, 0.35);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(125, 211, 252, 0.9), rgba(255, 255, 255, 0.95)) !important;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.9), 0 2px 5px rgba(3, 105, 161, 0.35);
 }
 
-/* Каменная/гравийная дорожка между рядами теплицы */
+/* Гравийно-каменная садовая дорожка между рядами теплицы */
 body.theme-cartoon .gh-pathway-h,
 body.theme-cartoon .gh-pathway-v {
-  background-color: #e7e0d3 !important;
-  background-image: radial-gradient(#c7bba7 1.3px, transparent 1.3px), radial-gradient(#d6cbb8 1.2px, transparent 1.2px) !important;
-  background-size: 10px 10px !important;
+  background-color: #e6dfd0 !important;
+  background-image:
+    radial-gradient(#bfb39c 1.6px, transparent 1.6px),
+    radial-gradient(#d4c9b4 1.4px, transparent 1.4px) !important;
+  background-size: 11px 11px !important;
   background-position: 0 0, 5px 5px !important;
-  border-radius: 6px;
-  border: 1px dashed rgba(120, 96, 72, 0.35);
+  border-radius: 8px;
+  border: 1.5px solid rgba(130, 106, 78, 0.35);
+  box-shadow: inset 0 2px 4px rgba(80, 60, 35, 0.16);
 }
 
-/* Внутренние грядки в теплице — аккуратные деревянные короба с рыхлой землёй */
+/* Внутренние грядки в теплице — 3D деревянные короба с рыхлой землёй */
 body.theme-cartoon .gh-internal-bed {
-  background-color: #6b4528 !important;
+  position: relative;
+  overflow: hidden;
+  background-color: #694326 !important;
   background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='28' viewBox='0 0 64 28'%3E%3Cpath d='M0 8 Q16 5 32 8 T64 8' stroke='%234a2d18' stroke-width='1.8' fill='none' opacity='0.48'/%3E%3Cpath d='M0 21 Q16 18 32 21 T64 21' stroke='%234a2d18' stroke-width='1.8' fill='none' opacity='0.48'/%3E%3C/svg%3E") !important;
-  border: 3px solid #b97034 !important;
-  border-radius: 11px !important;
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='28' viewBox='0 0 64 28'%3E%3Cpath d='M0 8 Q16 5 32 8 T64 8' stroke='%23472a15' stroke-width='2' fill='none' opacity='0.52'/%3E%3Cpath d='M0 21 Q16 18 32 21 T64 21' stroke='%23472a15' stroke-width='2' fill='none' opacity='0.52'/%3E%3C/svg%3E") !important;
+  border: 3.5px solid #c27838 !important;
+  border-radius: 12px !important;
   box-shadow:
-    inset 0 3px 8px rgba(30, 14, 4, 0.35),
-    0 2px 0 #5c3518 !important;
+    inset 0 4px 10px rgba(30, 14, 4, 0.42),
+    0 4px 0 #78421b,
+    0 6px 0 #4a260d !important;
 }
 
 body.theme-cartoon .gh-internal-bed:hover {
-  border-color: #e09f5a !important;
+  border-color: #eab366 !important;
   box-shadow:
-    inset 0 3px 8px rgba(30, 14, 4, 0.3),
-    0 0 0 2px rgba(250, 204, 21, 0.65) !important;
+    inset 0 4px 10px rgba(30, 14, 4, 0.35),
+    0 4px 0 #78421b,
+    0 0 0 2.5px rgba(250, 204, 21, 0.7) !important;
 }
 
 body.theme-cartoon .gh-internal-bed.gh-sec-selected {
-  border-color: #facc15 !important;
+  border-color: #fde047 !important;
   box-shadow:
-    0 0 0 3px rgba(250, 204, 21, 0.55),
-    inset 0 3px 8px rgba(30, 14, 4, 0.3) !important;
+    0 0 0 3px rgba(250, 204, 21, 0.65),
+    0 4px 0 #78421b,
+    inset 0 4px 10px rgba(30, 14, 4, 0.35) !important;
 }
 
-/* ---------- 4. Деревянная табличка-закладка сверху грядки ---------- */
+/* ---------- 5. Резная 3D деревянная табличка-закладка сверху ---------- */
 body.theme-cartoon .bed-tab-handle {
-  background: linear-gradient(180deg, #e5a45c 0%, #c47a35 100%) !important;
-  border: 2.5px solid #4e2a10 !important;
+  background: linear-gradient(180deg, #ebb067 0%, #c87d38 55%, #b36a27 100%) !important;
+  border: 2.5px solid #4a260d !important;
   border-bottom: none !important;
-  border-radius: 12px 12px 0 0 !important;
+  border-radius: 13px 13px 0 0 !important;
   color: #ffffff !important;
-  text-shadow: 0 1.5px 0 rgba(78, 42, 16, 0.85);
-  box-shadow: inset 0 2px 0 rgba(255, 240, 205, 0.5), 0 -2px 8px rgba(0, 0, 0, 0.12) !important;
-  padding: 4px 12px !important;
+  text-shadow: 0 1.8px 0 rgba(74, 38, 13, 0.9);
+  box-shadow:
+    inset 0 2.5px 0 rgba(255, 244, 214, 0.6),
+    0 -3px 10px rgba(0, 0, 0, 0.14) !important;
+  padding: 5px 13px !important;
 }
 
 body.theme-cartoon .greenhouse-structure .bed-tab-handle {
-  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%) !important;
+  background: linear-gradient(180deg, #52ccff 0%, #0ea5e9 55%, #0284c7 100%) !important;
   border-color: #0c4a6e !important;
-  text-shadow: 0 1.5px 0 rgba(12, 74, 110, 0.85);
+  text-shadow: 0 1.8px 0 rgba(12, 74, 110, 0.9);
 }
 
 body.theme-cartoon .bed-tab-title {
@@ -206,23 +394,16 @@ body.theme-cartoon .bed-tab-title {
 }
 
 body.theme-cartoon .bed-tab-grip {
-  color: rgba(255, 255, 255, 0.8) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 
-/* ---------- 5. Читаемые кремовые плашки и яркие иконки культур поверх земли ---------- */
-body.theme-cartoon .bed-crop-lead,
-body.theme-cartoon .gh-h-top-left .gh-crop-name,
-body.theme-cartoon .gh-v-crop-title {
-  color: #2c1810 !important;
-}
-
-/* Для обычной грядки: аккуратная кремовая карточка-этикетка для названия культуры */
+/* ---------- 6. Глянцевые кремовые плашки и живые 3D-аватары овощей ---------- */
 body.theme-cartoon .bed-crop-lead {
-  background: rgba(255, 253, 245, 0.94);
-  border: 2px solid #4e2a10;
+  background: linear-gradient(180deg, #ffffff 0%, #fef9e7 100%);
+  border: 2px solid #4a260d;
   border-radius: 999px;
-  padding: 2px 10px 2px 4px;
-  box-shadow: 0 2px 0 rgba(78, 42, 16, 0.45);
+  padding: 2px 11px 2px 4px;
+  box-shadow: 0 3px 0 rgba(74, 38, 13, 0.55), 0 5px 10px rgba(0, 0, 0, 0.22);
 }
 
 body.theme-cartoon .bed-crop-lead .crop-name {
@@ -230,126 +411,132 @@ body.theme-cartoon .bed-crop-lead .crop-name {
   font-weight: 800 !important;
 }
 
-/* Для внутренней секции теплицы (горизонтальной) */
 body.theme-cartoon .gh-h-top-left .gh-crop-name {
-  background: rgba(255, 253, 245, 0.94);
-  border: 1.5px solid #4e2a10;
+  background: linear-gradient(180deg, #ffffff 0%, #fef9e7 100%);
+  border: 1.8px solid #4a260d;
   border-radius: 999px;
-  padding: 1px 9px;
+  padding: 2px 10px;
+  color: #2c1810 !important;
   font-weight: 800 !important;
-  box-shadow: 0 2px 0 rgba(78, 42, 16, 0.4);
+  box-shadow: 0 2.5px 0 rgba(74, 38, 13, 0.5);
 }
 
 body.theme-cartoon .gh-crop-icon,
 body.theme-cartoon .crop-svg-avatar,
 body.theme-cartoon .gh-v-crop-avatar {
-  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #fef9e7 100%);
-  border: 2px solid #4e2a10;
+  background: radial-gradient(circle at 32% 28%, #ffffff 0%, #fef3c7 100%);
+  border: 2.2px solid #4a260d;
   border-radius: 50%;
   padding: 2px;
-  box-shadow: 0 2.5px 0 rgba(78, 42, 16, 0.45);
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 3px 0 rgba(74, 38, 13, 0.55), 0 4px 8px rgba(0, 0, 0, 0.22);
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 body.theme-cartoon .bed-item:hover .crop-svg-avatar,
 body.theme-cartoon .gh-internal-bed:hover .gh-crop-icon,
 body.theme-cartoon .gh-internal-bed:hover .gh-v-crop-avatar {
-  transform: scale(1.12) rotate(-5deg);
+  transform: scale(1.16) rotate(-6deg);
 }
 
-/* Вертикальная карточка культуры в теплице */
 body.theme-cartoon .gh-v-crop-title {
-  background: rgba(255, 253, 245, 0.94);
-  border: 1.5px solid #4e2a10;
-  border-radius: 8px;
-  padding: 1px 6px;
+  background: linear-gradient(180deg, #ffffff 0%, #fef9e7 100%);
+  border: 1.8px solid #4a260d;
+  border-radius: 9px;
+  padding: 2px 7px;
+  color: #2c1810 !important;
   font-weight: 800 !important;
+  box-shadow: 0 2px 0 rgba(74, 38, 13, 0.45);
 }
 
 body.theme-cartoon .gh-v-variety-label,
 body.theme-cartoon .crop-variety,
 body.theme-cartoon .gh-crop-var {
-  background: rgba(255, 251, 235, 0.92);
+  background: rgba(255, 251, 235, 0.95);
   color: #5c3518 !important;
   border: 1.5px solid #d4a373;
   border-radius: 8px;
   padding: 1px 7px;
   font-weight: 700;
+  box-shadow: 0 2px 0 rgba(74, 38, 13, 0.25);
 }
 
-/* Кнопка «+ Посадить» поверх земли */
+/* Объёмная солнечная кнопка «+ Посадить» */
 body.theme-cartoon .bed-empty-state,
 body.theme-cartoon .gh-h-cta-btn,
 body.theme-cartoon .gh-v-cta-btn {
-  background: linear-gradient(180deg, #fefce8 0%, #fef08a 100%) !important;
-  border: 2px dashed #b45309 !important;
-  color: #78350f !important;
+  background: linear-gradient(180deg, #fefce8 0%, #fde047 100%) !important;
+  border: 2px solid #92400e !important;
+  color: #5c2808 !important;
   border-radius: 12px !important;
   font-weight: 800 !important;
-  box-shadow: 0 3px 0 rgba(120, 53, 15, 0.35);
+  box-shadow: 0 3.5px 0 #92400e, 0 6px 10px rgba(0, 0, 0, 0.24);
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
 }
 
 body.theme-cartoon .bed-empty-state:hover,
 body.theme-cartoon .gh-h-cta-btn:hover,
 body.theme-cartoon .gh-v-cta-btn:hover {
-  background: linear-gradient(180deg, #dcfce7 0%, #86efac 100%) !important;
-  border-color: #15803d !important;
+  background: linear-gradient(180deg, #dcfce7 0%, #4ade80 100%) !important;
+  border-color: #14532d !important;
   color: #14532d !important;
+  box-shadow: 0 3.5px 0 #14532d, 0 6px 12px rgba(0, 0, 0, 0.26);
+  transform: translateY(-1px);
 }
 
 /* Пилюли номеров и названий рядков */
 body.theme-cartoon .gh-bed-num-badge {
-  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%) !important;
-  border: 2px solid #4e2a10 !important;
+  background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%) !important;
+  border: 2px solid #4a260d !important;
   color: #ffffff !important;
-  box-shadow: 0 2px 0 rgba(78, 42, 16, 0.5);
+  text-shadow: 0 1px 0 rgba(74, 38, 13, 0.8);
+  box-shadow: 0 2.5px 0 rgba(74, 38, 13, 0.55);
 }
 
 body.theme-cartoon .gh-bed-pill,
 body.theme-cartoon .gh-v-name-pill {
-  background: #fffdf5 !important;
+  background: linear-gradient(180deg, #ffffff 0%, #fef9e7 100%) !important;
   border: 1.8px solid #8c5e3a !important;
-  color: #4e2a10 !important;
+  color: #4a260d !important;
   font-weight: 800 !important;
-  box-shadow: 0 2px 0 rgba(78, 42, 16, 0.35);
+  box-shadow: 0 2.5px 0 rgba(74, 38, 13, 0.4);
 }
 
-/* Кнопки управления на самой грядке */
 body.theme-cartoon .gh-tool-btn {
-  background: linear-gradient(180deg, #ffffff 0%, #f5ebd6 100%) !important;
-  border: 1.8px solid #8c5e3a !important;
-  border-radius: 8px !important;
-  box-shadow: 0 2px 0 rgba(78, 42, 16, 0.4) !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f5e6c8 100%) !important;
+  border: 1.8px solid #78421b !important;
+  border-radius: 9px !important;
+  box-shadow: 0 2.5px 0 rgba(74, 38, 13, 0.45) !important;
 }
 
 body.theme-cartoon .gh-tool-btn:hover {
   transform: translateY(-1px);
-  background: #fef9c3 !important;
+  background: #fef08a !important;
 }
 
 body.theme-cartoon .bed-sec-indicator {
-  background: rgba(255, 253, 245, 0.92) !important;
-  border: 1.5px solid #0284c7 !important;
+  background: linear-gradient(180deg, #ffffff 0%, #e0f2fe 100%) !important;
+  border: 1.8px solid #0284c7 !important;
   color: #0369a1 !important;
   font-weight: 800 !important;
+  box-shadow: 0 2px 0 rgba(3, 105, 161, 0.35);
 }
 
-/* Прошлогодние теги и счётчики лунок */
 body.theme-cartoon .bed-prev-year-pill,
 body.theme-cartoon .gh-prev-year-tag,
 body.theme-cartoon .gh-v-bottom {
-  background: rgba(255, 253, 245, 0.9) !important;
+  background: rgba(255, 253, 245, 0.94) !important;
   border: 1.5px solid #c4a484 !important;
   color: #5c3518 !important;
   border-radius: 999px;
+  box-shadow: 0 2px 0 rgba(74, 38, 13, 0.28);
 }
 
 body.theme-cartoon .gh-varieties-dropdown-btn {
-  background: linear-gradient(180deg, #ffffff 0%, #fef3c7 100%) !important;
+  background: linear-gradient(180deg, #ffffff 0%, #fde68a 100%) !important;
   border: 1.8px solid #92400e !important;
   color: #451a03 !important;
   font-weight: 800 !important;
-  box-shadow: 0 2px 0 rgba(120, 53, 15, 0.35);
+  box-shadow: 0 2.5px 0 rgba(120, 53, 15, 0.45);
 }
 
 body.theme-cartoon .gh-holes-chip-count,
@@ -358,118 +545,122 @@ body.theme-cartoon .gh-v-summary-pill {
   border: 1.8px solid #15803d !important;
   color: #14532d !important;
   font-weight: 800 !important;
-  box-shadow: 0 2px 0 rgba(21, 128, 61, 0.35);
+  box-shadow: 0 2.5px 0 rgba(21, 128, 61, 0.45);
 }
 
-/* ---------- 6. Мультяшные лунки-кустики ---------- */
+/* ---------- 7. Объёмные лунки-бусинки на тёмной земле ---------- */
 body.theme-cartoon .gh-holes-micro-strip {
-  background: rgba(46, 26, 12, 0.55) !important;
-  border: 1.5px solid rgba(255, 228, 181, 0.35) !important;
+  background: rgba(42, 22, 10, 0.72) !important;
+  border: 1.5px solid rgba(255, 228, 181, 0.45) !important;
   border-radius: 10px !important;
   padding: 4px 6px !important;
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.48), 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 body.theme-cartoon .gh-micro-hole {
   border-radius: 50% !important;
-  transition: transform 0.15s ease;
+  transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 body.theme-cartoon .gh-micro-hole.is-empty {
-  background: #422714 !important;
-  border: 1.5px solid rgba(224, 159, 90, 0.45) !important;
-  box-shadow: inset 0 1.5px 3px rgba(0, 0, 0, 0.55);
+  background: #3b2110 !important;
+  border: 1.5px solid rgba(224, 159, 90, 0.5) !important;
+  box-shadow: inset 0 1.5px 3px rgba(0, 0, 0, 0.65);
 }
 
 body.theme-cartoon .gh-micro-hole.is-planted {
   border: 1.5px solid #ffffff !important;
   box-shadow:
-    inset -1px -1.5px 0 rgba(0, 0, 0, 0.22),
-    inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.55),
-    0 2px 3px rgba(0, 0, 0, 0.35) !important;
+    inset -1.5px -2px 0 rgba(0, 0, 0, 0.25),
+    inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.65),
+    0 2.5px 3px rgba(0, 0, 0, 0.4) !important;
 }
 
 body.theme-cartoon .gh-micro-hole.is-planted:hover {
-  transform: scale(1.35);
+  transform: scale(1.4);
 }
 
-/* ---------- 7. Уютный интерфейс шапки, пульта карты и боковой панели ---------- */
+/* ---------- 8. Уютная 3D-шапка, пульт карты и боковая панель ---------- */
 body.theme-cartoon .app-header {
-  background: linear-gradient(180deg, #fffdf5 0%, #fef5e0 100%) !important;
-  border-bottom: 3px solid #d4a373 !important;
-  box-shadow: 0 4px 14px rgba(78, 42, 16, 0.14) !important;
+  background: linear-gradient(180deg, #fffdf5 0%, #fef3d6 100%) !important;
+  border-bottom: 3.5px solid #c68642 !important;
+  box-shadow: 0 5px 16px rgba(74, 38, 13, 0.16) !important;
 }
 
 body.theme-cartoon .logo-icon-badge {
   background: linear-gradient(180deg, #4ade80 0%, #16a34a 100%) !important;
   border: 2.5px solid #14532d !important;
-  box-shadow: 0 3px 0 #14532d !important;
+  box-shadow: 0 3.5px 0 #14532d !important;
 }
 
 body.theme-cartoon .btn-primary {
   background: linear-gradient(180deg, #4ade80 0%, #16a34a 100%) !important;
   border: 2px solid #14532d !important;
-  box-shadow: 0 3.5px 0 #14532d, 0 6px 12px rgba(21, 128, 61, 0.25) !important;
+  box-shadow: 0 4px 0 #14532d, 0 6px 14px rgba(21, 128, 61, 0.28) !important;
   font-weight: 800 !important;
   transition: transform 0.1s ease, box-shadow 0.1s ease !important;
 }
 
 body.theme-cartoon .btn-primary:hover {
-  filter: brightness(1.04);
+  filter: brightness(1.05);
   transform: translateY(-1px);
 }
 
 body.theme-cartoon .btn-primary:active {
-  transform: translateY(2px);
+  transform: translateY(2.5px);
   box-shadow: 0 1px 0 #14532d !important;
 }
 
-/* Плавающий пульт масштабирования на карте */
 body.theme-cartoon .map-controls-floating {
-  background: linear-gradient(180deg, #fffdf5 0%, #f8edd6 100%) !important;
-  border: 2.5px solid #8c5e3a !important;
-  border-radius: 16px !important;
-  box-shadow: 0 5px 0 #6d4423, 0 10px 22px rgba(28, 54, 12, 0.3) !important;
+  background: linear-gradient(180deg, #fffdf5 0%, #f6e7c8 100%) !important;
+  border: 2.5px solid #78421b !important;
+  border-radius: 18px !important;
+  box-shadow: 0 6px 0 #5c3213, 0 12px 26px rgba(20, 48, 8, 0.36) !important;
 }
 
 body.theme-cartoon .nav-control-btn {
-  color: #4e2a10 !important;
-  font-weight: 700 !important;
-  border-radius: 10px !important;
+  color: #4a260d !important;
+  font-weight: 800 !important;
+  border-radius: 11px !important;
 }
 
 body.theme-cartoon .nav-control-btn:hover {
   background: #fef08a !important;
 }
 
-/* Активная кнопка переключателя стиля «🎨 Живой сад» */
 .nav-control-btn.style-toggle-active {
   background: linear-gradient(180deg, #fde047 0%, #f59e0b 100%) !important;
   color: #451a03 !important;
-  border: 1.5px solid #92400e !important;
-  box-shadow: 0 2px 0 #92400e !important;
+  border: 1.8px solid #92400e !important;
+  box-shadow: 0 2.5px 0 #92400e !important;
   font-weight: 800 !important;
 }
 
-/* Боковой инспектор в тёплом садовом стиле */
 body.theme-cartoon .inspector-panel {
   background: #fffdf7 !important;
-  border-left: 3px solid #d4a373 !important;
+  border-left: 3.5px solid #c68642 !important;
 }
 
 body.theme-cartoon .inspector-header {
-  background: linear-gradient(180deg, #fef9e7 0%, #faecc8 100%) !important;
-  border-bottom: 2px solid #e2c799 !important;
+  background: linear-gradient(180deg, #fef9e7 0%, #f8e5ba 100%) !important;
+  border-bottom: 2px solid #dfbe87 !important;
 }
 
 body.theme-cartoon .inspector-section {
   background: #ffffff !important;
-  border: 1.5px solid #ecdcc0 !important;
+  border: 1.5px solid #ebd8b7 !important;
   border-radius: 14px !important;
+  box-shadow: 0 2px 6px rgba(120, 66, 27, 0.06);
 }
 
-/* При печати на А4 возвращаем строгий экономный вид для принтера */
+/* При печати на А4 возвращаем чистый белый фон без бабочек и 3D-стен */
 @media print {
+  body.theme-cartoon .cartoon-atmosphere-layer,
+  body.theme-cartoon .bed-item::after,
+  body.theme-cartoon .bed-item::before,
+  body.theme-cartoon .gh-internal-bed::before {
+    display: none !important;
+  }
   body.theme-cartoon,
   body.theme-cartoon .garden-pan-viewport,
   body.theme-cartoon .infinite-grid-layer {
