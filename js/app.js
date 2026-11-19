@@ -24,6 +24,7 @@ class GardenApp {
     this.setupPwa();
     this.setupBackupReminder();
     this.renderActiveTab();
+    this.initVisitCounter();
 
     // Слушаем изменение данных
     window.addEventListener('garden-data-changed', () => {
@@ -47,6 +48,42 @@ class GardenApp {
         this.openBedInspector(this.activeInspectorBedId, this.activeInspectorSectionId);
       }
     });
+  }
+
+  /**
+   * Надёжный счётчик визитов через ваш сервер Google Apps Script
+   * (не блокируется Firefox/AdBlock и работает во всех странах)
+   */
+  async initVisitCounter() {
+    const scriptUrl = window.SMART_GARDEN_FEEDBACK_URL || 'https://script.google.com/macros/s/AKfycbyeV4HD7wz_hotJdi_p112JEuDrgBChYKOp7auXC25M5FP6hDazzlN0NUTG_ztsVpRP/exec';
+    if (!scriptUrl || !navigator.onLine) return;
+
+    try {
+      const sessionKey = 'smart_garden_visit_counted';
+      const alreadyCounted = sessionStorage.getItem(sessionKey) === '1';
+      const action = alreadyCounted ? 'stats' : 'hit';
+      const resp = await fetch(`${scriptUrl}?action=${action}`, { method: 'GET' });
+      if (!resp.ok) return;
+      const data = await resp.json();
+      if (data && data.ok && typeof data.total === 'number') {
+        if (!alreadyCounted) sessionStorage.setItem(sessionKey, '1');
+        const label = (typeof data.today === 'number') ? `${data.total} (сегодня: ${data.today})` : String(data.total);
+        const pill = document.getElementById('garden-visits-pill');
+        const countEl = document.getElementById('garden-visits-count');
+        if (pill && countEl) {
+          countEl.textContent = label;
+          pill.style.display = 'inline-flex';
+        }
+        const mStat = document.getElementById('mobile-visits-stat');
+        const mCount = document.getElementById('mobile-visits-count');
+        if (mStat && mCount) {
+          mCount.textContent = label;
+          mStat.style.display = 'flex';
+        }
+      }
+    } catch (e) {
+      // Тихо игнорируем при отсутствии сети или если doGet ещё не добавлен в скрипт
+    }
   }
 
   setupTheme() {
