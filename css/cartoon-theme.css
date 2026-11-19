@@ -752,6 +752,22 @@ body:not(.inspector-advanced-mode) .inspector-advanced-only {
   display: none !important;
 }
 
+/* На классической схеме скрываем кнопку сезонов (Весна / Лето / Осень) */
+body:not(.theme-cartoon) #map-season-btn {
+  display: none !important;
+}
+
+/* Когда отключён контроль севооборота — убираем все бейджи нарушений/внимания с грядок и легенду */
+body.rotation-check-off .bed-tab-rot-wrap,
+body.rotation-check-off .bed-badge-wrap,
+body.rotation-check-off .gh-pill-rot,
+body.rotation-check-off .gh-v-rot-badge,
+body.rotation-check-off .toolbar-legend,
+body.rotation-check-off #rotation-status-box,
+body.rotation-check-off .inspector-planting-section .status-pill {
+  display: none !important;
+}
+
 #btn-toggle-advanced-mode.is-active {
   background: #16a34a !important;
   color: #ffffff !important;

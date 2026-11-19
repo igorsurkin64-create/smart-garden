@@ -501,6 +501,37 @@ class GardenApp {
       });
     }
 
+    // Кнопка включения/выключения контроля севооборота (следить или нет)
+    const toggleRotBtn = document.getElementById('toggle-rotation-btn');
+    const applyRotationCheckState = (enabled, notify = false) => {
+      document.body.classList.toggle('rotation-check-off', !enabled);
+      try {
+        localStorage.setItem('smart_garden_rotation_enabled', enabled ? '1' : '0');
+      } catch (e) {}
+      if (toggleRotBtn) {
+        toggleRotBtn.classList.toggle('active', enabled);
+        const lang = window.i18n ? window.i18n.getLanguage() : 'ru';
+        const lblOn = lang === 'et' ? '🔄 Külvikord: Sees' : lang === 'lv' ? '🔄 Augseka: Iesl.' : lang === 'lt' ? '🔄 Sėjomaina: Įj.' : '🔄 Севооборот: Вкл';
+        const lblOff = lang === 'et' ? '🔄 Külvikord: Väljas' : lang === 'lv' ? '🔄 Augseka: Izsl.' : lang === 'lt' ? '🔄 Sėjomaina: Išj.' : '🔄 Севооборот: Выкл';
+        toggleRotBtn.textContent = enabled ? lblOn : lblOff;
+      }
+      if (notify) {
+        this.showToast(enabled
+          ? '🔄 Контроль севооборота включён — показаны подсказки совместимости'
+          : '✨ Контроль севооборота отключён — вы сами решаете, что и куда сажать!');
+      }
+    };
+
+    const savedRotEnabled = localStorage.getItem('smart_garden_rotation_enabled') !== '0';
+    applyRotationCheckState(savedRotEnabled, false);
+
+    if (toggleRotBtn) {
+      toggleRotBtn.addEventListener('click', () => {
+        const currentlyOn = !document.body.classList.contains('rotation-check-off');
+        applyRotationCheckState(!currentlyOn, true);
+      });
+    }
+
     // Фильтр по грядкам на карте
     const filterSelect = document.getElementById('map-filter-select');
     if (filterSelect) {
