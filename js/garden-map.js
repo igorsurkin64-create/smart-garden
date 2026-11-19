@@ -242,8 +242,8 @@ class GardenMap {
 
   openDecorPickerModal() {
     if (typeof GARDEN_DECOR_CATALOG === 'undefined') return;
-    const modal = document.getElementById('generic-modal-overlay');
-    const modalContent = document.getElementById('generic-modal-content');
+    const modal = document.getElementById('general-modal');
+    const modalContent = document.getElementById('modal-dynamic-content');
     if (!modal || !modalContent) return;
 
     const lang = (typeof window !== 'undefined' && window.i18n) ? window.i18n.getLanguage() : 'ru';
