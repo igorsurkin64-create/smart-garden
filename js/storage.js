@@ -1179,6 +1179,71 @@ class GardenStorage {
     this.saveData();
     return true;
   }
+
+  // ==================== Декор участка (домик, деревья, бочка, дорожки, забор) ====================
+  getDecorItems() {
+    if (!Array.isArray(this.data.decorItems)) {
+      this.data.decorItems = [];
+    }
+    return this.data.decorItems;
+  }
+
+  addDecorItem(type, x = 2, y = 2) {
+    const items = this.getDecorItems();
+    const tpl = (typeof getDecorTemplate === 'function') ? getDecorTemplate(type) : { type, width: 2, height: 2, nameRu: 'Декор' };
+    const newItem = {
+      id: 'decor-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+      type: tpl.type,
+      x: Math.round(x * 4) / 4,
+      y: Math.round(y * 4) / 4,
+      width: tpl.width || 2.0,
+      height: tpl.height || 2.0,
+      rotation: 0
+    };
+    items.push(newItem);
+    this.saveData();
+    return newItem;
+  }
+
+  updateDecorItemPosition(id, x, y) {
+    const item = this.getDecorItems().find(d => d.id === id);
+    if (!item) return null;
+    item.x = Math.max(0, Math.round(x * 4) / 4);
+    item.y = Math.max(0, Math.round(y * 4) / 4);
+    this.saveData();
+    return item;
+  }
+
+  rotateDecorItem(id) {
+    const item = this.getDecorItems().find(d => d.id === id);
+    if (!item) return null;
+    item.rotation = ((item.rotation || 0) + 90) % 360;
+    this.saveData();
+    return item;
+  }
+
+  cloneDecorItem(id) {
+    const item = this.getDecorItems().find(d => d.id === id);
+    if (!item) return null;
+    const clone = {
+      ...item,
+      id: 'decor-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+      x: item.x + 0.75,
+      y: item.y + 0.75
+    };
+    this.getDecorItems().push(clone);
+    this.saveData();
+    return clone;
+  }
+
+  deleteDecorItem(id) {
+    const items = this.getDecorItems();
+    const next = items.filter(d => d.id !== id);
+    if (next.length === items.length) return false;
+    this.data.decorItems = next;
+    this.saveData();
+    return true;
+  }
 }
 
 /**

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smart-garden-v5.9';
+const CACHE_NAME = 'smart-garden-v6.0';
 
 const STATIC_ASSETS = [
   './',
@@ -8,6 +8,7 @@ const STATIC_ASSETS = [
   './css/cartoon-theme.css',
   './js/i18n.js',
   './js/crops-data.js',
+  './js/decor-art.js',
   './js/storage.js',
   './js/garden-map.js',
   './js/rotation-advisor.js',

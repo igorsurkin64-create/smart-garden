@@ -75,6 +75,8 @@ class GardenMap {
         <div class="nav-divider"></div>
         <button class="nav-control-btn" id="map-arrange-btn" data-i18n-title="btn_arrange_title" title="${tr('btn_arrange_title') || 'Разровнять грядки и выстроить ровные проходы без наложений'}"><span class="nav-control-icon">📏</span><span class="nav-control-label" data-i18n="btn_arrange_label"> ${tr('btn_arrange_label') || 'Расставить дорожки'}</span></button>
         <div class="nav-divider"></div>
+        <button class="nav-control-btn" id="map-decor-btn" title="Добавить декор участка: домик, яблоня, бочка, дорожка, забор"><span class="nav-control-icon">🌳</span><span class="nav-control-label"> Декор</span></button>
+        <button class="nav-control-btn" id="map-season-btn" title="Переключить сезон: Весна / Лето / Осень"><span class="nav-control-icon" id="map-season-icon">☀️</span><span class="nav-control-label" id="map-season-label"> Лето</span></button>
         <button class="nav-control-btn" id="map-style-toggle-btn" title="Переключить оформление: «Живой сад» или «Схема»"><span class="nav-control-icon" id="map-style-icon">🎨</span><span class="nav-control-label" id="map-style-label"> Живой сад</span></button>
       </div>
 
@@ -84,13 +86,17 @@ class GardenMap {
           <!-- Слой координатной сетки -->
           <div class="infinite-grid-layer" id="infinite-grid-layer"></div>
 
+          <!-- Слой декора участка (домик, деревья, дорожки, забор, бочка) -->
+          <div class="decor-layer" id="decor-layer"></div>
+
           <!-- Слой всех грядок и теплиц -->
           <div class="beds-layer" id="beds-layer"></div>
         </div>
 
-        <!-- Атмосфера живого сада (солнечные лучи и бабочки — только в теме «Живой сад») -->
+        <!-- Атмосфера живого сада (солнечные лучи, бабочки, лепестки весны и осенние листья) -->
         <div class="cartoon-atmosphere-layer" aria-hidden="true">
           <div class="cartoon-sunbeams"></div>
+          <!-- Летние бабочки -->
           <div class="cartoon-butterfly bf-1">
             <svg viewBox="0 0 32 32" width="24" height="24">
               <ellipse cx="11" cy="13" rx="7" ry="5.5" transform="rotate(-22 11 13)" fill="#fde047" stroke="#78350f" stroke-width="1.4"/>
@@ -109,6 +115,18 @@ class GardenMap {
               <ellipse cx="16" cy="16.5" rx="1.8" ry="6.5" fill="#0f172a"/>
             </svg>
           </div>
+          <!-- Весенние лепестки цветения -->
+          <div class="season-particle spring-petal sp-1"></div>
+          <div class="season-particle spring-petal sp-2"></div>
+          <div class="season-particle spring-petal sp-3"></div>
+          <div class="season-particle spring-petal sp-4"></div>
+          <div class="season-particle spring-petal sp-5"></div>
+          <!-- Осенние золотые листья -->
+          <div class="season-particle autumn-leaf al-1"></div>
+          <div class="season-particle autumn-leaf al-2"></div>
+          <div class="season-particle autumn-leaf al-3"></div>
+          <div class="season-particle autumn-leaf al-4"></div>
+          <div class="season-particle autumn-leaf al-5"></div>
         </div>
 
         <!-- Оверлей чистого плана / Пустой огород (Onboarding Hero) -->
@@ -118,9 +136,11 @@ class GardenMap {
 
     this.viewportEl = document.getElementById('garden-pan-viewport');
     this.planeEl = document.getElementById('garden-transform-plane');
+    this.decorLayerEl = document.getElementById('decor-layer');
     this.bedsLayerEl = document.getElementById('beds-layer');
     this.emptyOverlayEl = document.getElementById('empty-garden-overlay');
     this.zoomIndicatorEl = document.getElementById('map-zoom-indicator');
+    this.dragDecorState = { isDragging: false, decorId: null, startX: 0, startY: 0, initialX: 0, initialY: 0 };
 
     document.getElementById('map-zoom-in-btn').addEventListener('click', () => this.zoomBy(1.2, null, null, true));
     document.getElementById('map-zoom-out-btn').addEventListener('click', () => this.zoomBy(0.83, null, null, true));
@@ -160,7 +180,201 @@ class GardenMap {
       this.applyVisualStyle(nextStyle, true);
     });
 
+    // Переключатель живых сезонов: Весна / Лето / Осень
+    const savedSeason = localStorage.getItem('smart_garden_season') || 'summer';
+    this.applySeason(savedSeason, false);
+
+    document.getElementById('map-season-btn')?.addEventListener('click', () => {
+      const order = ['spring', 'summer', 'autumn'];
+      const cur = localStorage.getItem('smart_garden_season') || 'summer';
+      const next = order[(order.indexOf(cur) + 1) % order.length];
+      this.applySeason(next, true);
+    });
+
+    // Кнопка «🌳 Декор участка» (домик, деревья, бочка, дорожки, забор)
+    document.getElementById('map-decor-btn')?.addEventListener('click', () => {
+      this.openDecorPickerModal();
+    });
+
     this.updateControlsLanguage();
+  }
+
+  applySeason(season, showNotification = false) {
+    const valid = ['spring', 'summer', 'autumn'].includes(season) ? season : 'summer';
+    document.body.classList.remove('season-spring', 'season-summer', 'season-autumn');
+    document.body.classList.add(`season-${valid}`);
+    try {
+      localStorage.setItem('smart_garden_season', valid);
+    } catch (e) {}
+
+    this.updateSeasonButton();
+
+    if (showNotification && window.app) {
+      const lang = (typeof window !== 'undefined' && window.i18n) ? window.i18n.getLanguage() : 'ru';
+      const msgs = {
+        spring: lang === 'et' ? '🌸 Kevad: aed õitseb ja rohi tärkab!' : lang === 'lv' ? '🌸 Pavasaris: dārzs zied!' : lang === 'lt' ? '🌸 Pavasaris: sodas žydi!' : '🌸 Сезон: Весна — сад цветёт, летят лепестки!',
+        summer: lang === 'et' ? '☀️ Suvi: soe päike ja liblikad!' : lang === 'lv' ? '☀️ Vasara: saule un tauriņi!' : lang === 'lt' ? '☀️ Vasara: saulė ir drugeliai!' : '☀️ Сезон: Лето — тёплое солнце и порхают бабочки!',
+        autumn: lang === 'et' ? '🍂 Sügis: kuldne saagikoristusaeg!' : lang === 'lv' ? '🍂 Rudens: zelta ražas laiks!' : lang === 'lt' ? '🍂 Ruduo: auksinis derliaus metas!' : '🍂 Сезон: Осень — золотой свет и опадают листья!'
+      };
+      window.app.showToast(msgs[valid]);
+    }
+  }
+
+  updateSeasonButton() {
+    const btn = document.getElementById('map-season-btn');
+    if (!btn) return;
+    const cur = localStorage.getItem('smart_garden_season') || 'summer';
+    const lang = (typeof window !== 'undefined' && window.i18n) ? window.i18n.getLanguage() : 'ru';
+    const labels = {
+      spring: { icon: '🌸', text: lang === 'et' ? 'Kevad' : lang === 'lv' ? 'Pavasaris' : lang === 'lt' ? 'Pavasaris' : 'Весна' },
+      summer: { icon: '☀️', text: lang === 'et' ? 'Suvi' : lang === 'lv' ? 'Vasara' : lang === 'lt' ? 'Vasara' : 'Лето' },
+      autumn: { icon: '🍂', text: lang === 'et' ? 'Sügis' : lang === 'lv' ? 'Rudens' : lang === 'lt' ? 'Ruduo' : 'Осень' }
+    };
+    const item = labels[cur] || labels.summer;
+    btn.innerHTML = `<span class="nav-control-icon">${item.icon}</span><span class="nav-control-label"> ${item.text}</span>`;
+
+    const decorBtn = document.getElementById('map-decor-btn');
+    if (decorBtn) {
+      const decorWord = lang === 'et' ? 'Dekoor' : lang === 'lv' ? 'Dekors' : lang === 'lt' ? 'Dekoras' : 'Декор';
+      decorBtn.innerHTML = `<span class="nav-control-icon">🌳</span><span class="nav-control-label"> ${decorWord}</span>`;
+    }
+  }
+
+  openDecorPickerModal() {
+    if (typeof GARDEN_DECOR_CATALOG === 'undefined') return;
+    const modal = document.getElementById('generic-modal-overlay');
+    const modalContent = document.getElementById('generic-modal-content');
+    if (!modal || !modalContent) return;
+
+    const lang = (typeof window !== 'undefined' && window.i18n) ? window.i18n.getLanguage() : 'ru';
+    const title = lang === 'et' ? '🌳 Aia dekoor ja ehitised' : lang === 'lv' ? '🌳 Dārza dekors un būves' : lang === 'lt' ? '🌳 Sodo dekoras ir statiniai' : '🌳 Декор участка — уютная дача';
+    const subtitle = lang === 'et' ? 'Klõpsake objektil, et lisada see plaanile. Seejärel saate seda lohistada ja pöörata!'
+      : lang === 'lv' ? 'Noklikšķiniet uz objekta, lai pievienotu to plānam. Pēc tam to var pārvietot un pagriezt!'
+      : lang === 'lt' ? 'Spustelėkite objektą, kad pridėtumėte jį prie plano. Vėliau galėsite jį perkelti ir pasukti!'
+      : 'Нажмите на любой объект — он появится в центре плана, и вы сможете перетащить его мышкой куда угодно!';
+
+    modalContent.innerHTML = `
+      <div class="modal-card modal-decor-picker" style="max-width: 680px; width: 95%;">
+        <div class="modal-header">
+          <div>
+            <h3 style="margin: 0;">${title}</h3>
+            <span class="text-xs text-muted">${subtitle}</span>
+          </div>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 1.1rem 1.25rem; max-height: 70vh; overflow-y: auto;">
+          <div class="decor-picker-grid">
+            ${GARDEN_DECOR_CATALOG.map(d => `
+              <button type="button" class="decor-picker-card" data-decor-type="${d.type}">
+                <div class="decor-picker-preview">${d.svg}</div>
+                <div class="decor-picker-name">${escapeHtml(getDecorName(d, lang))}</div>
+                <div class="decor-picker-size">${d.width}×${d.height} м</div>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+
+    modal.classList.add('active');
+    modalContent.querySelector('.modal-close-btn')?.addEventListener('click', () => modal.classList.remove('active'));
+
+    modalContent.querySelectorAll('.decor-picker-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const type = card.getAttribute('data-decor-type');
+        // Вычисляем центр видимой области карты в метрах
+        const rect = this.viewportEl ? this.viewportEl.getBoundingClientRect() : { width: 900, height: 600 };
+        const centerX = ((rect.width / 2 - this.panX) / this.zoom) / this.meterPixels;
+        const centerY = ((rect.height / 2 - this.panY) / this.zoom) / this.meterPixels;
+        const tpl = getDecorTemplate(type);
+        const x = Math.max(0.5, centerX - (tpl.width || 2) / 2);
+        const y = Math.max(0.5, centerY - (tpl.height || 2) / 2);
+
+        this.storage.addDecorItem(type, x, y);
+        this.renderDecorItems();
+        modal.classList.remove('active');
+        if (window.app) {
+          window.app.showToast(`${tpl.icon} «${getDecorName(tpl, lang)}» добавлен на участок! Перетащите его куда нужно.`);
+        }
+      });
+    });
+  }
+
+  renderDecorItems() {
+    if (!this.decorLayerEl || typeof getDecorTemplate !== 'function') return;
+    const items = this.storage.getDecorItems();
+    const lang = (typeof window !== 'undefined' && window.i18n) ? window.i18n.getLanguage() : 'ru';
+
+    this.decorLayerEl.innerHTML = items.map(item => {
+      const tpl = getDecorTemplate(item.type);
+      const leftPx = item.x * this.meterPixels;
+      const topPx = item.y * this.meterPixels;
+      const widthPx = (item.width || tpl.width || 2) * this.meterPixels;
+      const heightPx = (item.height || tpl.height || 2) * this.meterPixels;
+      const rot = item.rotation || 0;
+      const zClass = `decor-z-${tpl.zLayer || 'mid'}`;
+
+      return `
+        <div class="decor-item ${zClass}"
+             id="decor-el-${item.id}"
+             data-decor-id="${item.id}"
+             style="left: ${leftPx}px; top: ${topPx}px; width: ${widthPx}px; height: ${heightPx}px;"
+             title="${escapeHtml(getDecorName(tpl, lang))} (зажмите и перетащите)">
+          <div class="decor-svg-stage" style="transform: rotate(${rot}deg);">
+            ${tpl.svg}
+          </div>
+          <div class="decor-item-tools">
+            <button type="button" class="gh-tool-btn decor-rotate-btn" data-decor-id="${item.id}" title="Повернуть на 90°">↻</button>
+            <button type="button" class="gh-tool-btn decor-clone-btn" data-decor-id="${item.id}" title="Дублировать">❐</button>
+            <button type="button" class="gh-tool-btn decor-delete-btn" data-decor-id="${item.id}" title="Удалить">🗑️</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Привязываем перетаскивание и кнопки управления декора
+    this.decorLayerEl.querySelectorAll('.decor-item').forEach(el => {
+      el.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.decor-item-tools')) return;
+        e.stopPropagation();
+        const id = el.getAttribute('data-decor-id');
+        const item = this.storage.getDecorItems().find(d => d.id === id);
+        if (!item) return;
+        this.dragDecorState = {
+          isDragging: true,
+          decorId: id,
+          startX: e.clientX,
+          startY: e.clientY,
+          initialX: item.x,
+          initialY: item.y
+        };
+        el.classList.add('dragging');
+      });
+    });
+
+    this.decorLayerEl.querySelectorAll('.decor-rotate-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.storage.rotateDecorItem(btn.getAttribute('data-decor-id'));
+        this.renderDecorItems();
+      });
+    });
+
+    this.decorLayerEl.querySelectorAll('.decor-clone-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.storage.cloneDecorItem(btn.getAttribute('data-decor-id'));
+        this.renderDecorItems();
+      });
+    });
+
+    this.decorLayerEl.querySelectorAll('.decor-delete-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.storage.deleteDecorItem(btn.getAttribute('data-decor-id'));
+        this.renderDecorItems();
+      });
+    });
   }
 
   applyVisualStyle(style, showNotification = false) {
@@ -221,6 +435,7 @@ class GardenMap {
     if (zoomInBtn) zoomInBtn.title = tr('zoom_in_title') || 'Приблизить (+)';
     if (zoomOutBtn) zoomOutBtn.title = tr('zoom_out_title') || 'Отдалить (-)';
     this.updateStyleToggleButton();
+    this.updateSeasonButton();
   }
 
   setupGlobalEvents() {
@@ -454,6 +669,7 @@ class GardenMap {
       }
     }
 
+    this.renderDecorItems();
     this.bedsLayerEl.innerHTML = beds.length ? this.renderBedsHtml(beds, activeYear, prevYear) : '';
     this.attachBedEventListeners();
     this.updateTransform();
@@ -1441,6 +1657,23 @@ class GardenMap {
   }
 
   handleGlobalMouseMove(e) {
+    if (this.dragDecorState && this.dragDecorState.isDragging) {
+      const dxMeters = ((e.clientX - this.dragDecorState.startX) / this.zoom) / this.meterPixels;
+      const dyMeters = ((e.clientY - this.dragDecorState.startY) / this.zoom) / this.meterPixels;
+      let targetX = Math.round((this.dragDecorState.initialX + dxMeters) / this.gridSnap) * this.gridSnap;
+      let targetY = Math.round((this.dragDecorState.initialY + dyMeters) / this.gridSnap) * this.gridSnap;
+      targetX = Math.max(-50, Math.min(100, targetX));
+      targetY = Math.max(-50, Math.min(100, targetY));
+      this._dragDecorPendingX = targetX;
+      this._dragDecorPendingY = targetY;
+      const el = document.getElementById(`decor-el-${this.dragDecorState.decorId}`);
+      if (el) {
+        el.style.left = `${targetX * this.meterPixels}px`;
+        el.style.top = `${targetY * this.meterPixels}px`;
+      }
+      return;
+    }
+
     if (this.dragBedState.isDragging) {
       const dxPx = (e.clientX - this.dragBedState.startX) / this.zoom;
       const dyPx = (e.clientY - this.dragBedState.startY) / this.zoom;
@@ -1492,6 +1725,19 @@ class GardenMap {
   }
 
   handleGlobalMouseUp() {
+    if (this.dragDecorState && this.dragDecorState.isDragging) {
+      const el = document.getElementById(`decor-el-${this.dragDecorState.decorId}`);
+      if (el) el.classList.remove('dragging');
+      if (this._dragDecorPendingX !== undefined && this._dragDecorPendingY !== undefined) {
+        this.storage.updateDecorItemPosition(this.dragDecorState.decorId, this._dragDecorPendingX, this._dragDecorPendingY);
+      }
+      this.dragDecorState.isDragging = false;
+      this.dragDecorState.decorId = null;
+      this._dragDecorPendingX = undefined;
+      this._dragDecorPendingY = undefined;
+      return;
+    }
+
     if (this._panRafId) {
       window.cancelAnimationFrame(this._panRafId);
       this._panRafId = null;

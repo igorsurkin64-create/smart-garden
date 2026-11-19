@@ -707,12 +707,201 @@ body.theme-cartoon .inspector-section {
   box-shadow: 0 2px 6px rgba(120, 66, 27, 0.06);
 }
 
-/* При печати на А4 возвращаем чистый белый фон без бабочек и 3D-стен */
+/* ==========================================================================
+   🌳 9. ДЕКОР УЧАСТКА (домик, деревья, бочка, колодец, дорожки, забор)
+   ========================================================================== */
+.decor-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 4;
+}
+
+.decor-item {
+  position: absolute;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.16s ease, filter 0.16s ease;
+}
+
+.decor-item.decor-z-low { z-index: 1; }
+.decor-item.decor-z-mid { z-index: 3; }
+.decor-item.decor-z-high { z-index: 5; }
+
+.decor-item:hover {
+  filter: drop-shadow(0 6px 14px rgba(24, 52, 10, 0.35));
+  z-index: 20;
+}
+
+.decor-item.dragging {
+  cursor: grabbing;
+  transform: scale(1.04);
+  z-index: 30;
+  filter: drop-shadow(0 14px 24px rgba(24, 52, 10, 0.45));
+}
+
+.decor-svg-stage {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+
+.decor-item-tools {
+  position: absolute;
+  top: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  padding: 3px 5px;
+  background: rgba(255, 253, 245, 0.96);
+  border: 2px solid #78421b;
+  border-radius: 10px;
+  box-shadow: 0 3px 0 rgba(74, 38, 13, 0.4), 0 6px 12px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  z-index: 40;
+}
+
+.decor-item:hover .decor-item-tools,
+.decor-item:focus-within .decor-item-tools {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Модальное окно выбора декора */
+.decor-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+  gap: 0.75rem;
+}
+
+.decor-picker-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.75rem 0.5rem;
+  background: linear-gradient(180deg, #ffffff 0%, #fef9e7 100%);
+  border: 2px solid #e2c799;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.16s ease, box-shadow 0.16s ease;
+  box-shadow: 0 3px 0 #d4b078;
+}
+
+.decor-picker-card:hover {
+  transform: translateY(-3px);
+  border-color: #16a34a;
+  box-shadow: 0 5px 0 #15803d, 0 8px 16px rgba(21, 128, 61, 0.18);
+}
+
+.decor-picker-preview {
+  width: 78px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.decor-picker-name {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #3e220e;
+  text-align: center;
+}
+
+.decor-picker-size {
+  font-size: 0.72rem;
+  color: #8c5e3a;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   🍂 10. ЖИВЫЕ СЕЗОНЫ (Весна 🌸 / Лето ☀️ / Осень 🍂)
+   ========================================================================== */
+.season-particle {
+  display: none;
+  position: absolute;
+  top: -30px;
+  pointer-events: none;
+}
+
+/* 🌸 ВЕСНА: свежая яркая трава + мягкие розовые лепестки цветения */
+body.theme-cartoon.season-spring .garden-pan-viewport {
+  background: radial-gradient(circle at 30% 20%, #b5f075 0%, #86d44b 54%, #6cb838 100%) !important;
+}
+body.theme-cartoon.season-spring .cartoon-butterfly {
+  display: none !important;
+}
+body.theme-cartoon.season-spring .spring-petal {
+  display: block;
+  width: 12px;
+  height: 9px;
+  border-radius: 70% 30% 70% 30%;
+  background: radial-gradient(circle at 30% 30%, #ffffff 0%, #fbcfe8 55%, #f472b6 100%);
+  box-shadow: 0 2px 4px rgba(131, 24, 67, 0.2);
+  animation: cartoon-season-fall 16s linear infinite;
+}
+body.theme-cartoon.season-spring .sp-1 { left: 12%; animation-duration: 14s; animation-delay: 0s; }
+body.theme-cartoon.season-spring .sp-2 { left: 32%; animation-duration: 18s; animation-delay: 3s; }
+body.theme-cartoon.season-spring .sp-3 { left: 54%; animation-duration: 15s; animation-delay: 6s; }
+body.theme-cartoon.season-spring .sp-4 { left: 74%; animation-duration: 19s; animation-delay: 2s; }
+body.theme-cartoon.season-spring .sp-5 { left: 88%; animation-duration: 16s; animation-delay: 8s; }
+
+/* ☀️ ЛЕТО: бабочки и тёплый солнечный газон (по умолчанию) */
+body.theme-cartoon.season-summer .spring-petal,
+body.theme-cartoon.season-summer .autumn-leaf {
+  display: none !important;
+}
+
+/* 🍂 ОСЕНЬ: тёплый золотистый свет + опадающие золотые и оранжевые листья */
+body.theme-cartoon.season-autumn .garden-pan-viewport {
+  background: radial-gradient(circle at 30% 20%, #c8cf54 0%, #9ab33b 54%, #7c962d 100%) !important;
+}
+body.theme-cartoon.season-autumn .cartoon-sunbeams {
+  background:
+    radial-gradient(ellipse at 12% 8%, rgba(254, 215, 130, 0.48) 0%, rgba(251, 191, 36, 0.16) 30%, transparent 60%),
+    linear-gradient(128deg, rgba(254, 215, 130, 0.25) 0%, transparent 25%, rgba(251, 146, 60, 0.12) 40%, transparent 58%);
+}
+body.theme-cartoon.season-autumn .cartoon-butterfly {
+  display: none !important;
+}
+body.theme-cartoon.season-autumn .autumn-leaf {
+  display: block;
+  width: 14px;
+  height: 11px;
+  border-radius: 10% 80% 10% 80%;
+  background: linear-gradient(135deg, #fde047 0%, #f97316 65%, #c2410c 100%);
+  border: 1px solid rgba(124, 45, 18, 0.45);
+  box-shadow: 0 3px 5px rgba(74, 38, 13, 0.25);
+  animation: cartoon-season-fall 17s linear infinite;
+}
+body.theme-cartoon.season-autumn .al-1 { left: 10%; animation-duration: 15s; animation-delay: 0s; }
+body.theme-cartoon.season-autumn .al-2 { left: 28%; animation-duration: 19s; animation-delay: 4s; }
+body.theme-cartoon.season-autumn .al-3 { left: 50%; animation-duration: 16s; animation-delay: 2s; }
+body.theme-cartoon.season-autumn .al-4 { left: 72%; animation-duration: 20s; animation-delay: 7s; }
+body.theme-cartoon.season-autumn .al-5 { left: 86%; animation-duration: 17s; animation-delay: 10s; }
+
+@keyframes cartoon-season-fall {
+  0%   { transform: translate(0, -20px) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.9; }
+  35%  { transform: translate(45px, 34vh) rotate(130deg); }
+  70%  { transform: translate(-25px, 72vh) rotate(260deg); opacity: 0.85; }
+  100% { transform: translate(35px, 108vh) rotate(390deg); opacity: 0; }
+}
+
+/* При печати на А4 возвращаем чистый белый фон без бабочек, листьев и 3D-стен */
 @media print {
   body.theme-cartoon .cartoon-atmosphere-layer,
   body.theme-cartoon .bed-item::after,
   body.theme-cartoon .bed-item::before,
-  body.theme-cartoon .gh-internal-bed::before {
+  body.theme-cartoon .gh-internal-bed::before,
+  .decor-item-tools {
     display: none !important;
   }
   body.theme-cartoon,
