@@ -518,8 +518,13 @@ class GardenMap {
     window.addEventListener('touchend', (e) => this.handleTouchEnd(e));
     window.addEventListener('touchcancel', (e) => this.handleTouchEnd(e));
 
+    this._lastViewportWidth = window.innerWidth;
     window.addEventListener('resize', () => {
-      this.centerPlotInView();
+      // На телефонах скрытие/показ адресной строки меняет только высоту — игнорируем, чтобы грядки не прыгали!
+      if (Math.abs(window.innerWidth - this._lastViewportWidth) > 40) {
+        this._lastViewportWidth = window.innerWidth;
+        this.centerPlotInView();
+      }
     });
 
     // Закрытие поповера и снятие выделения декора при клике вне него

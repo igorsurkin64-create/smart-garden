@@ -1212,6 +1212,92 @@ body.theme-cartoon.season-autumn .al-5 { left: 86%; animation-duration: 17s; ani
   }
 }
 
+/* ==========================================================================
+   📱 12. ЧИСТАЯ И СТАБИЛЬНАЯ МОБИЛЬНАЯ ВЕРСИЯ (≤ 768px)
+   Убирает прыгание/дёргание грядок и оставляет только самый минимум кнопок!
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* 1. Полностью отключаем фоновые анимации и hover-прыжки (убирает тряску и лаги на телефоне) */
+  .cartoon-atmosphere-layer,
+  .cartoon-butterfly,
+  .season-particle {
+    display: none !important;
+    animation: none !important;
+  }
+
+  .bed-item.is-planted-bed::before,
+  .gh-internal-bed.is-planted-bed::before {
+    animation: none !important;
+  }
+
+  .bed-item,
+  .bed-item:hover,
+  body.theme-cartoon .bed-item:hover {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* Жёстко фиксируем сенсорное панорамирование, чтобы браузер не «прыгал» */
+  .garden-pan-viewport {
+    touch-action: none !important;
+    overscroll-behavior: none !important;
+  }
+
+  /* 2. Убираем перегруженную верхнюю панель фильтров (все эти функции уже есть в кнопке ☰ Меню!) */
+  .map-toolbar {
+    display: none !important;
+  }
+
+  /* Убираем десктопные стрелки D-pad (на телефоне удобно двигать пальцем) */
+  .map-pan-dpad {
+    display: none !important;
+  }
+
+  /* 3. На плавающей панели карты оставляем только 4 главные кнопки: ➕, ➖, ⛶ (Вписать), 🎨 (Вид) */
+  .map-controls-floating {
+    top: 8px !important;
+    left: 8px !important;
+    padding: 4px 6px !important;
+    gap: 4px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18) !important;
+  }
+
+  .map-controls-floating #map-zoom-indicator,
+  .map-controls-floating #map-center-btn,
+  .map-controls-floating #map-arrange-btn,
+  .map-controls-floating #map-decor-btn,
+  .map-controls-floating #map-season-btn,
+  .map-controls-floating .nav-divider {
+    display: none !important;
+  }
+
+  .map-controls-floating .nav-control-btn {
+    min-width: 34px !important;
+    height: 34px !important;
+    padding: 0 6px !important;
+    font-size: 1rem !important;
+  }
+
+  /* 4. Убираем мелкие кнопки редактирования с самих грядок (чтобы не нажать случайно «Удалить» пальцем — всё в карточке по клику!) */
+  .bed-inline-tools,
+  .bed-tools-bar,
+  .bed-tab-grip,
+  .decor-item-tools {
+    display: none !important;
+  }
+
+  /* Делаем 3D-стенки чуть компактнее, чтобы на маленьком экране было ещё аккуратнее */
+  body.theme-cartoon .bed-item.bed-type-raised::after,
+  body.theme-cartoon .bed-item.bed-type-warm::after,
+  body.theme-cartoon .bed-item.bed-type-berry::after,
+  body.theme-cartoon .bed-item.greenhouse-structure::after {
+    height: 10px;
+    bottom: -13px;
+    box-shadow: 0 5px 10px rgba(20, 48, 8, 0.3);
+  }
+}
+
 /* При печати на А4 возвращаем чистый белый фон без бабочек, листьев и 3D-стен */
 @media print {
   body.theme-cartoon .cartoon-atmosphere-layer,
