@@ -797,6 +797,157 @@ function getFamilyName(familyOrId, lang) {
   return family.nameRu || family.name;
 }
 
+const CROP_TEXTS_I18N = {
+  tomato: {
+    et: { root: 'Sügav (kuni 1–1,5 m)', desc: 'Armastab päikeselist kohta ja regulaarset juurekastmist. Ei talu niiskeid lehti.', tip: 'Pärast kurke, suvikõrvitsat või liblikõielisi annavad tomatid parima saagi ilma lehemädaniku riskita.' },
+    lv: { root: 'Dziļa (līdz 1–1,5 m)', desc: 'Mīl saulainu vietu un regulāru laistīšanu pie saknēm. Nepanes mitras lapas.', tip: 'Pēc gurķiem, kabačiem vai pākšaugiem tomāti dod vislabāko ražu bez fitoftoras riska.' },
+    lt: { root: 'Gili (iki 1–1,5 m)', desc: 'Mėgsta saulėtą vietą ir reguliarų laistymą po šaknimis. Nepakenčia drėgnų lapų.', tip: 'Po agurkų, cukinijų ar ankštinių pomidorai duoda geriausią derlių be fitoftoros rizikos.' }
+  },
+  cucumber: {
+    et: { root: 'Pindmine (20–30 cm)', desc: 'Niiskuslembene taim pindmiste juurtega. Armastab orgaanilisi soojapeenraid.', tip: 'Suurepärane istutada pärast ube-herneid või sibulat ja küüslauku, mis puhastavad mulda.' },
+    lv: { root: 'Virspusēja (20–30 cm)', desc: 'Mitrumu mīlošs augs ar virspusējām saknēm. Dievina organiskās siltās dobes.', tip: 'Lieliski stādīt pēc pākšaugiem vai sīpoliem ar ķiplokiem, kas attīra augsni no sēnītēm.' },
+    lt: { root: 'Paviršinė (20–30 cm)', desc: 'Drėgmę mėgstantis augalas su paviršinėmis šaknimis. Mėgsta organines šiltas lysves.', tip: 'Puikiai tinka sodinti po ankštinių arba svogūnų ir česnakų, kurie valo dirvą nuo grybelių.' }
+  },
+  pepper: {
+    et: { root: 'Keskmine (30–40 cm)', desc: 'Soojalembene ja tundlik temperatuurikõikumistele. Juured on kobestamise suhtes õrnad.', tip: 'Vältige istutamist pärast kartulit ja tomateid närbumistõve ja viiruste riski tõttu.' },
+    lv: { root: 'Vidēja (30–40 cm)', desc: 'Siltummīlošs un jutīgs pret temperatūras svārstībām. Saknes jutīgas pret irdināšanu.', tip: 'Izvairieties no stādīšanas pēc kartupeļiem un tomātiem vītes un vīrusu riska dēļ.' },
+    lt: { root: 'Vidutinė (30–40 cm)', desc: 'Šilumamėgis ir jautrus temperatūros svyravimams. Šaknys jautrios purenimui.', tip: 'Venkite sodinti po bulvių ir pomidorų dėl vytulio ir virusinių infekcijų rizikos.' }
+  },
+  eggplant: {
+    et: { root: 'Keskmine (40–50 cm)', desc: 'Kõige soojalembesem maavitsaline. Vajab maksimaalselt päikest ja viljakat mulda.', tip: 'Ärge istutage kartuli lähedale — kartulimardikas hävitab noored taimed kiiresti.' },
+    lv: { root: 'Vidēja (40–50 cm)', desc: 'Vissiltummīlošākais nakteņu dzimtas augs. Nepieciešama maksimāla saule un auglīga augsne.', tip: 'Nestādiet blakus kartupeļiem — Kolorādo vabole ātri iznīcinās jaunos dzinumus.' },
+    lt: { root: 'Vidutinė (40–50 cm)', desc: 'Labiausiai šilumą mėgstantis bulvinių augalas. Reikia daug saulės ir derlingos dirvos.', tip: 'Nesodinkite šalia bulvių — kolorado vabalas greitai sunaikins jaunus daigus.' }
+  },
+  potato: {
+    et: { root: 'Keskmine (40–50 cm)', desc: 'Peamine toidukultuur. Vähendab mullas tugevalt kaaliumi ja fosfori varusid.', tip: 'Vaheldage kindlasti haljasväetistega (rukis, keerispea, sinep) traatussi ja kärntõve vastu.' },
+    lv: { root: 'Vidēja (40–50 cm)', desc: 'Galvenā pārtikas kultūra. Stipri noplicina augsni kālija un fosfora ziņā.', tip: 'Obligāti mainiet ar zaļmēslojumu (rudzi, facēlija, sinepes) pret drātstārpiem un kraupi.' },
+    lt: { root: 'Vidutinė (40–50 cm)', desc: 'Pagrindinė maistinė kultūra. Stipriai nualina dirvą kalio ir fosforo atžvilgiu.', tip: 'Būtinai kaitaliokite su sideratais (rugiais, facelija, garstyčiomis) nuo spragšių ir rauplių.' }
+  },
+  cabbage_white: {
+    et: { root: 'Sügav (kuni 1 m)', desc: 'Väga niiskuslembene. Vajab lubjatud mulda nuutri vältimiseks.', tip: 'Till ja seller kapsa kõrval peletavad oma lõhnaga kapsaliblikat ja kapsakoid.' },
+    lv: { root: 'Dziļa (līdz 1 m)', desc: 'Ļoti mitrumprasīga. Nepieciešama kaļķota augsne aizsardzībai pret sakņu augoni.', tip: 'Dilles un selerijas blakus kāpostiem ar savu aromātu atbaida kāpostu balteni un kodi.' },
+    lt: { root: 'Gili (iki 1 m)', desc: 'Labai mėgsta drėgmę. Reikia nekalkingos (neutralios) dirvos apsaugai nuo šaknų gumbo.', tip: 'Krapai ir salierai šalia kopūstų savo aromatu atbaido baltukus ir kandis.' }
+  },
+  broccoli: {
+    et: { root: 'Keskmine (40–60 cm)', desc: 'Vitamiinirikas, vajab regulaarset kastmist ega talu üle +25°C kuumust õisikute loomisel.', tip: 'Ärge istutage pärast valget sinepit — sinep on ristõieline ja levitab nuutrit.' },
+    lv: { root: 'Vidēja (40–60 cm)', desc: 'Bagāts ar vitamīniem, prasa regulāru laistīšanu un nepanes karstumu virs +25°C.', tip: 'Nestādiet pēc baltajām sinepēm! Sinepes ir krustziežu dzimtas un pārnēsā sakņu augoni.' },
+    lt: { root: 'Vidutinė (40–60 cm)', desc: 'Turtingas vitaminais, reikalauja reguliaraus laistymo ir nepakenčia karščio virš +25°C.', tip: 'Nesodinkite po baltųjų garstyčių! Garstyčios yra bastutinės ir platina šaknų gumbą.' }
+  },
+  radish: {
+    et: { root: 'Madal (10–15 cm)', desc: 'Ideaalne kevadine vahekultuur enne tomatite ja kurkide istutamist.', tip: 'Sobib suurepäraselt porgandipeenra serva — tärkab esimesena ja kobestab mulda.' },
+    lv: { root: 'Sekla (10–15 cm)', desc: 'Ideāls kā pavasara blīvējošā kultūra pirms tomātu un gurķu stādīšanas.', tip: 'Lieliski sadzīvo dobes malā ar burkāniem — sadīgst pirmais un irdina zemi.' },
+    lt: { root: 'Sekli (10–15 cm)', desc: 'Puikiai tinka pavasariniam tarpiniam auginimui prieš pomidorus ir agurkus.', tip: 'Puikiai dera lysvės krašte su morkomis — sudygsta pirmas ir supurena žemę.' }
+  },
+  carrot: {
+    et: { root: 'Sügav (kuni 60–80 cm)', desc: 'Armastab kohevat liivmulda. Ei talu värsket sõnnikut — juurvili muutub haruliseks.', tip: 'Kuldne reegel: vaheldumisi read «porgand – sibul». Sibul peletab porgandikärbest ja vastupidi!' },
+    lv: { root: 'Dziļa (līdz 60–80 cm)', desc: 'Mīl irdenas smilšainas augsnes. Nepanes svaigus kūtsmēslus — sakne kļūst zaraina.', tip: 'Zelta standarts: pamīšus rindas «burkāni – sīpoli». Sīpoli atbaida burkānu mušu un otrādi!' },
+    lt: { root: 'Gili (iki 60–80 cm)', desc: 'Mėgsta purią smėlingą dirvą. Nepakenčia šviežio mėšlo — šakniavaisiai išsišakoja.', tip: 'Auksinė taisyklė: eilės pakaitomis „morkos – svogūnai“. Svogūnai atbaido morkinę musę, o morkos — svogūninę!' }
+  },
+  dill: {
+    et: { root: 'Pindmine (15–20 cm)', desc: 'Aromaatne maitsetaim, mis peletab oma lõhnaga kapsa ja kurgi kahjureid.', tip: 'Külvake tilli julgelt kurkide ja kapsaste reavahedesse.' },
+    lv: { root: 'Virspusēja (15–20 cm)', desc: 'Aromātisks garšaugs, kura smarža atbaida kāpostu un gurķu kaitēkļus.', tip: 'Droši pasējiet dilles gurķu un kāpostu rindstarpās.' },
+    lt: { root: 'Paviršinė (15–20 cm)', desc: 'Kvapnus prieskoninis augalas, aromatu atbaidantis kopūstų ir agurkų kenkėjus.', tip: 'Drąsiai pasėkite krapų agurkų ir kopūstų tarpueiliuose.' }
+  },
+  celery: {
+    et: { root: 'Keskmine', desc: 'Pikk kasvuperiood. Tugev kasvu soodustaja kapsale.', tip: 'Kooskasvatamine kapsaga on kasulik: kapsas annab varju, seller peletab kapsaliblikat.' },
+    lv: { root: 'Vidēja', desc: 'Garš veģetācijas periods. Spēcīgs augšanas stimulators kāpostiem.', tip: 'Kopstādījums ar kāpostiem ir abpusēji izdevīgs: kāposti dod ēnu, selerijas atbaida balteni.' },
+    lt: { root: 'Vidutinė', desc: 'Ilgas vegetacijos laikotarpis. Stiprus augimo stimuliatorius kopūstams.', tip: 'Mišrus sodinimas su kopūstais naudingas: kopūstai suteikia pavėsį, salierai atbaido baltuką.' }
+  },
+  onion: {
+    et: { root: 'Madal (15–20 cm)', desc: 'Valguslembene, ei talu liigniiskust suve teises pooles.', tip: 'Ärge istutage sibulat herneste või ubade kõrvale — sibula fütontsiidid pärsivad liblikõielisi!' },
+    lv: { root: 'Sekla (15–20 cm)', desc: 'Gaismasmīlošs, nepanes mitruma sastāvēšanos vasaras otrajā pusē.', tip: 'Nekad nestādiet sīpolus blakus zirņiem vai pupiņām — tie nomāc pākšaugu gumiņbaktērijas!' },
+    lt: { root: 'Sekli (15–20 cm)', desc: 'Šviesamėgis, nepakenčia užmirkimo antroje vasaros pusėje.', tip: 'Niekada nesodinkite svogūnų šalia žirnių ar pupelių — fitoncidai slopina ankštinių bakterijas!' }
+  },
+  garlic: {
+    et: { root: 'Madal (15–25 cm)', desc: 'Looduslik antiseptik peenardele. Puhastab mulda hahkhallituse tekitajatest.', tip: 'Istutage küüslauk maasikate kõrvale — see kaitseb marju hahkhallituse ja õielõikaja eest.' },
+    lv: { root: 'Sekla (15–25 cm)', desc: 'Dabisks antiseptiķis dobēm. Attīra augsni no pelēkās puves ierosinātājiem.', tip: 'Stādiet ķiplokus blakus zemenēm — tie pasargās ogas no pelēkās puves un smecernieka.' },
+    lt: { root: 'Sekli (15–25 cm)', desc: 'Natūralus antiseptikas lysvėms. Valo dirvą nuo kekerinio puvinio sukėlėjų.', tip: 'Pasodinkite česnakų šalia braškių — apsaugos uogas nuo kekerinio puvinio ir žiedgraužio.' }
+  },
+  zucchini: {
+    et: { root: 'Keskmine (40–60 cm)', desc: 'Vähenõudlik, kasvatab kiiresti lehemassi. Armastab kompostihunnikuid.', tip: 'Pärast suvikõrvitsat jääb muld kohevaks — järgmisel aastal kasvavad seal hästi porgand, sibul ja küüslauk.' },
+    lv: { root: 'Vidēja (40–60 cm)', desc: 'Nepretenciozs, ātri audzē lapu masu. Dievina komposta kaudzes.', tip: 'Pēc kabačiem zeme paliek irdena — nākamajā gadā tur lieliski augs burkāni, sīpoli vai ķiploki.' },
+    lt: { root: 'Vidutinė (40–60 cm)', desc: 'Nereiklus, greitai augina lapiją. Mėgsta komposto krūvas.', tip: 'Po cukinijų žemė lieka puri — kitais metais čia puikiai augs morkos, svogūnai ar česnakai.' }
+  },
+  pumpkin: {
+    et: { root: 'Sügav (kuni 1,5 m)', desc: 'Võimas taim pikkade väätidega, lämmatab suurte lehtedega umbrohu.', tip: 'Traditsiooniline kolmik «Kolm õde»: mais (tugi), uba (lämmastik) ja kõrvits (elav multš).' },
+    lv: { root: 'Dziļa (līdz 1,5 m)', desc: 'Spēcīgs augs ar garām stīgām, lielās lapas nomāc jebkuras nezāles.', tip: 'Tradicionālā trijotne «Trīs māsas»: kukurūza (balsts), pupiņas (slāpeklis) un ķirbis (dzīvā mulča).' },
+    lt: { root: 'Gili (iki 1,5 m)', desc: 'Galingas augalas su ilgomis virkščiais, dideliais lapais slopina piktžoles.', tip: 'Tradicinis derinys „Trys seserys“: kukurūzai (atrama), pupelės (azotas) ir moliūgas (gyvas mulčias).' }
+  },
+  peas: {
+    et: { root: 'Sügav (kuni 1 m)', desc: 'Vabastab peenra varakult ja jätab mulda kergesti omastatavat lämmastikku. Lõika pealsed, ära tõmba juuri!', tip: 'Pärast herneste koristamist juulis võib samale peenrale külvata redise või hiina kapsa!' },
+    lv: { root: 'Dziļa (līdz 1 m)', desc: 'Agri atbrīvo dobi, atstājot augsnē slāpekli. Neraujiet saknes — nogrieziet lakstus!', tip: 'Pēc zirņu novākšanas jūlijā tajā pašā dobē var uzreiz sēt redīsus, daikonu vai Pekinas kāpostus!' },
+    lt: { root: 'Gili (iki 1 m)', desc: 'Anksti atlaisvina lysvę, palikdamas dirvoje azoto. Neraukite šaknų — nupjaukite virkščius!', tip: 'Nuėmus žirnius liepą, toje pačioje lysvėje galima iškart sėti ridikėlius, daikonus ar pekino kopūstus!' }
+  },
+  beans: {
+    et: { root: 'Keskmine (kuni 80 cm)', desc: 'Soojalembesem kui hernes. Parandab mulla mikrobioloogiat.', tip: 'Põõsasuba kartulivahedes peletab kartulimardikat ja rikastab mulda lämmastikuga.' },
+    lv: { root: 'Vidēja (līdz 80 cm)', desc: 'Siltummīlošāka par zirņiem. Uzlabo augsnes mikrobioloģiju.', tip: 'Krūmu pupiņas kartupeļu rindstarpās atbaida Kolorādo vaboli un bagātina zemi ar slāpekli.' },
+    lt: { root: 'Vidutinė (iki 80 cm)', desc: 'Labiau šilumamėgės nei žirniai. Gerina dirvos mikrobiologiją.', tip: 'Krūminės pupelės bulvių tarpueiliuose atbaido kolorado vabalą ir aprūpina dirvą azotu.' }
+  },
+  beet: {
+    et: { root: 'Sügav (kuni 1–1,5 m)', desc: 'Tundlik mulla happesuse suhtes (happelises mullas muutuvad lehed punaseks). Vajab boori.', tip: 'Peet kasvab hästi sibula- või kapsapeenra servades, naabreid varjamata.' },
+    lv: { root: 'Dziļa (līdz 1–1,5 m)', desc: 'Jutīga pret augsnes skābumu (skābā augsnē lapas kļūst sarkanas). Nepieciešams bors.', tip: 'Bietes lieliski aug sīpolu vai kāpostu dobju malās, nenoēnojot kaimiņus.' },
+    lt: { root: 'Gili (iki 1–1,5 m)', desc: 'Jautrūs dirvos rūgštingumui (rūgščioje dirvoje rausta lapai). Reikia boro.', tip: 'Burokėliai puikiai auga svogūnų ar kopūstų lysvių kraštuose, neužstodami kaimynų.' }
+  },
+  strawberry: {
+    et: { root: 'Keskmine (25–35 cm)', desc: 'Püsik 3–4 aastaks. Ohtlikud on õielõikaja ja hahkhallitus. Mitte istutada pärast maavitsalisi!', tip: 'Istutage maasikad kindlasti pärast küüslauku või peiulilli — parim kaitse nematoodide vastu.' },
+    lv: { root: 'Vidēja (25–35 cm)', desc: 'Daudzgadīgs 3–4 gadiem. Bīstami ir smecernieks un pelēkā puve. Nestādīt pēc nakteņiem!', tip: 'Stādiet zemenes pēc ķiplokiem vai samtenēm — tā ir labākā dezinfekcija pret nematodēm.' },
+    lt: { root: 'Vidutinė (25–35 cm)', desc: 'Daugiametės 3–4 metams. Pavojingi žiedgraužis ir kekerinis puvinys. Nesodinti po bulvinių!', tip: 'Būtinai sodinkite braškes po česnakų ar serenčių — geriausia dezinfekcija nuo nematodų.' }
+  },
+  lettuce: {
+    et: { root: 'Pindmine (15 cm)', desc: 'Varajane ja kompaktne. Ideaalne kevadine vahekultuur igale peenrale.', tip: 'Külvake tomati- või kurgipeenra serva — jõuab saagi anda enne põhikultuuri suureks kasvamist.' },
+    lv: { root: 'Virspusēja (15 cm)', desc: 'Agrīns, kompakts. Ideāls pavasara blīvējošais augs jebkurā dobē.', tip: 'Stādiet tomātu vai gurķu dobju malās — paspēs dot ražu pirms lapu sakļaušanās.' },
+    lt: { root: 'Paviršinė (15 cm)', desc: 'Ankstyvos, kompaktiškos. Puikiai tinka pavasariniam įsėliui bet kurioje lysvėje.', tip: 'Sodinkite pomidorų ar agurkų lysvių kraštuose — spės duoti derlių iki lapų susivėrimo.' }
+  },
+  green_manure_phacelia: {
+    et: { root: 'Sügav, kobestav', desc: 'Universaalne haljasväetis! Ei kuulu ühtegi köögiviljaperekonda, vähendab happesust ja peletab nematoode.', tip: 'Ideaalne mullaparandaja pärast maavitsalisi enne nõudlike kultuuride istutamist.' },
+    lv: { root: 'Dziļa, irdinoša', desc: 'Universāls zaļmēslojums! Nepieder nevienai dārzeņu dzimtai, mazina skābumu un atbaida nematodes.', tip: 'Ideāls augsnes atjaunotājs pēc nakteņiem pirms prasīgu kultūru stādīšanas.' },
+    lt: { root: 'Gili, purenanti', desc: 'Universalus sideratas! Nepriklauso jokiai daržovių šeimai, mažina rūgštingumą ir atbaido nematodus.', tip: 'Idealus dirvos atstatytojas po bulvinių prieš sodinant reiklius augalus.' }
+  },
+  green_manure_mustard: {
+    et: { root: 'Sügav', desc: 'Puhastab mulda traatussist, kärntõvest ja lehemädanikust. Tähelepanu: ristõieline — mitte enne kapsast!', tip: 'Parim sügisene haljasväetis pärast kartulit ja tomateid. Keelatud enne kapsast ja redist!' },
+    lv: { root: 'Dziļa', desc: 'Attīra augsni no drātstārpiem, kraupja un fitoftoras. Uzmanību: krustziežu dzimta — nedrīkst pirms kāpostiem!', tip: 'Labākais rudens zaļmēslojums pēc kartupeļiem un tomātiem. Aizliegts pirms kāpostiem un redīsiem!' },
+    lt: { root: 'Gili', desc: 'Valo dirvą nuo spragšių, rauplių ir fitoftoros. Dėmesio: bastutinis — negalima prieš kopūstus!', tip: 'Geriausias rudeninis sideratas po bulvių ir pomidorų. Griežtai draudžiama prieš kopūstus ir ridikėlius!' }
+  },
+  fallow: {
+    et: { root: '—', desc: 'Peenar komposti või orgaanilise multši all mulla elustiku taastamiseks ja puhkuseks.', tip: 'Üks puhkehooaeg multšiga taastab kurnatud peenra viljakuse.' },
+    lv: { root: '—', desc: 'Dobe zem komposta vai organiskās mulčas slāņa augsnes atpūtai un atjaunošanai.', tip: 'Viena atpūtas sezona ar mulčēšanu atjauno noplicinātas dobes auglību.' },
+    lt: { root: '—', desc: 'Lysvė po komposto ar organinio mulčio sluoksniu dirvos gyvybingumui atkurti.', tip: 'Vienas poilsio sezonas su mulčiavimu grąžina nualintos lysvės derlingumą.' }
+  }
+};
+
+function getCropDescription(cropOrId, lang) {
+  if (!cropOrId) return '';
+  const crop = typeof cropOrId === 'string' ? getCropById(cropOrId) : cropOrId;
+  if (!crop) return '';
+  const currentLang = lang || (typeof window !== 'undefined' && window.i18n ? window.i18n.getLanguage() : 'ru');
+  if (currentLang !== 'ru' && CROP_TEXTS_I18N[crop.id]?.[currentLang]?.desc) {
+    return CROP_TEXTS_I18N[crop.id][currentLang].desc;
+  }
+  return crop.description || '';
+}
+
+function getCropRootDepth(cropOrId, lang) {
+  if (!cropOrId) return '—';
+  const crop = typeof cropOrId === 'string' ? getCropById(cropOrId) : cropOrId;
+  if (!crop) return '—';
+  const currentLang = lang || (typeof window !== 'undefined' && window.i18n ? window.i18n.getLanguage() : 'ru');
+  if (currentLang !== 'ru' && CROP_TEXTS_I18N[crop.id]?.[currentLang]?.root) {
+    return CROP_TEXTS_I18N[crop.id][currentLang].root;
+  }
+  return crop.rootDepth || '—';
+}
+
+function getCropTip(cropOrId, lang) {
+  if (!cropOrId) return '';
+  const crop = typeof cropOrId === 'string' ? getCropById(cropOrId) : cropOrId;
+  if (!crop) return '';
+  const currentLang = lang || (typeof window !== 'undefined' && window.i18n ? window.i18n.getLanguage() : 'ru');
+  if (currentLang !== 'ru' && CROP_TEXTS_I18N[crop.id]?.[currentLang]?.tip) {
+    return CROP_TEXTS_I18N[crop.id][currentLang].tip;
+  }
+  return crop.agronomicTip || '';
+}
+
 const VARIETY_COLORS = [
   '#059669', '#d97706', '#2563eb', '#7c3aed',
   '#dc2626', '#0891b2', '#ea580c', '#4f46e5',
@@ -1077,7 +1228,7 @@ function evaluateCropRotation(newCropId, history = []) {
     score,
     title,
     reasons: reasons.length ? reasons : [tr('eval_balanced') || 'Севооборот сбалансирован, противопоказаний нет.'],
-    advice: newCrop.agronomicTip || tr('eval_default_advice') || 'Соблюдайте режим полива и подкормок.'
+    advice: getCropTip(newCrop) || tr('eval_default_advice') || 'Соблюдайте режим полива и подкормок.'
   };
 }
 
@@ -1353,6 +1504,439 @@ const CROP_CALENDAR_TIMELINE = {
   ]
 };
 
+const CALENDAR_ACTION_TRANSLATIONS = {
+  'Посев семян на рассаду дома': {
+    et: 'Seemnete külvamine ettekasvatuseks toas',
+    lv: 'Sēklu sēšana dēstiem mājās',
+    lt: 'Sėklų sėja daigams namuose'
+  },
+  'Высадка рассады в теплицу / под укрытие': {
+    et: 'Istikute istutamine kasvuhoonesse / katte alla',
+    lv: 'Dēstu stādīšana siltumnīcā / zem seguma',
+    lt: 'Daigų sodinimas į šiltnamį / po priedanga'
+  },
+  'Пасынкование, подвязка, мульчирование': {
+    et: 'Külgvõrsete eemaldamine, sidumine, multšimine',
+    lv: 'Pazobju izlaušana, siešana, mulčēšana',
+    lt: 'Pažastinių ūglių šalinimas, rišimas, mulčiavimas'
+  },
+  'Сбор первых зрелых плодов': {
+    et: 'Esimeste küpsete viljade korjamine',
+    lv: 'Pirmo gatavo augļu novākšana',
+    lt: 'Pirmųjų sunokusių vaisių skynimas'
+  },
+  'Массовый сбор урожая и заготовки': {
+    et: 'Massiline saagikoristus ja hoidistamine',
+    lv: 'Masveida ražas novākšana un konservēšana',
+    lt: 'Masinis derliaus nuėmimas ir konservavimas'
+  },
+  'Посев на рассаду (или в торфяные горшочки)': {
+    et: 'Külvamine ettekasvatuseks (või turbapottidesse)',
+    lv: 'Sēšana dēstiem (vai kūdras podiņos)',
+    lt: 'Sėja daigams (arba į durpinius vazonėlius)'
+  },
+  'Высадка в теплицу или на тёплую гряду': {
+    et: 'Istutamine kasvuhoonesse või soojapeenrasse',
+    lv: 'Stādīšana siltumnīcā vai siltajā dobē',
+    lt: 'Sodinimas į šiltnamį arba šiltą lysvę'
+  },
+  'Начало плодоношения, сбор огурцов': {
+    et: 'Viljakandvuse algus, kurkide korjamine',
+    lv: 'Ražošanas sākums, gurķu vākšana',
+    lt: 'Derėjimo pradžia, agurkų skynimas'
+  },
+  'Пик урожая, полив только тёплой водой': {
+    et: 'Saagi tippaeg, kasta ainult sooja veega',
+    lv: 'Ražas maksimums, laistīšana tikai ar siltu ūdeni',
+    lt: 'Derliaus pikas, laistymas tik šiltu vandeniu'
+  },
+  'Сбор урожая и засолка': {
+    et: 'Saagikoristus ja soolamine',
+    lv: 'Ražas novākšana un skābēšana',
+    lt: 'Derliaus nuėmimas ir rauginimas'
+  },
+  'Ранний посев семян на рассаду': {
+    et: 'Varajane seemnete külvamine ettekasvatuseks',
+    lv: 'Agrīna sēklu sēšana dēstiem',
+    lt: 'Ankstyva sėklų sėja daigams'
+  },
+  'Пикировка сеянцев перца': {
+    et: 'Paprika taimede pikeerimine',
+    lv: 'Paprikas sējeņu piķēšana',
+    lt: 'Paprikos daigelių pikavimas'
+  },
+  'Высадка рассады в теплицу': {
+    et: 'Istikute istutamine kasvuhoonesse',
+    lv: 'Dēstu izstādīšana siltumnīcā',
+    lt: 'Daigų sodinimas į šiltnamį'
+  },
+  'Сбор первых перцев (техническая спелость)': {
+    et: 'Esimeste paprikate korjamine (tehniline küpsus)',
+    lv: 'Pirmo piparu vākšana (tehniskā gatavība)',
+    lt: 'Pirmųjų paprikų skynimas (techninė branda)'
+  },
+  'Массовый сбор биологически зрелых плодов': {
+    et: 'Bioloogiliselt küpsete viljade massiline korjamine',
+    lv: 'Bioloģiski gatavu augļu masveida novākšana',
+    lt: 'Masinis biologiškai sunokusių vaisių skynimas'
+  },
+  'Посев баклажанов на рассаду': {
+    et: 'Baklažaani külvamine ettekasvatuseks',
+    lv: 'Baklažānu sēšana dēstiem',
+    lt: 'Baklažanų sėja daigams'
+  },
+  'Высадка в теплицу или плёночное укрытие': {
+    et: 'Istutamine kasvuhoonesse või kilekattesse',
+    lv: 'Stādīšana siltumnīcā vai zem plēves seguma',
+    lt: 'Sodinimas į šiltnamį arba po plėvele'
+  },
+  'Сбор плодов баклажана': {
+    et: 'Baklažaanide korjamine',
+    lv: 'Baklažānu augļu novākšana',
+    lt: 'Baklažanų vaisių skynimas'
+  },
+  'Сбор урожая': {
+    et: 'Saagikoristus',
+    lv: 'Ražas novākšana',
+    lt: 'Derliaus nuėmimas'
+  },
+  'Яровизация и проращивание клубней на свету': {
+    et: 'Mugulate eelidandamine valguse käes',
+    lv: 'Bumbuļu diedzēšana gaismā',
+    lt: 'Gumbų daiginimas šviesoje'
+  },
+  'Посадка картофеля в прогретую почву (+8..10°C)': {
+    et: 'Kartuli panek soojenenud mulda (+8..10°C)',
+    lv: 'Kartupeļu stādīšana iesilušā augsnē (+8..10°C)',
+    lt: 'Bulvių sodinimas į įšilusią dirvą (+8..10°C)'
+  },
+  'Окучивание рядов и защита от вредителей': {
+    et: 'Vagude muldamine ja kahjuritõrje',
+    lv: 'Vagu raušana un aizsardzība pret kaitēkļiem',
+    lt: 'Eilių kaupimas ir apsauga nuo kenkėjų'
+  },
+  'Подкоп молодого картофеля к столу': {
+    et: 'Varajase kartuli võtmine toidulauale',
+    lv: 'Jauno kartupeļu rakšana galdam',
+    lt: 'Jaunų bulvių kasimas stalui'
+  },
+  'Массовая копка картофеля и просушка клубней': {
+    et: 'Massiline kartulivõtt ja mugulate kuivatamine',
+    lv: 'Masveida kartupeļu rakšana un apžāvēšana',
+    lt: 'Masinis bulvių kasimas ir džiovinimas'
+  },
+  'Посев ранней и среднеспелой капусты на рассаду': {
+    et: 'Varajase ja keskvalmiva kapsa külvamine ettekasvatuseks',
+    lv: 'Agro un vidēji agro kāpostu sēšana dēstiem',
+    lt: 'Ankstyvųjų ir vidutinio vėlyvumo kopūstų sėja daigams'
+  },
+  'Высадка рассады в грунт, защита от блошки': {
+    et: 'Istikute istutamine avamaale, kaitse maakirbu eest',
+    lv: 'Dēstu stādīšana laukā, aizsardzība pret spradžiem',
+    lt: 'Daigų sodinimas į gruntą, apsauga nuo spragių'
+  },
+  'Сбор кочанов ранней капусты': {
+    et: 'Varajase kapsa peade lõikamine',
+    lv: 'Agro kāpostu galviņu novākšana',
+    lt: 'Ankstyvųjų kopūstų gūžių pjovimas'
+  },
+  'Уборка поздней капусты для длительного хранения': {
+    et: 'Hilise kapsa koristamine talviseks säilitamiseks',
+    lv: 'Vēlo kāpostu novākšana ilgstošai glabāšanai',
+    lt: 'Vėlyvųjų kopūstų nuėmimas ilgalaikiam laikymui'
+  },
+  'Посев брокколи на рассаду': {
+    et: 'Brokoli külvamine ettekasvatuseks',
+    lv: 'Brokoļu sēšana dēstiem',
+    lt: 'Brokolių sėja daigams'
+  },
+  'Высадка рассады в открытый грунт': {
+    et: 'Istikute istutamine avamaale',
+    lv: 'Dēstu izstādīšana atklātā laukā',
+    lt: 'Daigų sodinimas į atvirą gruntą'
+  },
+  'Срезка центральных головок брокколи': {
+    et: 'Brokoli peaõisikute lõikamine',
+    lv: 'Brokoļu centrālo galviņu griešana',
+    lt: 'Pagrindinių brokolių galvučių pjovimas'
+  },
+  'Сбор урожая с боковых побегов': {
+    et: 'Külgvõrsete saagi korjamine',
+    lv: 'Ražas novākšana no sānu dzinumiem',
+    lt: 'Šoninių ūglių derliaus nuėmimas'
+  },
+  'Ранний посев семян редиса в парник или открытый грунт': {
+    et: 'Redise varajane külv kasvuhoonesse või avamaale',
+    lv: 'Agrīna redīsu sēšana lecektī vai laukā',
+    lt: 'Ankstyva ridikėlių sėja į šiltnamį ar gruntą'
+  },
+  'Сбор первого весеннего редиса': {
+    et: 'Esimese kevadise redise korjamine',
+    lv: 'Pirmo pavasara redīsu novākšana',
+    lt: 'Pirmųjų pavasarinių ridikėlių skynimas'
+  },
+  'Повторный осенний посев редиса на короткий световой день': {
+    et: 'Redise korduv sügiskülv lühikese päeva ajaks',
+    lv: 'Atkārtota rudens redīsu sēšana īsajai dienai',
+    lt: 'Pakartotinė rudeninė ridikėlių sėja trumpai dienai'
+  },
+  'Сбор осеннего сочного редиса': {
+    et: 'Sügisese mahlase redise korjamine',
+    lv: 'Rudens sulīgo redīsu novākšana',
+    lt: 'Rudeninių sultingų ridikėlių skynimas'
+  },
+  'Посев семян моркови во влажную почву': {
+    et: 'Porgandiseemnete külvamine niiskesse mulda',
+    lv: 'Burkānu sēklu sēšana mitrā augsnē',
+    lt: 'Morkų sėklų sėja į drėgną dirvą'
+  },
+  'Прореживание всходов и рыхление междурядий': {
+    et: 'Tõusmete harvendamine ja reavahede kobestamine',
+    lv: 'Dīgstu retināšana un rindstarpu irdināšana',
+    lt: 'Daigų retinimas ir tarpueilių purenimas'
+  },
+  'Выборочная уборка на пучок': {
+    et: 'Valikuline korjamine kimpudeks',
+    lv: 'Izlases novākšana buntītēm',
+    lt: 'Atrankinis rovimas ryšulėliams'
+  },
+  'Генеральная уборка моркови на зимнее хранение': {
+    et: 'Porgandi põhikoristus talviseks säilitamiseks',
+    lv: 'Galvenā burkānu novākšana ziemas glabāšanai',
+    lt: 'Pagrindinis morkų nuėmimas žiemai'
+  },
+  'Первый весенний посев укропа в открытый грунт': {
+    et: 'Esimene kevadine tillikülv avamaale',
+    lv: 'Pirmā pavasara diļļu sēšana laukā',
+    lt: 'Pirmoji pavasarinė krapų sėja į gruntą'
+  },
+  'Срезка свежей зелени, конвейерный подсев': {
+    et: 'Värske rohelise lõikamine, korduvkülv',
+    lv: 'Svaigu zaļumu griešana, atkārtota pasēšana',
+    lt: 'Šviežių žalumynų pjovimas, pakartotinė sėja'
+  },
+  'Сбор пряных зонтиков укропа для консервирования': {
+    et: 'Tilliõisikute kogumine hoidistamiseks',
+    lv: 'Diļļu ziedkopu vākšana konservēšanai',
+    lt: 'Krapų žiedynų rinkimas konservavimui'
+  },
+  'Посев семян корневого сельдерея на рассаду': {
+    et: 'Juurselleri külvamine ettekasvatuseks',
+    lv: 'Sakņu seleriju sēšana dēstiem',
+    lt: 'Šakninių salierų sėja daigams'
+  },
+  'Уборка крупных корнеплодов сельдерея': {
+    et: 'Suurte sellerijuurte koristamine',
+    lv: 'Lielo seleriju sakņu novākšana',
+    lt: 'Didelių salierų šakniavaisių nuėmimas'
+  },
+  'Подготовка почвы и посадка севка в борозды': {
+    et: 'Mulla ettevalmistamine ja tippsibula mahapanek',
+    lv: 'Augsnes sagatavošana un sīksīpolu stādīšana',
+    lt: 'Dirvos paruošimas ir sėjinukų sodinimas'
+  },
+  'Полив и рыхление междурядий': {
+    et: 'Kastmine ja reavahede kobestamine',
+    lv: 'Laistīšana un rindstarpu irdināšana',
+    lt: 'Laistymas ir tarpueilių purenimas'
+  },
+  'Прекращение полива, полегание и подсушивание пера': {
+    et: 'Kastmise lõpetamine, pealsete lamandumine ja kuivamine',
+    lv: 'Laistīšanas pārtraukšana, loku noliekšanās un žāvēšana',
+    lt: 'Laistymo nutraukimas, laiškų gulimas ir džiūvimas'
+  },
+  'Уборка лука-репки и просушка на солнце/чердаке': {
+    et: 'Mugulsibula koristamine ja kuivatamine',
+    lv: 'Sīpolu novākšana un žāvēšana saulē/bēniņos',
+    lt: 'Svogūnų ropučių nuėmimas ir džiovinimas'
+  },
+  'Посадка ярового чеснока / азотная подкормка озимого': {
+    et: 'Suviküüslaugu panek / taliküüslaugu lämmastikväetamine',
+    lv: 'Vasaras ķiploku stādīšana / ziemas ķiploku mēslošana',
+    lt: 'Vasarinių česnakų sodinimas / žieminių tręšimas azotu'
+  },
+  'Выламывание стрелок озимого чеснока (на заготовки)': {
+    et: 'Taliküüslaugu õisikuvarte eemaldamine',
+    lv: 'Ziemas ķiploku ziedkātu izlaušana',
+    lt: 'Žieminių česnakų žiedynstiebių šalinimas'
+  },
+  'Уборка озимого чеснока при растрескивании сигнального чехлика': {
+    et: 'Taliküüslaugu koristamine õisiku avanemisel',
+    lv: 'Ziemas ķiploku novākšana, kad plīst ziedkopas apvalks',
+    lt: 'Žieminių česnakų kasimas skilus žiedyno apvalkalui'
+  },
+  'Посадка зубчиков озимого чеснока под зиму': {
+    et: 'Taliküüslaugu küünte mahapanek talve alla',
+    lv: 'Ziemas ķiploku daiviņu stādīšana uz ziemu',
+    lt: 'Žieminių česnakų skiltelių sodinimas žiemai'
+  },
+  'Посев семян в теплую почву или высадка рассады': {
+    et: 'Seemnete külv sooja mulda või istikute istutamine',
+    lv: 'Sēklu sēšana siltā augsnē vai dēstu stādīšana',
+    lt: 'Sėklų sėja į šiltą dirvą arba daigų sodinimas'
+  },
+  'Сбор первых молодых цукини и кабачков': {
+    et: 'Esimeste noorte suvikõrvitsate korjamine',
+    lv: 'Pirmo jauno cukini un kabaču vākšana',
+    lt: 'Pirmųjų jaunų cukinijų skynimas'
+  },
+  'Регулярный сбор урожая каждые 3-4 дня для стимуляции новых завязей': {
+    et: 'Regulaarne korjamine iga 3–4 päeva tagant uute viljade tekkeks',
+    lv: 'Regulāra vākšana ik pēc 3–4 dienām jaunu augļu veidošanai',
+    lt: 'Reguliarus skynimas kas 3–4 dienas naujoms užuomazgoms'
+  },
+  'Сбор вызревших плодов с твердой корой на хранение': {
+    et: 'Kõva koorega küpsete viljade koristamine säilitamiseks',
+    lv: 'Nogatavojušos augļu ar cietu mizu novākšana glabāšanai',
+    lt: 'Subrendusių vaisių su kieta žieve nuėmimas laikymui'
+  },
+  'Посадка тыквы на компостную грядку или солнечное место': {
+    et: 'Kõrvitsa istutamine kompostipeenrasse või päikeselisse kohta',
+    lv: 'Ķirbju stādīšana komposta dobē vai saulainā vietā',
+    lt: 'Moliūgų sodinimas į komposto lysvę arba saulėtą vietą'
+  },
+  'Прищипывание плетей для формирования крупных тыкв': {
+    et: 'Võrsete näpistamine suuremate kõrvitsate saamiseks',
+    lv: 'Stīgu galotņošana lielāku ķirbju veidošanai',
+    lt: 'Virkščių viršūnių skabymas didesniems moliūgams'
+  },
+  'Срезка тыкв с плодоножкой до наступления заморозков': {
+    et: 'Kõrvitsate lõikamine koos varrega enne öökülmi',
+    lv: 'Ķirbju nogriešana ar kātiņu pirms salnām',
+    lt: 'Moliūgų pjovimas su koteliu iki šalnų'
+  },
+  'Ранний посев замоченных семян гороха в грунт': {
+    et: 'Leotatud herneseemnete varajane külv avamaale',
+    lv: 'Agrīna mērcētu zirņu sēklu sēšana laukā',
+    lt: 'Ankstyva mirkytų žirnių sėklų sėja į gruntą'
+  },
+  'Установка шпалер или сетки-опоры для плетей': {
+    et: 'Tugede või võrgu paigaldamine ronitaimedele',
+    lv: 'Balstu vai tīkla uzstādīšana stīgām',
+    lt: 'Atramos arba tinklo įrengimas vijokliams'
+  },
+  'Сбор сладких стручков сахарного и лущильного горошка': {
+    et: 'Magusate hernekaunade korjamine',
+    lv: 'Saldo zirņu pākšu vākšana',
+    lt: 'Saldžių žirnių ankščių skynimas'
+  },
+  'Срезка ботвы, корни оставляем в почве для насыщения азотом': {
+    et: 'Pealsete lõikamine, juured jäävad mulda lämmastiku rikastamiseks',
+    lv: 'Lakstu nogriešana, saknes atstāj augsnē slāpekļa bagātināšanai',
+    lt: 'Virkščių nupjovimas, šaknys paliekamos dirvoje azotui'
+  },
+  'Посев фасоли в прогретую почву (не менее +12..14°C)': {
+    et: 'Ubade külvamine sooja mulda (vähemalt +12..14°C)',
+    lv: 'Pupiņu sēšana siltā augsnē (vismaz +12..14°C)',
+    lt: 'Pupelių sėja į įšilusią dirvą (bent +12..14°C)'
+  },
+  'Сбор молодой нежной спаржевой фасоли': {
+    et: 'Noorte õrnade aedubade korjamine',
+    lv: 'Jauno maigo sviesta pupiņu vākšana',
+    lt: 'Jaunų švelnių šparaginių pupelių skynimas'
+  },
+  'Сбор и лущение сухих стручков зерновой фасоли': {
+    et: 'Kuivade ubade korjamine ja lüdimine',
+    lv: 'Sauso graudu pupiņu pākšu vākšana un lobīšana',
+    lt: 'Sausų gliaudomųjų pupelių rinkimas ir lukštenimas'
+  },
+  'Посев семян свёклы во влажный прогретый грунт': {
+    et: 'Peediseemnete külvamine niiskesse sooja mulda',
+    lv: 'Biešu sēklu sēšana mitrā, iesilušā augsnē',
+    lt: 'Burokėlių sėklų sėja į drėgną įšilusią dirvą'
+  },
+  'Прореживание всходов на расстояние 8-10 см': {
+    et: 'Tõusmete harvendamine 8–10 cm vahega',
+    lv: 'Dīgstu retināšana 8–10 cm attālumā',
+    lt: 'Daigų retinimas 8–10 cm atstumu'
+  },
+  'Выборочный сбор свёклы для летних блюд': {
+    et: 'Valikuline peedikoristus suvisteks roogadeks',
+    lv: 'Izlases biešu novākšana vasaras ēdieniem',
+    lt: 'Atrankinis burokėlių rovimas vasaros patiekalams'
+  },
+  'Уборка корнеплодов свёклы до заморозков': {
+    et: 'Peedi koristamine enne öökülmi',
+    lv: 'Biešu sakņu novākšana pirms salnām',
+    lt: 'Burokėlių šakniavaisių nuėmimas iki šalnų'
+  },
+  'Весенняя очистка от сухих листьев и рыхление': {
+    et: 'Kevadine kuivanud lehtede puhastus ja kobestamine',
+    lv: 'Pavasara tīrīšana no sausajām lapām un irdināšana',
+    lt: 'Pavasarinis sausų lapų valymas ir purenimas'
+  },
+  'Обильное цветение, мульчирование соломой или хвоей': {
+    et: 'Rikkalik õitsemine, multšimine põhu või okastega',
+    lv: 'Bagātīga ziedēšana, mulčēšana ar salmiem vai skujām',
+    lt: 'Gausus žydėjimas, mulčiavimas šiaudais ar spygliais'
+  },
+  'Сбор сладких ягод клубники и земляники': {
+    et: 'Magusate maasikate ja metsmaasikate korjamine',
+    lv: 'Saldo zemeņu ogu vākšana',
+    lt: 'Saldžių braškių ir žemuogių skynimas'
+  },
+  'Обрезка усов и старых листьев, подкормка фосфором и калием': {
+    et: 'Võsundite ja vanade lehtede lõikamine, fosfor-kaaliumväetis',
+    lv: 'Stīgu un veco lapu apgriešana, mēslošana ar fosforu un kāliju',
+    lt: 'Ūsų ir senų lapų šalinimas, tręšimas fosforu ir kaliu'
+  },
+  'Посадка укоренённых розеток на новые грядки': {
+    et: 'Juurdunud tütartaimede istutamine uutele peenardele',
+    lv: 'Apsakņotu stādu stādīšana jaunās dobēs',
+    lt: 'Įsišaknijusių daigų sodinimas į naujas lysves'
+  },
+  'Весенний посев листового салата в грунт': {
+    et: 'Lehtsalati kevadine külv avamaale',
+    lv: 'Lapu salātu pavasara sēšana laukā',
+    lt: 'Pavasarinė lapinių salotų sėja į gruntą'
+  },
+  'Срезка свежих листьев, повторный посев новой партии': {
+    et: 'Värskete lehtede lõikamine, uue partii külvamine',
+    lv: 'Svaigu lapu griešana, atkārtota jaunās partijas sēšana',
+    lt: 'Šviežių lapų pjovimas, pakartotinė naujos partijos sėja'
+  },
+  'Сбор салата': {
+    et: 'Salati korjamine',
+    lv: 'Salātu novākšana',
+    lt: 'Salotų skynimas'
+  },
+  'Весенний посев фацелии для оздоровления почвы': {
+    et: 'Keerispea kevadine külv mulla tervendamiseks',
+    lv: 'Facēlijas pavasara sēšana augsnes atveseļošanai',
+    lt: 'Pavasarinė facelijos sėja dirvos sveikatinimui'
+  },
+  'Цветение медоноса, скашивание до образования семян': {
+    et: 'Meetaime õitsemine, niitmine enne seemnete valmimist',
+    lv: 'Medusauga ziedēšana, pļaušana pirms sēklu veidošanās',
+    lt: 'Medingo augalo žydėjimas, pjovimas iki sėklų brandos'
+  },
+  'Осенний посев сидерата после сбора основного урожая': {
+    et: 'Haljasväetise sügiskülv pärast põhisaagi koristamist',
+    lv: 'Zaļmēslojuma rudens sēšana pēc pamatražas novākšanas',
+    lt: 'Rudeninė sideratų sėja nuėmus pagrindinį derlių'
+  },
+  'Заделка зелёной массы в верхний слой почвы': {
+    et: 'Haljasmassi sissekaevamine pindmisesse mullakihti',
+    lv: 'Zaļās masas iestrādāšana augsnes virskārtā',
+    lt: 'Žaliosios masės įterpimas į viršutinį dirvos sluoksnį'
+  },
+  'Ранний посев белой горчицы для очищения почвы от грибков': {
+    et: 'Valge sinepi varajane külv mulla puhastamiseks seentest',
+    lv: 'Baltās sinepes agrīna sēšana augsnes attīrīšanai no sēnītēm',
+    lt: 'Ankstyva baltųjų garstyčių sėja dirvos valymui nuo grybelių'
+  },
+  'Посев горчицы после уборки картофеля и томатов': {
+    et: 'Sinepi külv pärast kartuli ja tomati koristamist',
+    lv: 'Sinepju sēšana pēc kartupeļu un tomātu novākšanas',
+    lt: 'Garstyčių sėja nuėmus bulves ir pomidorus'
+  },
+  'Скашивание и заделка в грунт против проволочника и парши': {
+    et: 'Niitmine ja mulda kaevamine traatussi ja kärntõve vastu',
+    lv: 'Pļaušana un iestrādāšana augsnē pret drātstārpiem un kraupi',
+    lt: 'Pjovimas ir įterpimas į dirvą nuo spragšių ir rauplių'
+  }
+};
+
 /**
  * Собрать календарные события сезона на основе фактически посаженных культур
  * @param {number} activeYear
@@ -1373,18 +1957,24 @@ function getSeasonalCalendarEvents(activeYear, beds = [], lang = 'ru') {
     10: { ru: 'Октябрь', et: 'Oktoober', lv: 'Oktobris', lt: 'Spalis' }
   };
 
+  const localizeBedOrSec = (obj) => (typeof window !== 'undefined' && window.i18n && window.i18n.getBedName)
+    ? window.i18n.getBedName(obj)
+    : (obj && obj.name ? obj.name : '');
+
   const plantedItems = [];
   beds.forEach(bed => {
+    const locBedName = localizeBedOrSec(bed);
     if (bed.sections && bed.sections.length > 0) {
       bed.sections.forEach(sec => {
         const cropId = sec.history?.[activeYear]?.cropId;
         if (cropId && cropId !== 'fallow') {
+          const locSecName = localizeBedOrSec(sec);
           plantedItems.push({
             bed,
             section: sec,
             cropId,
             variety: sec.history[activeYear].variety || '',
-            name: `${bed.name} (${sec.name})`
+            name: `${locBedName} (${locSecName})`
           });
         }
       });
@@ -1396,7 +1986,7 @@ function getSeasonalCalendarEvents(activeYear, beds = [], lang = 'ru') {
           section: null,
           cropId,
           variety: bed.history[activeYear].variety || '',
-          name: bed.name
+          name: locBedName
         });
       }
     }
@@ -1418,6 +2008,9 @@ function getSeasonalCalendarEvents(activeYear, beds = [], lang = 'ru') {
     
     timeline.forEach(evt => {
       if (monthsMap[evt.month]) {
+        const translatedAction = (lang !== 'ru' && CALENDAR_ACTION_TRANSLATIONS[evt.labelRu] && CALENDAR_ACTION_TRANSLATIONS[evt.labelRu][lang])
+          ? CALENDAR_ACTION_TRANSLATIONS[evt.labelRu][lang]
+          : evt.labelRu;
         monthsMap[evt.month].events.push({
           cropId: item.cropId,
           cropName: getCropName(crop, lang),
@@ -1426,7 +2019,7 @@ function getSeasonalCalendarEvents(activeYear, beds = [], lang = 'ru') {
           bedName: item.name,
           bedType: item.bed.type,
           stage: evt.stage, // 'seedling' | 'greenhouse' | 'ground' | 'harvest'
-          action: evt.labelRu,
+          action: translatedAction,
           icon: evt.icon || '🌱'
         });
       }
@@ -1818,11 +2411,16 @@ function calculateTotalGardenWater(beds = [], activeYear = 2026, weather = 'norm
   let groundLiters = 0;
   const breakdown = [];
 
+  const locName = (obj) => (typeof window !== 'undefined' && window.i18n && window.i18n.getBedName)
+    ? window.i18n.getBedName(obj)
+    : (obj && obj.name ? obj.name : '');
+
   beds.forEach(bed => {
     const isGh = bed.type === 'greenhouse';
     const hasSections = Boolean(bed.sections && bed.sections.length > 0);
     const secCount = hasSections ? bed.sections.length : 1;
     const bedArea = (bed.width || 4) * (bed.height || 1.2);
+    const locBedName = locName(bed);
 
     if (hasSections) {
       const secArea = bedArea / secCount;
@@ -1833,9 +2431,10 @@ function calculateTotalGardenWater(beds = [], activeYear = 2026, weather = 'norm
         if (isGh) greenhouseLiters += norm.weeklyLiters;
         else groundLiters += norm.weeklyLiters;
 
+        const locSecName = locName(sec) || `${idx + 1}`;
         breakdown.push({
           bedId: bed.id,
-          bedName: `${bed.name} — ${sec.name || `Рядок ${idx + 1}`}`,
+          bedName: `${locBedName} — ${locSecName}`,
           cropId,
           areaM2: secArea,
           weeklyLiters: norm.weeklyLiters,
@@ -1851,7 +2450,7 @@ function calculateTotalGardenWater(beds = [], activeYear = 2026, weather = 'norm
 
       breakdown.push({
         bedId: bed.id,
-        bedName: bed.name,
+        bedName: locBedName,
         cropId,
         areaM2: bedArea,
         weeklyLiters: norm.weeklyLiters,
@@ -1877,6 +2476,9 @@ if (typeof window !== 'undefined') {
   window.getFamilyById = getFamilyById;
   window.getCropName = getCropName;
   window.getFamilyName = getFamilyName;
+  window.getCropDescription = getCropDescription;
+  window.getCropRootDepth = getCropRootDepth;
+  window.getCropTip = getCropTip;
   window.evaluateCropRotation = evaluateCropRotation;
   window.recommendCropsForBed = recommendCropsForBed;
   window.getCropSvg = getCropSvg;

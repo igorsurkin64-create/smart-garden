@@ -7973,11 +7973,11 @@ html, body {
 
 .calendar-filters-bar {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.4rem;
   padding: 0.5rem 0.85rem;
   background: var(--bg-tertiary);
   border-bottom: 1px solid var(--border-subtle);
-  overflow-x: auto;
   flex-shrink: 0;
 }
 

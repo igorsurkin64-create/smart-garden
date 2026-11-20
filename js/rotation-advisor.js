@@ -272,14 +272,14 @@ class RotationAdvisor {
           </div>
         </div>
 
-        <p class="crop-description">${escapeHtml(crop.description)}</p>
+        <p class="crop-description">${escapeHtml(typeof getCropDescription === 'function' ? getCropDescription(crop, currentLang) : crop.description)}</p>
 
         <div class="crop-info-grid">
           <div class="crop-info-item">
             <span class="info-label">${tr('encyclo_return_period', { years: crop.minYearsReturn }) || `Срок возврата: ${crop.minYearsReturn} года`}</span>
           </div>
           <div class="crop-info-item">
-            <span class="info-label">🌱 ${crop.rootDepth}</span>
+            <span class="info-label">🌱 ${escapeHtml(typeof getCropRootDepth === 'function' ? getCropRootDepth(crop, currentLang) : crop.rootDepth)}</span>
           </div>
           <div class="crop-info-item">
             <span class="info-label">📅 ${crop.sowingPeriod}</span>
@@ -336,7 +336,7 @@ class RotationAdvisor {
         <div class="agronomic-pro-tip">
           <div class="tip-icon">💡</div>
           <div class="tip-text">
-            <strong>${escapeHtml(colTip)}</strong> ${escapeHtml(crop.agronomicTip)}
+            <strong>${escapeHtml(colTip)}</strong> ${escapeHtml(typeof getCropTip === 'function' ? getCropTip(crop, currentLang) : crop.agronomicTip)}
           </div>
         </div>
       </div>

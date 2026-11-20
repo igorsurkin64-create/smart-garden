@@ -108,11 +108,11 @@
                 </div>
               </div>
 
-              <p class="catalog-crop-desc">${escapeHtml(crop.description)}</p>
+              <p class="catalog-crop-desc">${escapeHtml(typeof getCropDescription === 'function' ? getCropDescription(crop, currentLang) : crop.description)}</p>
 
               <div class="catalog-meta-row">
                 <span class="meta-tag">⏳ ${returnLabel}: ${crop.minYearsReturn} ${returnWord}</span>
-                <span class="meta-tag">🌱 ${crop.rootDepth}</span>
+                <span class="meta-tag">🌱 ${escapeHtml(typeof getCropRootDepth === 'function' ? getCropRootDepth(crop, currentLang) : crop.rootDepth)}</span>
               </div>
 
               <div class="catalog-predecessors-preview">

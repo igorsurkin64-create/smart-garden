@@ -413,6 +413,10 @@ class GardenApp {
   }
 
   renderTableView() {
+    const titleEl = document.getElementById('summary-view-title');
+    if (titleEl && window.t) {
+      titleEl.textContent = window.t('summary_title', { year: this.storage.getActiveYear() });
+    }
     const container = document.getElementById('table-view-container');
     if (!container) return;
     container.innerHTML = this.advisor.renderSummaryTable();
@@ -992,6 +996,74 @@ class GardenApp {
     const bedCount = data.beds?.length || 0;
     const yearsList = (data.years || []).join(', ');
     const tr = (k) => (window.t ? window.t(k) : k);
+    const lang = window.i18n ? window.i18n.getLanguage() : 'ru';
+
+    const DB_TXT = {
+      ru: {
+        totalBeds: '📊 Всего грядок на плане:',
+        seasonsMem: '📅 Сезоны в памяти:',
+        storageStatus: '🌱 Статус хранилища:',
+        autosaveOn: 'Автосохранение в браузере включено',
+        dlDesc: 'Скачать файл с вашими грядками на компьютер или телефон. Пригодится, чтобы записи никогда не потерялись.',
+        ulDesc: 'Открыть сохранённый ранее файл с планом огорода на этом или другом устройстве.',
+        guideTitle: '💡 Как это устроено простыми словами:',
+        guideBody: 'Все ваши грядки автоматически сохраняются прямо в этом браузере. Но если вы почистите историю или захотите работать на другом телефоне или компьютере — нажмите <strong>«Сохранить план в файл»</strong>. Открывать этот файл двойным кликом в Windows не нужно — когда понадобится продолжить работу, просто нажмите здесь <strong>«Загрузить план из файла»</strong>, и весь ваш огород сразу вернётся!',
+        demoTitle: 'Восстановить демонстрационные данные',
+        demoDesc: 'Загрузить готовый пример огорода с историей 2024–2026 гг. для тестирования севооборота.',
+        demoBtn: '🔄 Загрузить демо',
+        clearTitle: 'Очистить всё',
+        clearDesc: 'Удалить все грядки и начать проектирование огорода с чистого листа.',
+        clearBtn: '🗑️ Очистить всё'
+      },
+      et: {
+        totalBeds: '📊 Peenraid plaanil kokku:',
+        seasonsMem: '📅 Hooajad mälus:',
+        storageStatus: '🌱 Salvestuse olek:',
+        autosaveOn: 'Automaatne salvestus brauseris on sees',
+        dlDesc: 'Laadi peenarde fail arvutisse või telefoni, et andmed kunagi kaduma ei läheks.',
+        ulDesc: 'Ava varem salvestatud aiaplaani fail selles või mõnes teises seadmes.',
+        guideTitle: '💡 Kuidas see lihtsalt töötab:',
+        guideBody: 'Kõik peenrad salvestuvad automaatselt selles brauseris. Kui puhastad brauseri ajaloo või soovid jätkata teises telefonis/arvutis — vajuta <strong>«Salvesta plaan faili»</strong>. Seda faili pole vaja arvutis eraldi avada — jätkamiseks vajuta siin lihtsalt <strong>«Laadi plaan failist»</strong> ja kogu aed taastub kohe!',
+        demoTitle: 'Taasta näidisandmed',
+        demoDesc: 'Laadi valmis aia näidis 2024–2026 ajalooga külvikorra proovimiseks.',
+        demoBtn: '🔄 Laadi näidis',
+        clearTitle: 'Tühjenda kõik',
+        clearDesc: 'Kustuta kõik peenrad ja alusta aia planeerimist puhtalt lehelt.',
+        clearBtn: '🗑️ Tühjenda kõik'
+      },
+      lv: {
+        totalBeds: '📊 Kopā dobes plānā:',
+        seasonsMem: '📅 Sezonas atmiņā:',
+        storageStatus: '🌱 Krātuves statuss:',
+        autosaveOn: 'Automātiskā saglabāšana pārlūkā ieslēgta',
+        dlDesc: 'Lejupielādēt failu ar dobēm datorā vai tālrunī, lai ieraksti nekad nepazustu.',
+        ulDesc: 'Atvērt iepriekš saglabātu dārza plāna failu šajā vai citā ierīcē.',
+        guideTitle: '💡 Kā tas darbojas vienkāršiem vārdiem:',
+        guideBody: 'Visas dobes automātiski saglabājas šajā pārlūkprogrammā. Ja notīrīsiet vēsturi vai vēlēsieties turpināt citā ierīcē — nospiediet <strong>«Saglabāt plānu failā»</strong>. Failu nav jāatver datorā — kad vajadzēs turpināt, vienkārši nospiediet šeit <strong>«Ielādēt plānu no faila»</strong> un viss dārzs uzreiz atgriezīsies!',
+        demoTitle: 'Atjaunot demonstrācijas datus',
+        demoDesc: 'Ielādēt gatavu dārza piemēru ar 2024.–2026. g. vēsturi augu sekas pārbaudei.',
+        demoBtn: '🔄 Ielādēt demo',
+        clearTitle: 'Notīrīt visu',
+        clearDesc: 'Dzēst visas dobes un sākt dārza plānošanu no baltas lapas.',
+        clearBtn: '🗑️ Notīrīt visu'
+      },
+      lt: {
+        totalBeds: '📊 Iš viso lysvių plane:',
+        seasonsMem: '📅 Sezonai atmintyje:',
+        storageStatus: '🌱 Saugyklos būsena:',
+        autosaveOn: 'Automatinis išsaugojimas naršyklėje įjungtas',
+        dlDesc: 'Atsisiųsti failą su lysvėmis į kompiuterį ar telefoną, kad duomenys niekada nedingtų.',
+        ulDesc: 'Atidaryti anksčiau išsaugotą daržo plano failą šiame ar kitame įrenginyje.',
+        guideTitle: '💡 Kaip tai veikia paprastai:',
+        guideBody: 'Visos lysvės automatiškai išsaugomos šioje naršyklėje. Jei išvalysite istoriją arba norėsite dirbti kitame telefone ar kompiuteryje — spauskite <strong>«Išsaugoti planą į failą»</strong>. Šio failo nereikia atidaryti kompiuteryje — kai prireiks tęsti, tiesiog spauskite čia <strong>«Įkelti planą iš failo»</strong> ir visas daržas iškart sugrįš!',
+        demoTitle: 'Atkurti pavyzdinius duomenis',
+        demoDesc: 'Įkelti paruoštą daržo pavyzdį su 2024–2026 m. istorija sėjomainai išbandyti.',
+        demoBtn: '🔄 Įkelti pavyzdį',
+        clearTitle: 'Išvalyti viską',
+        clearDesc: 'Ištrinti visas lysves ir pradėti daržo planavimą nuo švaraus lapo.',
+        clearBtn: '🗑️ Išvalyti viską'
+      }
+    }[lang] || {};
 
     modalContent.innerHTML = `
       <div class="modal-card">
@@ -1001,16 +1073,16 @@ class GardenApp {
         </div>
         <div class="modal-body">
           <div class="db-stats-box">
-            <div>📊 Всего грядок на плане: <strong>${bedCount}</strong></div>
-            <div>📅 Сезоны в памяти: <strong>${yearsList}</strong></div>
-            <div>🌱 Статус хранилища: <span class="text-success">Автосохранение в браузере включено</span></div>
+            <div>${DB_TXT.totalBeds} <strong>${bedCount}</strong></div>
+            <div>${DB_TXT.seasonsMem} <strong>${yearsList}</strong></div>
+            <div>${DB_TXT.storageStatus} <span class="text-success">${DB_TXT.autosaveOn}</span></div>
           </div>
 
           <div class="db-actions-list mt-3">
             <div class="db-action-item">
               <div>
                 <strong>${(tr('db_btn_download') || 'Сохранить план в файл').replace(/^[^\p{L}\p{N}]+/u, '').trim()}</strong>
-                <p class="text-xs text-muted">Скачать файл с вашими грядками на компьютер или телефон. Пригодится, чтобы записи никогда не потерялись.</p>
+                <p class="text-xs text-muted">${DB_TXT.dlDesc}</p>
               </div>
               <button class="btn btn-primary" id="db-export-btn">${tr('db_btn_download') || '📥 Сохранить план в файл'}</button>
             </div>
@@ -1018,7 +1090,7 @@ class GardenApp {
             <div class="db-action-item mt-3">
               <div>
                 <strong>${(tr('db_btn_upload') || 'Загрузить план из файла').replace(/^[^\p{L}\p{N}]+/u, '').trim()}</strong>
-                <p class="text-xs text-muted">Открыть сохранённый ранее файл с планом огорода на этом или другом устройстве.</p>
+                <p class="text-xs text-muted">${DB_TXT.ulDesc}</p>
               </div>
               <label class="btn btn-outline file-input-label">
                 ${tr('db_btn_upload') || '📤 Загрузить план из файла'}
@@ -1027,24 +1099,24 @@ class GardenApp {
             </div>
 
             <div class="db-guide-note mt-3 p-3 bg-tertiary rounded" style="font-size: 0.84rem; line-height: 1.5; border-left: 3px solid var(--primary);">
-              <strong style="display: block; margin-bottom: 0.25rem;">💡 Как это устроено простыми словами:</strong>
-              Все ваши грядки автоматически сохраняются прямо в этом браузере. Но если вы почистите историю или захотите работать на другом телефоне или компьютере — нажмите <strong>«Сохранить план в файл»</strong>. Открывать этот файл двойным кликом в Windows не нужно — когда понадобится продолжить работу, просто нажмите здесь <strong>«Загрузить план из файла»</strong>, и весь ваш огород сразу вернётся!
+              <strong style="display: block; margin-bottom: 0.25rem;">${DB_TXT.guideTitle}</strong>
+              ${DB_TXT.guideBody}
             </div>
 
             <div class="db-action-item mt-3">
               <div>
-                <strong>Восстановить демонстрационные данные</strong>
-                <p class="text-xs text-muted">Загрузить готовый пример огорода с историей 2024-2026 гг. для тестирования севооборота.</p>
+                <strong>${DB_TXT.demoTitle}</strong>
+                <p class="text-xs text-muted">${DB_TXT.demoDesc}</p>
               </div>
-              <button class="btn btn-warning" id="db-reset-demo-btn">🔄 Загрузить демо</button>
+              <button class="btn btn-warning" id="db-reset-demo-btn">${DB_TXT.demoBtn}</button>
             </div>
 
             <div class="db-action-item mt-3">
               <div>
-                <strong class="text-danger">Очистить всё</strong>
-                <p class="text-xs text-muted">Удалить все грядки и начать проектирование огорода с чистого листа.</p>
+                <strong class="text-danger">${DB_TXT.clearTitle}</strong>
+                <p class="text-xs text-muted">${DB_TXT.clearDesc}</p>
               </div>
-              <button class="btn btn-danger" id="db-clear-all-btn">🗑️ Очистить всё</button>
+              <button class="btn btn-danger" id="db-clear-all-btn">${DB_TXT.clearBtn}</button>
             </div>
           </div>
         </div>

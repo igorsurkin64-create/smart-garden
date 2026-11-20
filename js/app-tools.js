@@ -1464,7 +1464,7 @@
                 <datalist id="vc-name-datalist">
                   ${popVars.map(v => `<option value="${escapeHtml(v)}">`).join('')}
                 </datalist>
-                ${popVars.length > 0 ? `
+                ${currentLang === 'ru' && popVars.length > 0 ? `
                   <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; align-items: center;">
                     <span style="font-size: 0.7rem; color: var(--text-muted);">${VC.popLbl}</span>
                     ${popVars.slice(0, 6).map(v => `
@@ -1491,7 +1491,7 @@
                   ` : `
                     <label style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 14px 8px; width: 100%;">
                       <span style="font-size: 2rem;">📸</span>
-                      <span style="font-size: 0.8rem; font-weight: 700; color: #15803d;">Выбрать фото или перетащить сюда</span>
+                      <span style="font-size: 0.8rem; font-weight: 700; color: #15803d;">${currentLang === 'et' ? 'Vali foto või lohista siia' : currentLang === 'lv' ? 'Izvēlies foto vai ievelc šeit' : currentLang === 'lt' ? 'Pasirinkite foto arba nutempkite čia' : 'Выбрать фото или перетащить сюда'}</span>
                       <span style="font-size: 0.72rem; color: var(--text-muted); text-align: center;">${VC.photoHint}</span>
                       <input type="file" id="vc-photo-file" accept="image/*" style="display: none;">
                     </label>

@@ -1838,6 +1838,43 @@ class I18nManager {
 
     const lang = this.currentLanguage || 'ru';
 
+    // 0. Демо-секции теплиц (с описанием культур в скобках)
+    const DEMO_SECTION_NAMES = {
+      'Левая грядка (Томаты)': {
+        et: 'Vasak peenar (Tomatid)',
+        lv: 'Kreisā dobe (Tomāti)',
+        lt: 'Kairioji lysvė (Pomidorai)'
+      },
+      'Центральная грядка (Перцы & Базилик)': {
+        et: 'Keskpeenar (Paprika & Basiilik)',
+        lv: 'Centrālā dobe (Paprika & Baziliks)',
+        lt: 'Centrinė lysvė (Paprikos & Bazilikas)'
+      },
+      'Правая грядка (Огурцы)': {
+        et: 'Parem peenar (Kurgid)',
+        lv: 'Labā dobe (Gurķi)',
+        lt: 'Dešinioji lysvė (Agurkai)'
+      },
+      'Левая грядка (Томаты Черри)': {
+        et: 'Vasak peenar (Kirsstomatid)',
+        lv: 'Kreisā dobe (Ķiršu tomāti)',
+        lt: 'Kairioji lysvė (Vyšniniai pomidorai)'
+      },
+      'Центральная грядка (Баклажаны / Зелень)': {
+        et: 'Keskpeenar (Baklažaanid / Roheline)',
+        lv: 'Centrālā dobe (Baklažāni / Zaļumi)',
+        lt: 'Centrinė lysvė (Baklažanai / Žalumynai)'
+      },
+      'Правая грядка (Огурцы шпалерные)': {
+        et: 'Parem peenar (Ronikurgid)',
+        lv: 'Labā dobe (Kāpjošie gurķi)',
+        lt: 'Dešinioji lysvė (Vijokliniai agurkai)'
+      }
+    };
+    if (lang !== 'ru' && DEMO_SECTION_NAMES[name.trim()] && DEMO_SECTION_NAMES[name.trim()][lang]) {
+      return DEMO_SECTION_NAMES[name.trim()][lang];
+    }
+
     // 1. "Рядок 1 (Левый)" / "Rida 1 (Vasak)" / "Rinda 1 (Kreisā)" / "Eilutė 1 (Kairė)"
     const rowSubMatch = name.match(/^(?:Рядок|Rida|Rinda|Eilutė)\s*(\d+)\s*\((.*?)\)$/i);
     if (rowSubMatch) {
