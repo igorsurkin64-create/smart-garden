@@ -1399,12 +1399,12 @@
             <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
               <h3 style="margin: 0; font-size: 1.2rem;">${VC.title}</h3>
               <span class="badge-mini" style="background: #dcfce7; color: #15803d; padding: 3px 9px; border-radius: 999px; font-weight: 800; font-size: 0.78rem;">
-                ${allVarieties.length} шт.
+                ${allVarieties.length} ${currentLang === 'et' ? 'tk' : currentLang === 'lv' ? 'gab.' : currentLang === 'lt' ? 'vnt.' : 'шт.'}
               </span>
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
-              <button type="button" class="btn btn-sm btn-primary" id="btn-print-varieties-a4" style="padding: 6px 14px; font-size: 0.85rem; font-weight: 700;" title="Распечатать выбранные сорта с фото и описаниями на листе A4">
-                🖨️ Распечатать каталог (A4)
+              <button type="button" class="btn btn-sm btn-primary" id="btn-print-varieties-a4" style="padding: 6px 14px; font-size: 0.85rem; font-weight: 700;">
+                ${window.t ? window.t('varieties_btn_print') : '🖨️ Распечатать каталог (A4)'}
               </button>
               <button class="modal-close-btn">&times;</button>
             </div>
@@ -1424,7 +1424,7 @@
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
                   <label class="form-sublabel" style="font-weight: 700; font-size: 0.82rem; margin: 0;">${VC.cropLbl}</label>
                   <button type="button" class="btn-text" id="vc-toggle-custom-crop-btn" style="font-size: 0.76rem; font-weight: 800; color: #15803d; cursor: pointer; padding: 1px 6px; border-radius: 6px; background: #dcfce7; border: 1px solid #86efac;">
-                    ${isAddingCustomCrop ? '✕ Отмена' : '➕ Своя культура'}
+                    ${isAddingCustomCrop ? ('✕ ' + VC.cancelEdit) : (window.t ? window.t('varieties_btn_custom_crop') : '➕ Своя культура')}
                   </button>
                 </div>
                 <select id="vc-crop-select" class="form-input" style="font-weight: 600;">
@@ -1434,7 +1434,7 @@
                 </select>
                 ${isAddingCustomCrop ? `
                   <div style="margin-top: 6px; padding: 8px; border-radius: 8px; background: #f0fdf4; border: 1.5px solid #22c55e;">
-                    <div style="font-size: 0.74rem; font-weight: 700; color: #15803d; margin-bottom: 5px;">✨ Добавить новое растение (появится и на грядках!):</div>
+                    <div style="font-size: 0.74rem; font-weight: 700; color: #15803d; margin-bottom: 5px;">✨ ${currentLang === 'et' ? 'Lisa uus taim (ilmub ka peenardel!):' : currentLang === 'lv' ? 'Pievienot jaunu augu (parādīsies arī dobēs!):' : currentLang === 'lt' ? 'Pridėti naują augalą (atsiras ir lysvėse!):' : 'Добавить новое растение (появится и на грядках!):'}</div>
                     <div style="display: flex; gap: 5px; align-items: center;">
                       <select id="vc-custom-crop-emoji" class="form-input" style="width: 58px; padding: 5px 4px; font-size: 1rem;">
                         <option value="🌿">🌿</option>

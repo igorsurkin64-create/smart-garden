@@ -195,7 +195,7 @@
               <span>${escapeHtml(bedTitle)}</span>
               ${rotationEval ? `
                 <span class="status-pill status-${rotationEval.status} inspector-advanced-only" style="font-size: 0.72rem; font-weight: 800; padding: 1px 7px; border-radius: 4px;">
-                  ${rotationEval.status === 'optimal' ? '✓ Идеально' : (rotationEval.status === 'warning' ? '⚠️ Внимание' : '✕ Нарушение')}
+                  ${rotationEval.status === 'optimal' ? ('✓ ' + (window.t ? window.t('legend_perfect') : 'Идеально')) : (rotationEval.status === 'warning' ? ('⚠️ ' + (window.t ? window.t('legend_warning') : 'Внимание')) : ('✕ ' + (window.t ? window.t('legend_danger') : 'Нарушение')))}
                 </span>
               ` : ''}
               <button class="btn-rename-pill" id="btn-quick-rename-header" title="Быстро изменить название этой грядки">✏️ ${nameSubLabel}</button>
@@ -307,7 +307,7 @@
               </label>
               ${rotationEval ? `
                 <span class="status-pill status-${rotationEval.status}" style="font-size: 0.74rem; font-weight: 800; padding: 2px 8px; border-radius: 6px;" title="${escapeHtml(rotationEval.reasons?.join('. ') || rotationEval.title)}">
-                  ${rotationEval.status === 'optimal' ? '✓ Идеально' : (rotationEval.status === 'warning' ? '⚠️ Внимание' : '✕ Нарушение')}
+                  ${rotationEval.status === 'optimal' ? ('✓ ' + (window.t ? window.t('legend_perfect') : 'Идеально')) : (rotationEval.status === 'warning' ? ('⚠️ ' + (window.t ? window.t('legend_warning') : 'Внимание')) : ('✕ ' + (window.t ? window.t('legend_danger') : 'Нарушение')))}
                 </span>
               ` : ''}
             </div>

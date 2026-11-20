@@ -510,20 +510,26 @@ class GardenApp {
       } catch (e) {}
       if (toggleRotBtn) {
         toggleRotBtn.classList.toggle('active', enabled);
-        const lang = window.i18n ? window.i18n.getLanguage() : 'ru';
-        const lblOn = lang === 'et' ? '🔄 Külvikord: Sees' : lang === 'lv' ? '🔄 Augseka: Iesl.' : lang === 'lt' ? '🔄 Sėjomaina: Įj.' : '🔄 Севооборот: Вкл';
-        const lblOff = lang === 'et' ? '🔄 Külvikord: Väljas' : lang === 'lv' ? '🔄 Augseka: Izsl.' : lang === 'lt' ? '🔄 Sėjomaina: Išj.' : '🔄 Севооборот: Выкл';
-        toggleRotBtn.textContent = enabled ? lblOn : lblOff;
+        const tr = (k) => (window.t ? window.t(k) : '');
+        toggleRotBtn.textContent = enabled
+          ? (tr('toolbar_rotation_on') || '🔄 Севооборот: Вкл')
+          : (tr('toolbar_rotation_off') || '🔄 Севооборот: Выкл');
       }
       if (notify) {
-        this.showToast(enabled
-          ? '🔄 Контроль севооборота включён — показаны подсказки совместимости'
-          : '✨ Контроль севооборота отключён — вы сами решаете, что и куда сажать!');
+        const lang = window.i18n ? window.i18n.getLanguage() : 'ru';
+        const msgOn = lang === 'et' ? '🔄 Külvikorra kontroll sisse lülitatud' : lang === 'lv' ? '🔄 Augu sekas kontrole ieslēgta' : lang === 'lt' ? '🔄 Sėjomainos kontrolė įjungta' : '🔄 Контроль севооборота включён — показаны подсказки совместимости';
+        const msgOff = lang === 'et' ? '✨ Külvikorra kontroll välja lülitatud' : lang === 'lv' ? '✨ Augu sekas kontrole izslēgta' : lang === 'lt' ? '✨ Sėjomainos kontrolė išjungta' : '✨ Контроль севооборота отключён — вы сами решаете, что и куда сажать!';
+        this.showToast(enabled ? msgOn : msgOff);
       }
     };
 
     const savedRotEnabled = localStorage.getItem('smart_garden_rotation_enabled') !== '0';
     applyRotationCheckState(savedRotEnabled, false);
+
+    window.addEventListener('language-changed', () => {
+      const currentlyOn = !document.body.classList.contains('rotation-check-off');
+      applyRotationCheckState(currentlyOn, false);
+    });
 
     if (toggleRotBtn) {
       toggleRotBtn.addEventListener('click', () => {

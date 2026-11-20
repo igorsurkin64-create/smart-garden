@@ -284,21 +284,41 @@
         }
       },
       et: {
-        title: "📖 Kasutusjuhend «Minu Aed»",
-        subtitle: "Interaktiivne juhend aiamaa kaardi, peenarde, külvikorra ja varukoopiate haldamiseks",
+        title: "📖 Kasutusjuhend «Minu Aed» (v8.7)",
+        subtitle: "Interaktiivne juhend: Elav aed, dekoor, istutuspesad, sordikataloog, töö- ja väetamiskalender, külvikord",
         tabs: [
           { id: 'quickstart', label: '🚀 Kiire algus' },
           { id: 'holes', label: '🌱 Istutuspesad ja sordid' },
           { id: 'rotation', label: '🔄 Külvikord' },
-          { id: 'beds', label: '📦 Peenarde ehitaja' },
-          { id: 'care', label: '💧 Kastmine ja hooldus' },
-          { id: 'data', label: '💾 Andmed ja trükk' },
+          { id: 'beds', label: '📦 Peenrad ja dekoor' },
+          { id: 'care', label: '🧪 Väetamine ja kalender' },
+          { id: 'data', label: '💾 Salvestamine ja trükk' },
           { id: 'tips', label: '💡 Nõuanded' },
           { id: 'donate', label: '☕ Toeta autorit' },
           { id: 'feedback', label: '✈️ Tagasiside & Telegram' }
         ],
         sections: {
           quickstart: [
+            {
+              icon: '🎨',
+              title: 'Kaks kaardistiili: «🎨 Elav aed» ja «📐 Skeem» + Aastaajad',
+              desc: 'Vaheta kaardi välimust 1 klõpsuga: 3D-stiil <strong>«🎨 Elav aed»</strong> (puitpeenrad, kaarkasvuhooned, rohelus) või klassikaline <strong>«📐 Skeem»</strong>. «Elavas aias» saad valida hooaja: <strong>🌸 Kevad</strong>, <strong>☀️ Suvi</strong>, <strong>🍂 Sügis</strong>.'
+            },
+            {
+              icon: '🌳',
+              title: 'Aia dekoor («🌳 Dekoor») ja «➕ Pikenda»',
+              desc: 'Lisa plaani aiamaja, lehtla, õunapuu, marjapõõsad, tiik, kivitee ja puitaed. Klõpsa objektil, et kasutada <strong>➕ Pikenda</strong> (ühendab aia ja tee täpselt kokku), <strong>↻ Pööra</strong> või <strong>🗑️ Kustuta</strong> (ka klahv <span class="help-kbd">Delete</span>).'
+            },
+            {
+              icon: '🧪',
+              title: 'Väetamiskalender («🧪 Väetamine») ja Töökalender («📅 Kalender»)',
+              desc: 'Pane kirja väetamised kuupäevade ja peenarde kaupa, võrdle <strong>2025 ja 2026</strong> hooaega kõrvuti ja korda eelmise aasta väetamist 1 klõpsuga. Töökalendris saad märkida tööd tehtuks ☑️ ja lisada oma ülesandeid.'
+            },
+            {
+              icon: '↩️',
+              title: 'Juhusliku liigutamise tagasivõtmine ja «🔄 Külvikord: Sees/Väljas»',
+              desc: 'Kui liigutad peenart kogemata, ilmub alla nupp <strong>↩️ Võta tagasi</strong> (või <span class="help-kbd">Ctrl+Z</span>). Tööriistaribal saad külvikorra märgid 1 klõpsuga sisse või välja lülitada.'
+            },
             {
               icon: '🖱️',
               title: 'Kaardi nihutamine ja suum (Pan & Zoom)',
@@ -494,21 +514,41 @@
         }
       },
       lv: {
-        title: "📖 Lietotāja rokasgrāmata «Mans Dārzs»",
-        subtitle: "Interaktīva pamācība darbam ar dārza plānu, dobēm, augseku un datu dublēšanu",
+        title: "📖 Lietotāja rokasgrāmata «Mans Dārzs» (v8.7)",
+        subtitle: "Interaktīva pamācība: Dzīvais dārzs, dekors, bedrītes, šķirņu katalogs, darbu un mēslošanas kalendārs",
         tabs: [
           { id: 'quickstart', label: '🚀 Ātrais starts' },
           { id: 'holes', label: '🌱 Stādīšanas bedrītes' },
           { id: 'rotation', label: '🔄 Augseka' },
-          { id: 'beds', label: '📦 Dobju konstruktors' },
-          { id: 'care', label: '💧 Laistīšana un kopšana' },
-          { id: 'data', label: '💾 Dati un druka' },
+          { id: 'beds', label: '📦 Dobes un dekors' },
+          { id: 'care', label: '🧪 Mēslošana un kalendārs' },
+          { id: 'data', label: '💾 Saglabāšana un druka' },
           { id: 'tips', label: '💡 Padomi' },
           { id: 'donate', label: '☕ Atbalstīt autoru' },
           { id: 'feedback', label: '✈️ Saziņa & Telegram' }
         ],
         sections: {
           quickstart: [
+            {
+              icon: '🎨',
+              title: 'Divi kartes stili: «🎨 Dzīvais dārzs» un «📐 Shēma» + Gadalaiki',
+              desc: 'Pārslēdziet skatu ar 1 klikšķi: 3D stils <strong>«🎨 Dzīvais dārzs»</strong> (koka dobes, siltumnīcas, zaļumi) vai klasiskā <strong>«📐 Shēma»</strong>. «Dzīvajā dārzā» var mainīt gadalaiku: <strong>🌸 Pavasaris</strong>, <strong>☀️ Vasara</strong>, <strong>🍂 Rudens</strong>.'
+            },
+            {
+              icon: '🌳',
+              title: 'Dārza dekors («🌳 Dekors») un «➕ Pagarināt»',
+              desc: 'Novietojiet dārza māju, lapeni, ābeli, ogulājus, dīķi, akmeņu taciņu un žogu. Noklikšķiniet uz objekta, lai izmantotu <strong>➕ Pagarināt</strong> (savieno žogu/taciņu cieši kopā), <strong>↻ Pagriezt</strong> vai <strong>🗑️ Dzēst</strong> (<span class="help-kbd">Delete</span>).'
+            },
+            {
+              icon: '🧪',
+              title: 'Mēslošanas kalendārs («🧪 Mēslošana») un Darbu kalendārs («📅 Kalendārs»)',
+              desc: 'Pierakstiet mēslošanu pa datumiem un dobēm, salīdziniet <strong>2025 un 2026</strong> sezonu blakus un atkārtojiet ar 1 klikšķi. Darbu kalendārā atzīmējiet paveikto ☑️ un pievienojiet savus darbus.'
+            },
+            {
+              icon: '↩️',
+              title: 'Nejaušas pārvietošanas atsaukšana un «🔄 Augu seka: Iesl./Izsl.»',
+              desc: 'Ja nejauši pārbīdījāt dobi, apakšā parādīsies poga <strong>↩️ Atsaukt</strong> (vai <span class="help-kbd">Ctrl+Z</span>). Rīkjoslā varat ieslēgt vai izslēgt augu sekas norādes ar 1 klikšķi.'
+            },
             {
               icon: '🖱️',
               title: 'Plāna pārvietošana un mērogs (Pan & Zoom)',
@@ -704,21 +744,41 @@
         }
       },
       lt: {
-        title: "📖 Vartotojo vadovas «Mano Daržas»",
-        subtitle: "Interaktyvi instrukcija darbui su daržo planu, lysvėmis, sėjomaina ir atsarginėmis kopijomis",
+        title: "📖 Vartotojo vadovas «Mano Daržas» (v8.7)",
+        subtitle: "Interaktyvi instrukcija: Gyvas sodas, dekoras, duobutės, veislių katalogas, darbų ir tręšimo kalendorius",
         tabs: [
           { id: 'quickstart', label: '🚀 Greita pradžia' },
           { id: 'holes', label: '🌱 Duobutės ir veislės' },
           { id: 'rotation', label: '🔄 Sėjomaina' },
-          { id: 'beds', label: '📦 Lysvių konstruktorius' },
-          { id: 'care', label: '💧 Laistymas ir priežiūra' },
-          { id: 'data', label: '💾 Duomenys ir kopijos' },
+          { id: 'beds', label: '📦 Lysvės ir dekoras' },
+          { id: 'care', label: '🧪 Tręšimas ir kalendorius' },
+          { id: 'data', label: '💾 Išsaugojimas ir spauda' },
           { id: 'tips', label: '💡 Patarimai' },
           { id: 'donate', label: '☕ Paremti autorių' },
           { id: 'feedback', label: '✈️ Grįžtamasis ryšys & Telegram' }
         ],
         sections: {
           quickstart: [
+            {
+              icon: '🎨',
+              title: 'Du žemėlapio stiliai: «🎨 Gyvas sodas» ir «📐 Schema» + Metų laikai',
+              desc: 'Perjunkite vaizdą 1 paspaudimu: 3D stilius <strong>«🎨 Gyvas sodas»</strong> (medinės lysvės, šiltnamiai, žaluma) arba klasikinė <strong>«📐 Schema»</strong>. «Gyvame sode» galima keisti sezoną: <strong>🌸 Pavasaris</strong>, <strong>☀️ Vasara</strong>, <strong>🍂 Ruduo</strong>.'
+            },
+            {
+              icon: '🌳',
+              title: 'Sklypo dekoras («🌳 Dekoras») ir «➕ Pratęsti»',
+              desc: 'Pridėkite namelį, pavėsinę, obelį, krūmus, tvenkinį, akmeninį taką ir tvorą. Spustelėkite objektą ir naudokite <strong>➕ Pratęsti</strong> (tiksliai sujungia tvorą/taką), <strong>↻ Pasukti</strong> arba <strong>🗑️ Ištrinti</strong> (<span class="help-kbd">Delete</span>).'
+            },
+            {
+              icon: '🧪',
+              title: 'Tręšimo kalendorius («🧪 Tręšimas») ir Darbų kalendorius («📅 Kalendorius»)',
+              desc: 'Fiksuokite tręšimus pagal datas ir lysves, palyginkite <strong>2025 ir 2026</strong> sezonus šalia ir pakartokite 1 paspaudimu. Darbų kalendoriuje žymėkite atliktus darbus ☑️ ir pridėkite savo užduotis.'
+            },
+            {
+              icon: '↩️',
+              title: 'Atsitiktinio perkėlimo atšaukimas ir «🔄 Sėjomaina: Įj./Išj.»',
+              desc: 'Jei netyčia pajudinote lysvę, apačioje atsiras mygtukas <strong>↩️ Atšaukti</strong> (arba <span class="help-kbd">Ctrl+Z</span>). Įrankių juostoje galite įjungti arba išjungti sėjomainos ženklus 1 paspaudimu.'
+            },
             {
               icon: '🖱️',
               title: 'Plano slinkimas ir mastelis (Pan & Zoom)',

@@ -871,6 +871,73 @@
     };
 
     const renderCalendarModal = () => {
+      const CL = {
+        ru: {
+          title: `📅 Календарь работ (${activeYear} г.)`,
+          sub: 'Отмечайте галочкой выполненные работы, ставьте точную дату и добавляйте свои дела',
+          hideForm: '✕ Скрыть форму',
+          addWork: '➕ Добавить работу',
+          newEntry: '📌 Новая запись в календарь:',
+          newPlh: 'Например: Пропикировать томаты, купить грунт...',
+          wholeGarden: '🏡 Весь участок',
+          saveBtn: '💾 Добавить',
+          all: 'Все', pending: '⏳ Осталось', done: '✅ Выполнено',
+          seedling: '🪴 Рассада', greenhouse: '🏡 Теплица', ground: '🌱 Грунт', harvest: '🧺 Урожай', custom: '📌 Мои дела',
+          doneShort: 'выполнено', emptyCat: 'Нет задач в выбранной категории.',
+          emptyTitle: `На ${activeYear} год пока нет задач`,
+          emptySub: 'Назначьте посадки на грядках или нажмите «➕ Добавить работу» выше!',
+          printBtn: '🖨️ Распечатать календарь (A4)', closeBtn: 'Готово'
+        },
+        et: {
+          title: `📅 Aiatööde kalender (${activeYear})`,
+          sub: 'Märgi tehtud tööd linnukesega, lisa täpne kuupäev ja oma ülesanded',
+          hideForm: '✕ Peida vorm',
+          addWork: '➕ Lisa töö',
+          newEntry: '📌 Uus töö kalendrisse:',
+          newPlh: 'Nt: Pikeeri tomatid, osta mulda...',
+          wholeGarden: '🏡 Kogu aed',
+          saveBtn: '💾 Lisa',
+          all: 'Kõik', pending: '⏳ Jäänud', done: '✅ Tehtud',
+          seedling: '🪴 Ettekasvatus', greenhouse: '🏡 Kasvuhoone', ground: '🌱 Avamaa', harvest: '🧺 Saak', custom: '📌 Minu tööd',
+          doneShort: 'tehtud', emptyCat: 'Valitud kategoorias töid ei ole.',
+          emptyTitle: `${activeYear}. aastaks pole veel töid`,
+          emptySub: 'Määra peenardele kultuurid või vajuta ülal «➕ Lisa töö»!',
+          printBtn: '🖨️ Trüki kalender (A4)', closeBtn: 'Valmis'
+        },
+        lv: {
+          title: `📅 Darbu kalendārs (${activeYear}. g.)`,
+          sub: 'Atzīmējiet paveiktos darbus ar ķeksīti, norādiet datumu un pievienojiet savus darbus',
+          hideForm: '✕ Paslēpt formu',
+          addWork: '➕ Pievienot darbu',
+          newEntry: '📌 Jauns ieraksts kalendārā:',
+          newPlh: 'Piem.: Izpiķēt tomātus, nopirkt zemi...',
+          wholeGarden: '🏡 Viss dārzs',
+          saveBtn: '💾 Pievienot',
+          all: 'Visi', pending: '⏳ Atlicis', done: '✅ Izpildīts',
+          seedling: '🪴 Stādi', greenhouse: '🏡 Siltumnīca', ground: '🌱 Lauks', harvest: '🧺 Raža', custom: '📌 Mani darbi',
+          doneShort: 'izpildīts', emptyCat: 'Izvēlētajā kategorijā nav darbu.',
+          emptyTitle: `${activeYear}. gadam vēl nav darbu`,
+          emptySub: 'Norādiet kultūras dobēs vai nospiediet «➕ Pievienot darbu» augstāk!',
+          printBtn: '🖨️ Drukāt kalendāru (A4)', closeBtn: 'Gatavs'
+        },
+        lt: {
+          title: `📅 Darbų kalendorius (${activeYear} m.)`,
+          sub: 'Pažymėkite atliktus darbus varnele, nurodykite tikslią datą ir pridėkite savo darbus',
+          hideForm: '✕ Slėpti formą',
+          addWork: '➕ Pridėti darbą',
+          newEntry: '📌 Naujas įrašas kalendoriuje:',
+          newPlh: 'Pvz.: Pikuoti pomidorus, nusipirkti žemės...',
+          wholeGarden: '🏡 Visas daržas',
+          saveBtn: '💾 Pridėti',
+          all: 'Visi', pending: '⏳ Liko', done: '✅ Atlikta',
+          seedling: '🪴 Daigai', greenhouse: '🏡 Šiltnamis', ground: '🌱 Gruntas', harvest: '🧺 Derlius', custom: '📌 Mano darbai',
+          doneShort: 'atlikta', emptyCat: 'Pasirinktoje kategorijoje darbų nėra.',
+          emptyTitle: `${activeYear} metams darbų dar nėra`,
+          emptySub: 'Priskirkite augalus lysvėms arba spauskite «➕ Pridėti darbą» viršuje!',
+          printBtn: '🖨️ Spausdinti kalendorių (A4)', closeBtn: 'Atlikta'
+        }
+      }[currentLang] || {};
+
       const mergedMonths = buildMergedMonths();
       let totalTasks = 0;
       let doneTasks = 0;
@@ -881,14 +948,18 @@
         });
       });
       const pct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+      const doneOfText = currentLang === 'et' ? `✅ Tehtud: ${doneTasks} / ${totalTasks} (${pct}%)`
+        : currentLang === 'lv' ? `✅ Izpildīts: ${doneTasks} no ${totalTasks} (${pct}%)`
+        : currentLang === 'lt' ? `✅ Atlikta: ${doneTasks} iš ${totalTasks} (${pct}%)`
+        : `✅ Выполнено: ${doneTasks} из ${totalTasks} (${pct}%)`;
 
       const renderEventsHtml = () => {
         if (mergedMonths.length === 0) {
           return `
             <div style="text-align: center; padding: 2.2rem 1rem; color: var(--text-muted);">
               <div style="font-size: 2.4rem; margin-bottom: 0.5rem;">🌱</div>
-              <h3>На ${activeYear} год пока нет задач</h3>
-              <p style="font-size: 0.88rem; margin-top: 0.35rem;">Назначьте посадки на грядках или нажмите <b>«➕ Добавить свою работу»</b> выше!</p>
+              <h3>${CL.emptyTitle}</h3>
+              <p style="font-size: 0.88rem; margin-top: 0.35rem;">${CL.emptySub}</p>
             </div>
           `;
         }
@@ -909,12 +980,12 @@
             <div class="calendar-month-card">
               <div class="calendar-month-header">
                 <span class="calendar-month-title">${escapeHtml(m.monthName)}</span>
-                <span class="calendar-month-count">${monthDone}/${filtered.length} выполнено</span>
+                <span class="calendar-month-count">${monthDone}/${filtered.length} ${CL.doneShort}</span>
               </div>
               <div class="calendar-events-list">
                 ${filtered.map(ev => `
                   <div class="calendar-event-row ${ev.done ? 'cal-row-done' : ''}" style="display: flex; align-items: center; gap: 0.55rem; flex-wrap: wrap; padding: 0.55rem 0.7rem; border-radius: 8px; transition: background 0.15s ease; ${ev.done ? 'background: rgba(22, 163, 74, 0.09);' : ''}">
-                    <label style="display: flex; align-items: center; cursor: pointer; flex-shrink: 0;" title="Отметить работу выполненной">
+                    <label style="display: flex; align-items: center; cursor: pointer; flex-shrink: 0;">
                       <input type="checkbox"
                              class="cal-task-checkbox"
                              data-is-custom="${ev.isCustom ? '1' : '0'}"
@@ -939,10 +1010,9 @@
                              data-is-custom="${ev.isCustom ? '1' : '0'}"
                              data-task-id="${escapeHtml(ev.isCustom ? ev.id : ev.taskKey)}"
                              value="${escapeHtml(ev.date || '')}"
-                             title="Указать точную дату выполнения или плана"
                              style="padding: 3px 6px; font-size: 0.78rem; border: 1px solid var(--border-subtle); border-radius: 6px; background: var(--bg-primary); color: var(--text-main);">
                       ${ev.isCustom ? `
-                        <button type="button" class="btn btn-sm btn-outline cal-delete-custom-btn" data-task-id="${escapeHtml(ev.id)}" title="Удалить эту запись" style="padding: 2px 6px; color: #dc2626; border-color: #fca5a5;">🗑️</button>
+                        <button type="button" class="btn btn-sm btn-outline cal-delete-custom-btn" data-task-id="${escapeHtml(ev.id)}" style="padding: 2px 6px; color: #dc2626; border-color: #fca5a5;">🗑️</button>
                       ` : ''}
                     </div>
                   </div>
@@ -954,29 +1024,30 @@
 
         return html || `
           <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
-            Нет задач в выбранной категории.
+            ${CL.emptyCat}
           </div>
         `;
       };
 
-      const bedOptionsHtml = beds.map(b => `<option value="${escapeHtml(b.name)}">${escapeHtml(b.name)}</option>`).join('');
+      const getBedDispCal = (b) => (window.i18n && window.i18n.getBedName ? window.i18n.getBedName(b) : b.name);
+      const bedOptionsHtml = beds.map(b => `<option value="${escapeHtml(getBedDispCal(b))}">${escapeHtml(getBedDispCal(b))}</option>`).join('');
 
       modalContent.innerHTML = `
         <div class="modal-card calendar-modal-content" style="max-width: 820px; width: 96%;">
           <div class="modal-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
             <div>
-              <h3 style="margin: 0;">📅 Календарь работ (${activeYear} г.)</h3>
-              <span class="text-xs text-muted">Отмечайте галочкой выполненные работы, ставьте точную дату и добавляйте свои дела</span>
+              <h3 style="margin: 0;">${CL.title}</h3>
+              <span class="text-xs text-muted">${CL.sub}</span>
               <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
                 <div style="flex: 1; max-width: 240px; height: 8px; background: var(--bg-tertiary, #e5e7eb); border-radius: 999px; overflow: hidden;">
                   <div style="width: ${pct}%; height: 100%; background: #16a34a; transition: width 0.25s ease;"></div>
                 </div>
-                <span style="font-size: 0.78rem; font-weight: 800; color: #15803d;">✅ Выполнено: ${doneTasks} из ${totalTasks} (${pct}%)</span>
+                <span style="font-size: 0.78rem; font-weight: 800; color: #15803d;">${doneOfText}</span>
               </div>
             </div>
             <div style="display: flex; align-items: center; gap: 6px;">
               <button type="button" class="btn btn-sm btn-primary" id="cal-toggle-add-btn" style="white-space: nowrap;">
-                ${showAddForm ? '✕ Скрыть форму' : '➕ Добавить работу'}
+                ${showAddForm ? CL.hideForm : CL.addWork}
               </button>
               <button class="modal-close-btn">&times;</button>
             </div>
@@ -984,28 +1055,28 @@
 
           ${showAddForm ? `
             <div style="padding: 0.85rem 1.2rem; background: rgba(22, 163, 74, 0.07); border-bottom: 1px solid var(--border-subtle);">
-              <div style="font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #15803d;">📌 Новая запись в календарь:</div>
+              <div style="font-weight: 700; font-size: 0.86rem; margin-bottom: 6px; color: #15803d;">${CL.newEntry}</div>
               <div style="display: grid; grid-template-columns: 145px 1fr 180px auto; gap: 6px; align-items: center;">
                 <input type="date" id="cal-new-date" class="form-input" value="${todayIso}" style="padding: 6px 8px; font-size: 0.84rem;">
-                <input type="text" id="cal-new-title" class="form-input" placeholder="Например: Пропикировать томаты, купить грунт..." style="padding: 6px 8px; font-size: 0.84rem;">
+                <input type="text" id="cal-new-title" class="form-input" placeholder="${escapeHtml(CL.newPlh)}" style="padding: 6px 8px; font-size: 0.84rem;">
                 <select id="cal-new-bed" class="form-input" style="padding: 6px 8px; font-size: 0.84rem;">
-                  <option value="Весь участок">🏡 Весь участок</option>
+                  <option value="${escapeHtml(CL.wholeGarden)}">${escapeHtml(CL.wholeGarden)}</option>
                   ${bedOptionsHtml}
                 </select>
-                <button type="button" class="btn btn-sm btn-primary" id="cal-save-new-btn" style="padding: 6px 12px;">💾 Добавить</button>
+                <button type="button" class="btn btn-sm btn-primary" id="cal-save-new-btn" style="padding: 6px 12px;">${CL.saveBtn}</button>
               </div>
             </div>
           ` : ''}
 
           <div class="calendar-filters-bar">
-            <button class="calendar-filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all">Все (${totalTasks})</button>
-            <button class="calendar-filter-btn ${currentFilter === 'pending' ? 'active' : ''}" data-filter="pending">⏳ Осталось (${totalTasks - doneTasks})</button>
-            <button class="calendar-filter-btn ${currentFilter === 'done' ? 'active' : ''}" data-filter="done">✅ Выполнено (${doneTasks})</button>
-            <button class="calendar-filter-btn ${currentFilter === 'seedling' ? 'active' : ''}" data-filter="seedling">🪴 Рассада</button>
-            <button class="calendar-filter-btn ${currentFilter === 'greenhouse' ? 'active' : ''}" data-filter="greenhouse">🏡 Теплица</button>
-            <button class="calendar-filter-btn ${currentFilter === 'ground' ? 'active' : ''}" data-filter="ground">🌱 Грунт</button>
-            <button class="calendar-filter-btn ${currentFilter === 'harvest' ? 'active' : ''}" data-filter="harvest">🧺 Урожай</button>
-            <button class="calendar-filter-btn ${currentFilter === 'custom' ? 'active' : ''}" data-filter="custom">📌 Мои дела</button>
+            <button class="calendar-filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all">${CL.all} (${totalTasks})</button>
+            <button class="calendar-filter-btn ${currentFilter === 'pending' ? 'active' : ''}" data-filter="pending">${CL.pending} (${totalTasks - doneTasks})</button>
+            <button class="calendar-filter-btn ${currentFilter === 'done' ? 'active' : ''}" data-filter="done">${CL.done} (${doneTasks})</button>
+            <button class="calendar-filter-btn ${currentFilter === 'seedling' ? 'active' : ''}" data-filter="seedling">${CL.seedling}</button>
+            <button class="calendar-filter-btn ${currentFilter === 'greenhouse' ? 'active' : ''}" data-filter="greenhouse">${CL.greenhouse}</button>
+            <button class="calendar-filter-btn ${currentFilter === 'ground' ? 'active' : ''}" data-filter="ground">${CL.ground}</button>
+            <button class="calendar-filter-btn ${currentFilter === 'harvest' ? 'active' : ''}" data-filter="harvest">${CL.harvest}</button>
+            <button class="calendar-filter-btn ${currentFilter === 'custom' ? 'active' : ''}" data-filter="custom">${CL.custom}</button>
           </div>
 
           <div class="calendar-timeline-body" id="calendar-timeline-body">
@@ -1014,10 +1085,10 @@
 
           <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
             <button class="btn btn-outline btn-sm" id="calendar-print-btn">
-              🖨️ Распечатать календарь (A4)
+              ${CL.printBtn}
             </button>
             <button class="btn btn-primary btn-sm" id="calendar-close-ok-btn">
-              Готово
+              ${CL.closeBtn}
             </button>
           </div>
         </div>
@@ -1174,10 +1245,17 @@
     let compareMode = false;
     const todayIso = new Date().toISOString().split('T')[0];
 
-    const monthNames = {
-      1: 'Январь', 2: 'Февраль', 3: 'Март', 4: 'Апрель', 5: 'Май', 6: 'Июнь',
-      7: 'Июль', 8: 'Август', 9: 'Сентябрь', 10: 'Октябрь', 11: 'Ноябрь', 12: 'Декабрь'
+    const tr = (k, p) => (window.t ? window.t(k, p) : k);
+    const getBedDisp = (b) => (window.i18n && window.i18n.getBedName ? window.i18n.getBedName(b) : b.name);
+    const getSecDisp = (s) => (window.i18n && window.i18n.getBedName ? window.i18n.getBedName({ id: s.id, name: s.name }) : s.name);
+
+    const monthNamesByLang = {
+      ru: { 1: 'Январь', 2: 'Февраль', 3: 'Март', 4: 'Апрель', 5: 'Май', 6: 'Июнь', 7: 'Июль', 8: 'Август', 9: 'Сентябрь', 10: 'Октябрь', 11: 'Ноябрь', 12: 'Декабрь' },
+      et: { 1: 'Jaanuar', 2: 'Veebruar', 3: 'Märts', 4: 'Aprill', 5: 'Mai', 6: 'Juuni', 7: 'Juuli', 8: 'August', 9: 'September', 10: 'Oktoober', 11: 'November', 12: 'Detsember' },
+      lv: { 1: 'Janvāris', 2: 'Februāris', 3: 'Marts', 4: 'Aprīlis', 5: 'Maijs', 6: 'Jūnijs', 7: 'Jūlijs', 8: 'Augusts', 9: 'Septembris', 10: 'Oktobris', 11: 'Novembris', 12: 'Decembris' },
+      lt: { 1: 'Sausis', 2: 'Vasaris', 3: 'Kovas', 4: 'Balandis', 5: 'Gegužė', 6: 'Birželis', 7: 'Liepa', 8: 'Rugpjūtis', 9: 'Rugsėjis', 10: 'Spalis', 11: 'Lapkritis', 12: 'Gruodis' }
     };
+    const monthNames = monthNamesByLang[currentLang] || monthNamesByLang.ru;
 
     const formatRuDate = (iso) => {
       if (!iso || !iso.includes('-')) return iso || '—';
@@ -1195,7 +1273,7 @@
           isWholeGarden: true,
           bedId: null,
           sectionId: null,
-          targetLabel: '🏡 Весь участок',
+          targetLabel: tr('feeding_whole_garden'),
           cropEmoji: '🌿',
           cropName: ''
         });
@@ -1214,7 +1292,7 @@
                 isWholeGarden: false,
                 bedId: bed.id,
                 sectionId: sec.id,
-                targetLabel: `${bed.name} (${sec.name})`,
+                targetLabel: `${getBedDisp(bed)} (${getSecDisp(sec)})`,
                 cropEmoji: c ? c.emoji : '🌱',
                 cropName: c ? getCropName(c, currentLang) : ''
               });
@@ -1230,7 +1308,7 @@
               isWholeGarden: false,
               bedId: bed.id,
               sectionId: null,
-              targetLabel: bed.name,
+              targetLabel: getBedDisp(bed),
               cropEmoji: c ? c.emoji : '🌱',
               cropName: c ? getCropName(c, currentLang) : ''
             });
@@ -1243,20 +1321,20 @@
     };
 
     const buildTargetOptions = () => {
-      let opts = `<option value="garden">🏡 Весь участок (общая подкормка)</option>`;
+      let opts = `<option value="garden">${escapeHtml(tr('feeding_whole_garden'))}</option>`;
       beds.forEach(bed => {
         if (bed.sections && bed.sections.length > 0) {
           bed.sections.forEach(sec => {
             const p = sec.history?.[selectedYear];
             const c = p?.cropId ? getCropById(p.cropId) : null;
             const cTxt = c ? ` — ${c.emoji} ${getCropName(c, currentLang)}` : '';
-            opts += `<option value="bed|${bed.id}|${sec.id}">${escapeHtml(bed.name)} (${escapeHtml(sec.name)})${escapeHtml(cTxt)}</option>`;
+            opts += `<option value="bed|${bed.id}|${sec.id}">${escapeHtml(getBedDisp(bed))} (${escapeHtml(getSecDisp(sec))})${escapeHtml(cTxt)}</option>`;
           });
         } else {
           const p = bed.history?.[selectedYear];
           const c = p?.cropId ? getCropById(p.cropId) : null;
           const cTxt = c ? ` — ${c.emoji} ${getCropName(c, currentLang)}` : '';
-          opts += `<option value="bed|${bed.id}|">${escapeHtml(bed.name)}${escapeHtml(cTxt)}</option>`;
+          opts += `<option value="bed|${bed.id}|">${escapeHtml(getBedDisp(bed))}${escapeHtml(cTxt)}</option>`;
         }
       });
       return opts;
@@ -1267,8 +1345,7 @@
         return `
           <div style="text-align: center; padding: 2rem 1rem; color: var(--text-muted); background: var(--bg-secondary); border-radius: 10px; border: 1.5px dashed var(--border-subtle);">
             <div style="font-size: 2rem; margin-bottom: 6px;">🧪</div>
-            <div style="font-weight: 700; color: var(--text-main);">За ${yearNum} год подкормок пока не записано</div>
-            <div class="text-xs" style="margin-top: 4px;">Добавьте первую подкормку в форме выше — с точной датой и дозировкой!</div>
+            <div style="font-weight: 700; color: var(--text-main);">${escapeHtml(tr('feeding_empty', { year: yearNum }))}</div>
           </div>
         `;
       }
@@ -1282,16 +1359,19 @@
       });
 
       const typeBadge = (t) => {
-        if (t === 'protection') return `<span style="background: #fef3c7; color: #b45309; padding: 2px 7px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">🛡️ Защита</span>`;
-        if (t === 'care') return `<span style="background: #e0f2fe; color: #0369a1; padding: 2px 7px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">✂️ Уход</span>`;
-        return `<span style="background: #dcfce7; color: #15803d; padding: 2px 7px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">🧪 Подкормка</span>`;
+        if (t === 'protection') return `<span style="background: #fef3c7; color: #b45309; padding: 2px 7px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">${escapeHtml(tr('feeding_type_treatment'))}</span>`;
+        if (t === 'care') return `<span style="background: #e0f2fe; color: #0369a1; padding: 2px 7px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">${escapeHtml(tr('feeding_type_care'))}</span>`;
+        return `<span style="background: #dcfce7; color: #15803d; padding: 2px 7px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">${escapeHtml(tr('feeding_type_feeding'))}</span>`;
       };
+
+      const noDateLbl = currentLang === 'et' ? 'Kuupäevata' : currentLang === 'lv' ? 'Bez datuma' : currentLang === 'lt' ? 'Be datos' : 'Без даты';
+      const pcsLbl = currentLang === 'et' ? 'tk' : currentLang === 'lv' ? 'gab.' : currentLang === 'lt' ? 'vnt.' : 'шт.';
 
       return Array.from(byMonth.entries()).map(([mNum, list]) => `
         <div class="calendar-month-card" style="margin-bottom: 10px;">
           <div class="calendar-month-header">
-            <span class="calendar-month-title">${monthNames[mNum] || 'Без даты'} ${yearNum}</span>
-            <span class="calendar-month-count">${list.length} шт.</span>
+            <span class="calendar-month-title">${monthNames[mNum] || noDateLbl} ${yearNum}</span>
+            <span class="calendar-month-count">${list.length} ${pcsLbl}</span>
           </div>
           <div class="calendar-events-list">
             ${list.map(ev => `
@@ -1314,9 +1394,8 @@
                             data-note="${escapeHtml(ev.note || '')}"
                             data-type="${escapeHtml(ev.type || 'fertilizer')}"
                             data-target="${ev.isWholeGarden ? 'garden' : `bed|${ev.bedId}|${ev.sectionId || ''}`}"
-                            title="Повторить эту подкормку в ${activeYear} году (на сегодняшнюю дату)"
                             style="padding: 3px 8px; font-size: 0.74rem; color: #15803d; border-color: #86efac;">
-                      📋 В ${activeYear} г.
+                      ${escapeHtml(tr('feeding_btn_repeat', { year: activeYear }))}
                     </button>
                   ` : ''}
                   <button type="button" class="btn btn-sm btn-outline feed-del-btn"
@@ -1325,7 +1404,6 @@
                           data-is-garden="${ev.isWholeGarden ? '1' : '0'}"
                           data-bed-id="${escapeHtml(ev.bedId || '')}"
                           data-sec-id="${escapeHtml(ev.sectionId || '')}"
-                          title="Удалить запись"
                           style="padding: 2px 7px; color: #dc2626; border-color: #fca5a5;">🗑️</button>
                 </div>
               </div>
@@ -1347,16 +1425,65 @@
         ? todayIso
         : `${selectedYear}-${todayIso.slice(5)}`;
 
+      const presetsByLang = {
+        ru: [
+          ['fertilizer', 'Настой древесной золы', '🪵 Зола'],
+          ['fertilizer', 'Настой крапивы (азот)', '🌿 Крапива'],
+          ['fertilizer', 'Гумат калия / Биогумус', '💧 Гумат'],
+          ['fertilizer', 'Монофосфат калия', '🧪 Монофосфат'],
+          ['fertilizer', 'Борная кислота (для завязи)', '🥛 Борная'],
+          ['protection', 'Опрыскивание Фитоспорином', '🛡️ Фитоспорин'],
+          ['fertilizer', 'Компост / Перегной', '🐄 Компост'],
+          ['care', 'Мульчирование травой / соломой', '🌾 Мульча']
+        ],
+        et: [
+          ['fertilizer', 'Puutuhalahus', '🪵 Tuhk'],
+          ['fertilizer', 'Nõgeseleotis (lämmastik)', '🌿 Nõges'],
+          ['fertilizer', 'Kaaliumhumaat / Biohuumus', '💧 Humaat'],
+          ['fertilizer', 'Kaaliummonofosfaat', '🧪 Fosfaat'],
+          ['fertilizer', 'Boorhape (õitsemiseks)', '🥛 Boor'],
+          ['protection', 'Bioloogiline pritsimine', '🛡️ Kaitse'],
+          ['fertilizer', 'Kompost / Kõdusõnnik', '🐄 Kompost'],
+          ['care', 'Multšimine rohu / põhuga', '🌾 Multš']
+        ],
+        lv: [
+          ['fertilizer', 'Koksnes pelnu uzlējums', '🪵 Pelni'],
+          ['fertilizer', 'Nātru virca (slāpeklis)', '🌿 Nātres'],
+          ['fertilizer', 'Kālija humāts / Biohumuss', '💧 Humāts'],
+          ['fertilizer', 'Kālija monofosfāts', '🧪 Fosfāts'],
+          ['fertilizer', 'Borskābe (ziedēšanai)', '🥛 Bors'],
+          ['protection', 'Aizsargsmidzināšana', '🛡️ Aizsardzība'],
+          ['fertilizer', 'Komposts / Kūtsmēsli', '🐄 Komposts'],
+          ['care', 'Mulčēšana ar zāli / salmiem', '🌾 Mulča']
+        ],
+        lt: [
+          ['fertilizer', 'Medžio pelenų tirpalas', '🪵 Pelenai'],
+          ['fertilizer', 'Dilgėlių raugas (azotas)', '🌿 Dilgėlės'],
+          ['fertilizer', 'Kalio humatas / Biohumusas', '💧 Humatas'],
+          ['fertilizer', 'Kalio monofosfatas', '🧪 Fosfatas'],
+          ['fertilizer', 'Boro rūgštis (žydėjimui)', '🥛 Boras'],
+          ['protection', 'Purškimas apsaugai', '🛡️ Apsauga'],
+          ['fertilizer', 'Kompostas / Mėšlas', '🐄 Kompostas'],
+          ['care', 'Mulčiavimas žole / šiaudais', '🌾 Mulčias']
+        ]
+      };
+      const presets = presetsByLang[currentLang] || presetsByLang.ru;
+      const quickLbl = currentLang === 'et' ? '⚡ Kiirvalik:' : currentLang === 'lv' ? '⚡ Ātrā izvēle:' : currentLang === 'lt' ? '⚡ Greitas pasirinkimas:' : '⚡ Быстрый выбор:';
+      const thisSeasonLbl = currentLang === 'et' ? '(Käesolev)' : currentLang === 'lv' ? '(Šī sezona)' : currentLang === 'lt' ? '(Šis sezonas)' : '(Этот сезон)';
+      const prevSeasonLbl = currentLang === 'et' ? '(Eelmine)' : currentLang === 'lv' ? '(Pagājušā)' : currentLang === 'lt' ? '(Praėjęs)' : '(Прошлый)';
+      const doneBtnLbl = currentLang === 'et' ? 'Valmis' : currentLang === 'lv' ? 'Gatavs' : currentLang === 'lt' ? 'Atlikta' : 'Готово';
+      const notePlaceholder = currentLang === 'et' ? 'Annus või märkus (valikuline)' : currentLang === 'lv' ? 'Deva vai piezīme (neobligāti)' : currentLang === 'lt' ? 'Dozė ar pastaba (nebūtina)' : 'Дозировка или заметка (необязательно, напр.: 1 стакан золы на 10 л воды)';
+
       modalContent.innerHTML = `
         <div class="modal-card calendar-modal-content" style="max-width: 980px; width: 96vw; max-height: 88vh; display: flex; flex-direction: column;">
           <div class="modal-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-shrink: 0;">
             <div>
-              <h3 style="margin: 0;">🧪 Календарь подкормок и обработок</h3>
-              <span class="text-xs text-muted">Записывайте, чем и какого числа подкармливали грядки, и сравнивайте с прошлым сезоном</span>
+              <h3 style="margin: 0;">${escapeHtml(tr('feeding_modal_title'))}</h3>
+              <span class="text-xs text-muted">${escapeHtml(tr('feeding_modal_subtitle'))}</span>
             </div>
             <div style="display: flex; align-items: center; gap: 6px;">
-              <button type="button" class="btn btn-sm ${compareMode ? 'btn-primary' : 'btn-outline'}" id="feed-compare-toggle-btn" title="Показать прошлый и текущий сезон рядом">
-                🔀 Сравнить ${prevYear} и ${activeYear}
+              <button type="button" class="btn btn-sm ${compareMode ? 'btn-primary' : 'btn-outline'}" id="feed-compare-toggle-btn">
+                ${escapeHtml(tr('feeding_tab_compare', { prev: prevYear, curr: activeYear }))}
               </button>
               <button class="modal-close-btn">&times;</button>
             </div>
@@ -1366,7 +1493,7 @@
           <div class="calendar-filters-bar" style="flex-shrink: 0;">
             ${yearsList.map(y => `
               <button type="button" class="calendar-filter-btn feed-year-tab ${!compareMode && selectedYear === y ? 'active' : ''}" data-year="${y}">
-                ${y === activeYear ? '📅' : '🕰️'} ${y} г.${y === activeYear ? ' (Этот сезон)' : (y === prevYear ? ' (Прошлый)' : '')} • ${yearCounts.get(y) || 0}
+                ${y === activeYear ? '📅' : '🕰️'} ${y} ${y === activeYear ? thisSeasonLbl : (y === prevYear ? prevSeasonLbl : '')} • ${yearCounts.get(y) || 0}
               </button>
             `).join('')}
           </div>
@@ -1374,31 +1501,24 @@
           <!-- Форма добавления подкормки на дату -->
           <div style="padding: 0.75rem 1.15rem; background: rgba(22, 163, 74, 0.06); border-bottom: 1px solid var(--border-subtle); flex-shrink: 0;">
             <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; align-items: center;">
-              <span style="font-size: 0.76rem; font-weight: 700; color: #15803d;">⚡ Быстрый выбор:</span>
-              <button type="button" class="chip-preset-btn feed-preset-chip" data-type="fertilizer" data-title="Настой древесной золы">🪵 Зола</button>
-              <button type="button" class="chip-preset-btn feed-preset-chip" data-type="fertilizer" data-title="Настой крапивы (азот)">🌿 Крапива</button>
-              <button type="button" class="chip-preset-btn feed-preset-chip" data-type="fertilizer" data-title="Гумат калия / Биогумус">💧 Гумат</button>
-              <button type="button" class="chip-preset-btn feed-preset-chip" data-type="fertilizer" data-title="Монофосфат калия">🧪 Монофосфат</button>
-              <button type="button" class="chip-preset-btn feed-preset-chip" data-type="fertilizer" data-title="Борная кислота (для завязи)">🥛 Борная</button>
-              <button type="button" class="chip-preset-btn feed-preset-chip" data-type="protection" data-title="Опрыскивание Фитоспорином">🛡️ Фитоспорин</button>
-              <button type="button" class="chip-preset-btn feed-preset-chip" data-type="fertilizer" data-title="Компост / Перегной">🐄 Компост</button>
-              <button type="button" class="chip-preset-btn feed-preset-chip" data-type="care" data-title="Мульчирование травой / соломой">🌾 Мульча</button>
+              <span style="font-size: 0.76rem; font-weight: 700; color: #15803d;">${quickLbl}</span>
+              ${presets.map(([t, full, short]) => `<button type="button" class="chip-preset-btn feed-preset-chip" data-type="${t}" data-title="${escapeHtml(full)}">${short}</button>`).join('')}
             </div>
             <div style="display: grid; grid-template-columns: 140px 130px 1fr 1fr auto; gap: 6px; align-items: center;">
-              <input type="date" id="feed-input-date" class="form-input" value="${defaultDateForYear}" style="padding: 6px 8px; font-size: 0.84rem;" title="Дата подкормки">
+              <input type="date" id="feed-input-date" class="form-input" value="${defaultDateForYear}" style="padding: 6px 8px; font-size: 0.84rem;">
               <select id="feed-input-type" class="form-input" style="padding: 6px 6px; font-size: 0.82rem;">
-                <option value="fertilizer">🧪 Подкормка</option>
-                <option value="protection">🛡️ Защита</option>
-                <option value="care">✂️ Уход</option>
+                <option value="fertilizer">${escapeHtml(tr('feeding_type_feeding'))}</option>
+                <option value="protection">${escapeHtml(tr('feeding_type_treatment'))}</option>
+                <option value="care">${escapeHtml(tr('feeding_type_care'))}</option>
               </select>
               <select id="feed-input-target" class="form-input" style="padding: 6px 8px; font-size: 0.82rem;">
                 ${buildTargetOptions()}
               </select>
-              <input type="text" id="feed-input-title" class="form-input" placeholder="Чем подкормили..." style="padding: 6px 8px; font-size: 0.84rem;">
-              <button type="button" class="btn btn-sm btn-primary" id="feed-save-btn" style="padding: 6px 14px; font-weight: 800;">💾 Записать</button>
+              <input type="text" id="feed-input-title" class="form-input" placeholder="${escapeHtml(tr('feeding_what_placeholder'))}" style="padding: 6px 8px; font-size: 0.84rem;">
+              <button type="button" class="btn btn-sm btn-primary" id="feed-save-btn" style="padding: 6px 14px; font-weight: 800;">${escapeHtml(tr('feeding_btn_save'))}</button>
             </div>
             <div style="margin-top: 6px;">
-              <input type="text" id="feed-input-note" class="form-input" placeholder="Дозировка или заметка (необязательно, напр.: 1 стакан золы на 10 л воды)" style="padding: 5px 8px; font-size: 0.82rem;">
+              <input type="text" id="feed-input-note" class="form-input" placeholder="${escapeHtml(notePlaceholder)}" style="padding: 5px 8px; font-size: 0.82rem;">
             </div>
           </div>
 
@@ -1407,11 +1527,11 @@
             ${compareMode ? `
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start;">
                 <div>
-                  <h4 style="margin: 0 0 8px 0; color: #64748b;">🕰️ Прошлый сезон — ${prevYear} г. (${prevEntries.length})</h4>
+                  <h4 style="margin: 0 0 8px 0; color: #64748b;">🕰️ ${prevYear} ${prevSeasonLbl} (${prevEntries.length})</h4>
                   ${renderEntriesList(prevEntries, prevYear, true)}
                 </div>
                 <div>
-                  <h4 style="margin: 0 0 8px 0; color: #15803d;">📅 Этот сезон — ${activeYear} г. (${activeEntries.length})</h4>
+                  <h4 style="margin: 0 0 8px 0; color: #15803d;">📅 ${activeYear} ${thisSeasonLbl} (${activeEntries.length})</h4>
                   ${renderEntriesList(activeEntries, activeYear, false)}
                 </div>
               </div>
@@ -1420,10 +1540,10 @@
 
           <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
             <button type="button" class="btn btn-outline btn-sm" id="feed-print-btn">
-              🖨️ Распечатать подкормки (A4)
+              ${escapeHtml(tr('feeding_btn_print'))}
             </button>
             <button type="button" class="btn btn-primary btn-sm" id="feed-close-ok-btn">
-              Готово
+              ${doneBtnLbl}
             </button>
           </div>
         </div>
