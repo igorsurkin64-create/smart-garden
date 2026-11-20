@@ -140,6 +140,13 @@ class GardenMap {
           <button type="button" class="dpad-btn dpad-down" id="dpad-down" title="Сдвинуть карту вниз">▼</button>
         </div>
 
+        <!-- Плашка отмены случайного переноса грядки/декора (особенно удобно на телефоне и планшете!) -->
+        <div class="map-undo-move-bar" id="map-undo-move-bar" style="display: none;">
+          <span class="undo-move-text" id="map-undo-move-text">📍 Грядка перемещена</span>
+          <button type="button" class="undo-move-btn" id="map-undo-move-btn">↩️ Отменить</button>
+          <button type="button" class="undo-move-close" id="map-undo-move-close" title="Скрыть">&times;</button>
+        </div>
+
         <!-- Оверлей чистого плана / Пустой огород (Onboarding Hero) -->
         <div class="empty-garden-overlay" id="empty-garden-overlay" style="display: none;"></div>
       </div>
@@ -164,6 +171,17 @@ class GardenMap {
     document.getElementById('dpad-left')?.addEventListener('click', (e) => { e.stopPropagation(); panStep(160, 0); });
     document.getElementById('dpad-right')?.addEventListener('click', (e) => { e.stopPropagation(); panStep(-160, 0); });
     document.getElementById('dpad-fit')?.addEventListener('click', (e) => { e.stopPropagation(); this.fitPlotToView(true); });
+
+    this.lastMoveUndo = null;
+    this._undoMoveTimer = null;
+    document.getElementById('map-undo-move-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.undoLastMove();
+    });
+    document.getElementById('map-undo-move-close')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.hideMoveUndoBar();
+    });
 
     document.getElementById('map-zoom-in-btn').addEventListener('click', () => this.zoomBy(1.2, null, null, true));
     document.getElementById('map-zoom-out-btn').addEventListener('click', () => this.zoomBy(0.83, null, null, true));
@@ -544,6 +562,12 @@ class GardenMap {
     document.addEventListener('keydown', (e) => {
       const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
       if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target?.isContentEditable) return;
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && this.lastMoveUndo) {
+        e.preventDefault();
+        this.undoLastMove();
+        return;
+      }
 
       if ((e.key === 'Delete' || e.key === 'Backspace') && this.selectedDecorId) {
         e.preventDefault();
@@ -1833,12 +1857,77 @@ class GardenMap {
     }
   }
 
+  showMoveUndoBar(undoData) {
+    this.lastMoveUndo = undoData;
+    const bar = document.getElementById('map-undo-move-bar');
+    const txt = document.getElementById('map-undo-move-text');
+    const btn = document.getElementById('map-undo-move-btn');
+    if (!bar || !txt) return;
+
+    const lang = (typeof window !== 'undefined' && window.i18n) ? window.i18n.getLanguage() : 'ru';
+    const undoBtnLabel = lang === 'et' ? '↩️ Võta tagasi' : lang === 'lv' ? '↩️ Atsaukt' : lang === 'lt' ? '↩️ Atšaukti' : '↩️ Отменить';
+    const movedWord = lang === 'et' ? 'liigutati' : lang === 'lv' ? 'pārvietots' : lang === 'lt' ? 'perkelta' : 'перемещена';
+    if (btn) btn.textContent = undoBtnLabel;
+    txt.textContent = `📍 «${undoData.label || 'Грядка'}» ${movedWord}`;
+
+    bar.style.display = 'flex';
+    clearTimeout(this._undoMoveTimer);
+    this._undoMoveTimer = setTimeout(() => {
+      this.hideMoveUndoBar();
+    }, 8000);
+  }
+
+  hideMoveUndoBar() {
+    clearTimeout(this._undoMoveTimer);
+    const bar = document.getElementById('map-undo-move-bar');
+    if (bar) bar.style.display = 'none';
+  }
+
+  undoLastMove() {
+    if (!this.lastMoveUndo) return;
+    const u = this.lastMoveUndo;
+    if (u.kind === 'bed') {
+      const bed = this.storage.getBedById(u.id);
+      if (bed) {
+        bed.x = u.prevX;
+        bed.y = u.prevY;
+        this.storage.saveBed(bed);
+        this.render();
+      }
+    } else if (u.kind === 'decor') {
+      this.storage.updateDecorItemPosition(u.id, u.prevX, u.prevY);
+      this.renderDecorItems();
+    }
+    this.lastMoveUndo = null;
+    this.hideMoveUndoBar();
+    if (window.app) {
+      const lang = (typeof window !== 'undefined' && window.i18n) ? window.i18n.getLanguage() : 'ru';
+      const msg = lang === 'et' ? '↩️ Tagasi algsele kohale!' : lang === 'lv' ? '↩️ Atgriezts iepriekšējā vietā!' : lang === 'lt' ? '↩️ Grąžinta į buvusią vietą!' : '↩️ Возвращено на прежнее место!';
+      window.app.showToast(msg);
+    }
+  }
+
   handleGlobalMouseUp() {
     if (this.dragDecorState && this.dragDecorState.isDragging) {
       const el = document.getElementById(`decor-el-${this.dragDecorState.decorId}`);
       if (el) el.classList.remove('dragging');
       if (this._dragDecorPendingX !== undefined && this._dragDecorPendingY !== undefined) {
+        const prevX = this.dragDecorState.initialX;
+        const prevY = this.dragDecorState.initialY;
+        const moved = Math.abs(this._dragDecorPendingX - prevX) > 0.01 || Math.abs(this._dragDecorPendingY - prevY) > 0.01;
         this.storage.updateDecorItemPosition(this.dragDecorState.decorId, this._dragDecorPendingX, this._dragDecorPendingY);
+        if (moved) {
+          const item = this.storage.getDecorItems().find(d => d.id === this.dragDecorState.decorId);
+          const tpl = (item && typeof getDecorTemplate === 'function') ? getDecorTemplate(item.type) : null;
+          const lang = (typeof window !== 'undefined' && window.i18n) ? window.i18n.getLanguage() : 'ru';
+          this.showMoveUndoBar({
+            kind: 'decor',
+            id: this.dragDecorState.decorId,
+            prevX,
+            prevY,
+            label: tpl ? getDecorName(tpl, lang) : 'Декор'
+          });
+        }
       }
       this.dragDecorState.isDragging = false;
       this.dragDecorState.decorId = null;
@@ -1881,9 +1970,22 @@ class GardenMap {
 
         const bed = this.storage.getBedById(this.dragBedState.bedId);
         if (bed) {
+          const prevX = this.dragBedState.initialBedX;
+          const prevY = this.dragBedState.initialBedY;
+          const moved = Math.abs(newX - prevX) > 0.01 || Math.abs(newY - prevY) > 0.01;
           bed.x = newX;
           bed.y = newY;
           this.storage.saveBed(bed);
+          if (moved) {
+            const bedLabel = (typeof window !== 'undefined' && window.i18n) ? window.i18n.getBedName(bed) : bed.name;
+            this.showMoveUndoBar({
+              kind: 'bed',
+              id: bed.id,
+              prevX,
+              prevY,
+              label: bedLabel
+            });
+          }
         }
       }
 

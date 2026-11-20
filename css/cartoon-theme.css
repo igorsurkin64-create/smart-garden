@@ -1298,6 +1298,84 @@ body.theme-cartoon.season-autumn .al-5 { left: 86%; animation-duration: 17s; ani
   }
 }
 
+/* Плашка отмены случайного переноса грядки/декора */
+.map-undo-move-bar {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px 8px 14px;
+  background: rgba(24, 34, 48, 0.94);
+  color: #ffffff;
+  border: 2px solid #facc15;
+  border-radius: 999px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.32);
+  max-width: calc(100% - 24px);
+  animation: undoBarIn 0.2s ease;
+}
+
+@keyframes undoBarIn {
+  from { opacity: 0; transform: translate(-50%, 14px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.undo-move-text {
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 240px;
+}
+
+.undo-move-btn {
+  padding: 6px 13px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(180deg, #fde047 0%, #f59e0b 100%);
+  color: #451a03;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 2px 0 #92400e;
+}
+
+.undo-move-btn:active {
+  transform: translateY(1px);
+}
+
+.undo-move-close {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+@media (max-width: 768px) {
+  .map-undo-move-bar {
+    bottom: 72px;
+    padding: 8px 10px 8px 12px;
+    gap: 8px;
+  }
+  .undo-move-text {
+    font-size: 0.8rem;
+    max-width: 155px;
+  }
+  .undo-move-btn {
+    padding: 7px 14px;
+    font-size: 0.84rem;
+  }
+}
+
 /* При печати на А4 возвращаем чистый белый фон без бабочек, листьев и 3D-стен */
 @media print {
   body.theme-cartoon .cartoon-atmosphere-layer,
