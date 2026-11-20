@@ -640,6 +640,17 @@ body.theme-cartoon .gh-v-summary-pill {
 }
 
 /* ---------- 7. Объёмные лунки-бусинки (растянуты равномерно на всю грядку, НАД названием!) ---------- */
+.bed-item.has-active-holes {
+  min-height: 118px !important;
+}
+
+.bed-item.has-active-holes .bed-top-row {
+  position: relative;
+  z-index: 6;
+  margin-bottom: 3px;
+  flex-shrink: 0;
+}
+
 .bed-item.has-active-holes .bed-main-row,
 .gh-bed-horizontal.has-active-holes .gh-bed-h-container {
   flex-direction: column-reverse !important;
