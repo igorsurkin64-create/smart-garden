@@ -739,23 +739,29 @@ html, body {
 }
 
 .map-toolbar {
-  padding: 0.15rem 0.85rem;
+  padding: 0.3rem 0.8rem;
   background-color: var(--bg-secondary);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.55rem;
+  gap: 0.35rem 0.55rem;
   z-index: 10;
   flex-shrink: 0;
-  min-height: 32px;
-  max-height: 34px;
+  min-height: 36px;
+}
+
+.map-toolbar .btn {
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .toolbar-left {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.35rem 0.45rem;
   min-width: 0;
 }
 
@@ -827,9 +833,10 @@ html, body {
 
 .toolbar-right {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.45rem;
-  flex-shrink: 0;
+  gap: 0.35rem 0.45rem;
+  min-width: 0;
 }
 
 .map-hint {
@@ -838,8 +845,14 @@ html, body {
   white-space: nowrap;
 }
 
-@media (max-width: 1420px) {
+@media (max-width: 1620px) {
   .map-hint {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1460px) {
+  .toolbar-legend {
     display: none !important;
   }
 }
@@ -963,18 +976,27 @@ html, body {
 /* Плавающие элементы управления навигацией и масштабом */
 .map-controls-floating {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
+  top: 0.75rem;
+  left: 0.75rem;
+  max-width: calc(100% - 1.5rem);
   z-index: 35;
   background: var(--bg-secondary);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
-  padding: 0.35rem;
+  padding: 0.3rem;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.3rem;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
   backdrop-filter: blur(8px);
+}
+
+@media (max-width: 1366px) {
+  .map-controls-floating .nav-control-btn {
+    padding: 0.28rem 0.5rem;
+    font-size: 0.75rem;
+  }
 }
 
 .nav-control-icon {
