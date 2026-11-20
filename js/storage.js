@@ -1183,6 +1183,43 @@ class GardenStorage {
     return true;
   }
 
+  getGardenCareLogs(year) {
+    if (!this.data.gardenCareLogs || typeof this.data.gardenCareLogs !== 'object') {
+      this.data.gardenCareLogs = {};
+    }
+    const yStr = String(year);
+    if (!Array.isArray(this.data.gardenCareLogs[yStr])) {
+      this.data.gardenCareLogs[yStr] = [];
+    }
+    return this.data.gardenCareLogs[yStr];
+  }
+
+  addGardenCareLog(year, logEntry) {
+    const list = this.getGardenCareLogs(year);
+    const entry = {
+      id: 'glog_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      date: logEntry.date || new Date().toISOString().split('T')[0],
+      type: logEntry.type || 'fertilizer',
+      title: (logEntry.title || '').trim(),
+      note: (logEntry.note || '').trim(),
+      createdAt: new Date().toISOString()
+    };
+    if (!entry.title) return null;
+    list.unshift(entry);
+    this.saveData();
+    return entry;
+  }
+
+  deleteGardenCareLog(year, logId) {
+    const list = this.getGardenCareLogs(year);
+    const yStr = String(year);
+    const next = list.filter(item => item.id !== logId);
+    if (next.length === list.length) return false;
+    this.data.gardenCareLogs[yStr] = next;
+    this.saveData();
+    return true;
+  }
+
   // ==================== Декор участка (домик, деревья, бочка, дорожки, забор) ====================
   getDecorItems() {
     if (!Array.isArray(this.data.decorItems)) {

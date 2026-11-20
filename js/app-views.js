@@ -1153,6 +1153,420 @@
     renderCalendarModal();
   },
 
+  /**
+   * 🧪 Календарь подкормок и обработок по сезонам и датам (сравнение с прошлым сезоном + печать А4)
+   */
+  openFeedingCalendarModal() {
+    const data = this.storage.getData();
+    const activeYear = this.storage.getActiveYear();
+    const prevYear = activeYear - 1;
+    const currentLang = window.i18n ? window.i18n.getLanguage() : 'ru';
+    const beds = data.beds || [];
+
+    const modal = document.getElementById('general-modal');
+    const modalContent = document.getElementById('modal-dynamic-content');
+    if (!modal || !modalContent) return;
+
+    const yearsList = [...new Set([activeYear, prevYear, ...(this.storage.getYears ? this.storage.getYears() : [])])]
+      .sort((a, b) => b - a);
+
+    let selectedYear = activeYear;
+    let compareMode = false;
+    const todayIso = new Date().toISOString().split('T')[0];
+
+    const monthNames = {
+      1: 'Январь', 2: 'Февраль', 3: 'Март', 4: 'Апрель', 5: 'Май', 6: 'Июнь',
+      7: 'Июль', 8: 'Август', 9: 'Сентябрь', 10: 'Октябрь', 11: 'Ноябрь', 12: 'Декабрь'
+    };
+
+    const formatRuDate = (iso) => {
+      if (!iso || !iso.includes('-')) return iso || '—';
+      const [y, m, d] = iso.split('-');
+      return `${d}.${m}.${y}`;
+    };
+
+    const collectYearEntries = (year) => {
+      const result = [];
+      // 1. Общие подкормки по всему участку
+      const gardenLogs = this.storage.getGardenCareLogs ? this.storage.getGardenCareLogs(year) : [];
+      gardenLogs.forEach(log => {
+        result.push({
+          ...log,
+          isWholeGarden: true,
+          bedId: null,
+          sectionId: null,
+          targetLabel: '🏡 Весь участок',
+          cropEmoji: '🌿',
+          cropName: ''
+        });
+      });
+
+      // 2. Подкормки по каждой грядке и ряду теплицы
+      beds.forEach(bed => {
+        if (bed.sections && bed.sections.length > 0) {
+          bed.sections.forEach(sec => {
+            const logs = this.storage.getBedCareLogs(bed.id, year, sec.id);
+            const p = sec.history?.[year];
+            const c = p?.cropId ? getCropById(p.cropId) : null;
+            logs.forEach(log => {
+              result.push({
+                ...log,
+                isWholeGarden: false,
+                bedId: bed.id,
+                sectionId: sec.id,
+                targetLabel: `${bed.name} (${sec.name})`,
+                cropEmoji: c ? c.emoji : '🌱',
+                cropName: c ? getCropName(c, currentLang) : ''
+              });
+            });
+          });
+        } else {
+          const logs = this.storage.getBedCareLogs(bed.id, year, null);
+          const p = bed.history?.[year];
+          const c = p?.cropId ? getCropById(p.cropId) : null;
+          logs.forEach(log => {
+            result.push({
+              ...log,
+              isWholeGarden: false,
+              bedId: bed.id,
+              sectionId: null,
+              targetLabel: bed.name,
+              cropEmoji: c ? c.emoji : '🌱',
+              cropName: c ? getCropName(c, currentLang) : ''
+            });
+          });
+        }
+      });
+
+      result.sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+      return result;
+    };
+
+    const buildTargetOptions = () => {
+      let opts = `<option value="garden">🏡 Весь участок (общая подкормка)</option>`;
+      beds.forEach(bed => {
+        if (bed.sections && bed.sections.length > 0) {
+          bed.sections.forEach(sec => {
+            const p = sec.history?.[selectedYear];
+            const c = p?.cropId ? getCropById(p.cropId) : null;
+            const cTxt = c ? ` — ${c.emoji} ${getCropName(c, currentLang)}` : '';
+            opts += `<option value="bed|${bed.id}|${sec.id}">${escapeHtml(bed.name)} (${escapeHtml(sec.name)})${escapeHtml(cTxt)}</option>`;
+          });
+        } else {
+          const p = bed.history?.[selectedYear];
+          const c = p?.cropId ? getCropById(p.cropId) : null;
+          const cTxt = c ? ` — ${c.emoji} ${getCropName(c, currentLang)}` : '';
+          opts += `<option value="bed|${bed.id}|">${escapeHtml(bed.name)}${escapeHtml(cTxt)}</option>`;
+        }
+      });
+      return opts;
+    };
+
+    const renderEntriesList = (entries, yearNum, allowRepeatToActive = false) => {
+      if (!entries.length) {
+        return `
+          <div style="text-align: center; padding: 2rem 1rem; color: var(--text-muted); background: var(--bg-secondary); border-radius: 10px; border: 1.5px dashed var(--border-subtle);">
+            <div style="font-size: 2rem; margin-bottom: 6px;">🧪</div>
+            <div style="font-weight: 700; color: var(--text-main);">За ${yearNum} год подкормок пока не записано</div>
+            <div class="text-xs" style="margin-top: 4px;">Добавьте первую подкормку в форме выше — с точной датой и дозировкой!</div>
+          </div>
+        `;
+      }
+
+      // Группируем по месяцам
+      const byMonth = new Map();
+      entries.forEach(ev => {
+        const mNum = parseInt(String(ev.date || '').split('-')[1], 10) || 0;
+        if (!byMonth.has(mNum)) byMonth.set(mNum, []);
+        byMonth.get(mNum).push(ev);
+      });
+
+      const typeBadge = (t) => {
+        if (t === 'protection') return `<span style="background: #fef3c7; color: #b45309; padding: 2px 7px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">🛡️ Защита</span>`;
+        if (t === 'care') return `<span style="background: #e0f2fe; color: #0369a1; padding: 2px 7px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">✂️ Уход</span>`;
+        return `<span style="background: #dcfce7; color: #15803d; padding: 2px 7px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">🧪 Подкормка</span>`;
+      };
+
+      return Array.from(byMonth.entries()).map(([mNum, list]) => `
+        <div class="calendar-month-card" style="margin-bottom: 10px;">
+          <div class="calendar-month-header">
+            <span class="calendar-month-title">${monthNames[mNum] || 'Без даты'} ${yearNum}</span>
+            <span class="calendar-month-count">${list.length} шт.</span>
+          </div>
+          <div class="calendar-events-list">
+            ${list.map(ev => `
+              <div class="calendar-event-row" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 7px 10px;">
+                <span style="font-weight: 800; font-size: 0.82rem; color: #15803d; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 2px 8px; border-radius: 6px; white-space: nowrap;">
+                  📅 ${escapeHtml(formatRuDate(ev.date))}
+                </span>
+                ${typeBadge(ev.type)}
+                <div style="flex: 1; min-width: 170px;">
+                  <div style="font-weight: 800; font-size: 0.9rem; color: var(--text-main);">${escapeHtml(ev.title)}</div>
+                  <div class="text-xs text-muted">
+                    ${ev.cropEmoji} <strong>${escapeHtml(ev.targetLabel)}</strong>${ev.cropName ? ` (${escapeHtml(ev.cropName)})` : ''}
+                    ${ev.note ? ` • <span style="color: var(--text-main);">${escapeHtml(ev.note)}</span>` : ''}
+                  </div>
+                </div>
+                <div style="display: flex; gap: 5px; align-items: center;">
+                  ${allowRepeatToActive && yearNum !== activeYear ? `
+                    <button type="button" class="btn btn-sm btn-outline feed-repeat-btn"
+                            data-title="${escapeHtml(ev.title)}"
+                            data-note="${escapeHtml(ev.note || '')}"
+                            data-type="${escapeHtml(ev.type || 'fertilizer')}"
+                            data-target="${ev.isWholeGarden ? 'garden' : `bed|${ev.bedId}|${ev.sectionId || ''}`}"
+                            title="Повторить эту подкормку в ${activeYear} году (на сегодняшнюю дату)"
+                            style="padding: 3px 8px; font-size: 0.74rem; color: #15803d; border-color: #86efac;">
+                      📋 В ${activeYear} г.
+                    </button>
+                  ` : ''}
+                  <button type="button" class="btn btn-sm btn-outline feed-del-btn"
+                          data-year="${yearNum}"
+                          data-log-id="${escapeHtml(ev.id)}"
+                          data-is-garden="${ev.isWholeGarden ? '1' : '0'}"
+                          data-bed-id="${escapeHtml(ev.bedId || '')}"
+                          data-sec-id="${escapeHtml(ev.sectionId || '')}"
+                          title="Удалить запись"
+                          style="padding: 2px 7px; color: #dc2626; border-color: #fca5a5;">🗑️</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    };
+
+    const renderModal = () => {
+      const yearCounts = new Map();
+      yearsList.forEach(y => yearCounts.set(y, collectYearEntries(y).length));
+
+      const currentEntries = collectYearEntries(selectedYear);
+      const prevEntries = collectYearEntries(prevYear);
+      const activeEntries = collectYearEntries(activeYear);
+
+      const defaultDateForYear = selectedYear === new Date().getFullYear()
+        ? todayIso
+        : `${selectedYear}-${todayIso.slice(5)}`;
+
+      modalContent.innerHTML = `
+        <div class="modal-card calendar-modal-content" style="max-width: 980px; width: 96vw; max-height: 88vh; display: flex; flex-direction: column;">
+          <div class="modal-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-shrink: 0;">
+            <div>
+              <h3 style="margin: 0;">🧪 Календарь подкормок и обработок</h3>
+              <span class="text-xs text-muted">Записывайте, чем и какого числа подкармливали грядки, и сравнивайте с прошлым сезоном</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <button type="button" class="btn btn-sm ${compareMode ? 'btn-primary' : 'btn-outline'}" id="feed-compare-toggle-btn" title="Показать прошлый и текущий сезон рядом">
+                🔀 Сравнить ${prevYear} и ${activeYear}
+              </button>
+              <button class="modal-close-btn">&times;</button>
+            </div>
+          </div>
+
+          <!-- Вкладки сезонов (годов) -->
+          <div class="calendar-filters-bar" style="flex-shrink: 0;">
+            ${yearsList.map(y => `
+              <button type="button" class="calendar-filter-btn feed-year-tab ${!compareMode && selectedYear === y ? 'active' : ''}" data-year="${y}">
+                ${y === activeYear ? '📅' : '🕰️'} ${y} г.${y === activeYear ? ' (Этот сезон)' : (y === prevYear ? ' (Прошлый)' : '')} • ${yearCounts.get(y) || 0}
+              </button>
+            `).join('')}
+          </div>
+
+          <!-- Форма добавления подкормки на дату -->
+          <div style="padding: 0.75rem 1.15rem; background: rgba(22, 163, 74, 0.06); border-bottom: 1px solid var(--border-subtle); flex-shrink: 0;">
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; align-items: center;">
+              <span style="font-size: 0.76rem; font-weight: 700; color: #15803d;">⚡ Быстрый выбор:</span>
+              <button type="button" class="chip-preset-btn feed-preset-chip" data-type="fertilizer" data-title="Настой древесной золы">🪵 Зола</button>
+              <button type="button" class="chip-preset-btn feed-preset-chip" data-type="fertilizer" data-title="Настой крапивы (азот)">🌿 Крапива</button>
+              <button type="button" class="chip-preset-btn feed-preset-chip" data-type="fertilizer" data-title="Гумат калия / Биогумус">💧 Гумат</button>
+              <button type="button" class="chip-preset-btn feed-preset-chip" data-type="fertilizer" data-title="Монофосфат калия">🧪 Монофосфат</button>
+              <button type="button" class="chip-preset-btn feed-preset-chip" data-type="fertilizer" data-title="Борная кислота (для завязи)">🥛 Борная</button>
+              <button type="button" class="chip-preset-btn feed-preset-chip" data-type="protection" data-title="Опрыскивание Фитоспорином">🛡️ Фитоспорин</button>
+              <button type="button" class="chip-preset-btn feed-preset-chip" data-type="fertilizer" data-title="Компост / Перегной">🐄 Компост</button>
+              <button type="button" class="chip-preset-btn feed-preset-chip" data-type="care" data-title="Мульчирование травой / соломой">🌾 Мульча</button>
+            </div>
+            <div style="display: grid; grid-template-columns: 140px 130px 1fr 1fr auto; gap: 6px; align-items: center;">
+              <input type="date" id="feed-input-date" class="form-input" value="${defaultDateForYear}" style="padding: 6px 8px; font-size: 0.84rem;" title="Дата подкормки">
+              <select id="feed-input-type" class="form-input" style="padding: 6px 6px; font-size: 0.82rem;">
+                <option value="fertilizer">🧪 Подкормка</option>
+                <option value="protection">🛡️ Защита</option>
+                <option value="care">✂️ Уход</option>
+              </select>
+              <select id="feed-input-target" class="form-input" style="padding: 6px 8px; font-size: 0.82rem;">
+                ${buildTargetOptions()}
+              </select>
+              <input type="text" id="feed-input-title" class="form-input" placeholder="Чем подкормили..." style="padding: 6px 8px; font-size: 0.84rem;">
+              <button type="button" class="btn btn-sm btn-primary" id="feed-save-btn" style="padding: 6px 14px; font-weight: 800;">💾 Записать</button>
+            </div>
+            <div style="margin-top: 6px;">
+              <input type="text" id="feed-input-note" class="form-input" placeholder="Дозировка или заметка (необязательно, напр.: 1 стакан золы на 10 л воды)" style="padding: 5px 8px; font-size: 0.82rem;">
+            </div>
+          </div>
+
+          <!-- Список подкормок (1 сезон или сравнение 2 сезонов рядом!) -->
+          <div class="calendar-timeline-body" style="flex: 1; overflow-y: auto; padding: 0.9rem 1.15rem;">
+            ${compareMode ? `
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start;">
+                <div>
+                  <h4 style="margin: 0 0 8px 0; color: #64748b;">🕰️ Прошлый сезон — ${prevYear} г. (${prevEntries.length})</h4>
+                  ${renderEntriesList(prevEntries, prevYear, true)}
+                </div>
+                <div>
+                  <h4 style="margin: 0 0 8px 0; color: #15803d;">📅 Этот сезон — ${activeYear} г. (${activeEntries.length})</h4>
+                  ${renderEntriesList(activeEntries, activeYear, false)}
+                </div>
+              </div>
+            ` : renderEntriesList(currentEntries, selectedYear, true)}
+          </div>
+
+          <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+            <button type="button" class="btn btn-outline btn-sm" id="feed-print-btn">
+              🖨️ Распечатать подкормки (A4)
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" id="feed-close-ok-btn">
+              Готово
+            </button>
+          </div>
+        </div>
+      `;
+
+      const closeModal = () => modal.classList.remove('active');
+      modalContent.querySelector('.modal-close-btn')?.addEventListener('click', closeModal);
+      document.getElementById('feed-close-ok-btn')?.addEventListener('click', closeModal);
+
+      document.getElementById('feed-compare-toggle-btn')?.addEventListener('click', () => {
+        compareMode = !compareMode;
+        renderModal();
+      });
+
+      modalContent.querySelectorAll('.feed-year-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          compareMode = false;
+          selectedYear = parseInt(tab.getAttribute('data-year'), 10);
+          renderModal();
+        });
+      });
+
+      modalContent.querySelectorAll('.feed-preset-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const titleInp = document.getElementById('feed-input-title');
+          const typeSel = document.getElementById('feed-input-type');
+          if (titleInp) {
+            titleInp.value = chip.getAttribute('data-title') || '';
+            titleInp.focus();
+          }
+          if (typeSel) typeSel.value = chip.getAttribute('data-type') || 'fertilizer';
+        });
+      });
+
+      document.getElementById('feed-save-btn')?.addEventListener('click', () => {
+        const dateVal = document.getElementById('feed-input-date')?.value || todayIso;
+        const typeVal = document.getElementById('feed-input-type')?.value || 'fertilizer';
+        const targetVal = document.getElementById('feed-input-target')?.value || 'garden';
+        const titleVal = document.getElementById('feed-input-title')?.value.trim();
+        const noteVal = document.getElementById('feed-input-note')?.value.trim() || '';
+
+        if (!titleVal) {
+          this.showToast('⚠️ Укажите название подкормки или выберите из быстрых кнопок!');
+          document.getElementById('feed-input-title')?.focus();
+          return;
+        }
+
+        const saveYear = parseInt(dateVal.split('-')[0], 10) || selectedYear;
+        if (targetVal === 'garden') {
+          this.storage.addGardenCareLog(saveYear, { date: dateVal, type: typeVal, title: titleVal, note: noteVal });
+        } else {
+          const [, bId, sId] = targetVal.split('|');
+          this.storage.addBedCareLog(bId, saveYear, { date: dateVal, type: typeVal, title: titleVal, note: noteVal }, sId || null);
+        }
+
+        selectedYear = saveYear;
+        this.showToast(`🧪 Подкормка «${titleVal}» записана на ${formatRuDate(dateVal)}!`);
+        renderModal();
+      });
+
+      // Повторить прошлогоднюю подкормку в текущем сезоне
+      modalContent.querySelectorAll('.feed-repeat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const titleVal = btn.getAttribute('data-title');
+          const noteVal = btn.getAttribute('data-note') || '';
+          const typeVal = btn.getAttribute('data-type') || 'fertilizer';
+          const targetVal = btn.getAttribute('data-target') || 'garden';
+          if (targetVal === 'garden') {
+            this.storage.addGardenCareLog(activeYear, { date: todayIso, type: typeVal, title: titleVal, note: noteVal });
+          } else {
+            const [, bId, sId] = targetVal.split('|');
+            this.storage.addBedCareLog(bId, activeYear, { date: todayIso, type: typeVal, title: titleVal, note: noteVal }, sId || null);
+          }
+          this.showToast(`✓ Подкормка «${titleVal}» скопирована в ${activeYear} г. на ${formatRuDate(todayIso)}!`);
+          renderModal();
+        });
+      });
+
+      // Удаление записи подкормки
+      modalContent.querySelectorAll('.feed-del-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const y = parseInt(btn.getAttribute('data-year'), 10);
+          const logId = btn.getAttribute('data-log-id');
+          const isGarden = btn.getAttribute('data-is-garden') === '1';
+          if (isGarden) {
+            this.storage.deleteGardenCareLog(y, logId);
+          } else {
+            this.storage.deleteBedCareLog(btn.getAttribute('data-bed-id'), y, logId, btn.getAttribute('data-sec-id') || null);
+          }
+          this.showToast('🗑️ Запись подкормки удалена');
+          renderModal();
+        });
+      });
+
+      // Печать журнала подкормок на А4
+      document.getElementById('feed-print-btn')?.addEventListener('click', () => {
+        const listToPrint = collectYearEntries(selectedYear);
+        const printWin = window.open('', '_blank', 'width=900,height=700');
+        if (!printWin) {
+          this.showToast('⚠️ Разрешите всплывающие окна для печати А4');
+          return;
+        }
+        const rowsHtml = listToPrint.map(ev => `
+          <tr>
+            <td style="white-space:nowrap; font-weight:700;">${escapeHtml(formatRuDate(ev.date))}</td>
+            <td><strong>${escapeHtml(ev.targetLabel)}</strong>${ev.cropName ? ` (${escapeHtml(ev.cropName)})` : ''}</td>
+            <td>${escapeHtml(ev.title)}</td>
+            <td>${escapeHtml(ev.note || '—')}</td>
+          </tr>
+        `).join('');
+
+        printWin.document.write(`<!DOCTYPE html>
+          <html lang="ru"><head><meta charset="UTF-8"><title>Календарь подкормок ${selectedYear}</title>
+          <style>
+            @page { size: A4 portrait; margin: 12mm; }
+            body { font-family: 'Segoe UI', Arial, sans-serif; color: #1f2937; margin: 0; padding: 12px; }
+            h1 { font-size: 18px; color: #14532d; border-bottom: 2px solid #15803d; padding-bottom: 6px; margin: 0 0 12px 0; }
+            table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+            th, td { border: 1px solid #d1d5db; padding: 6px 8px; text-align: left; }
+            th { background: #f0fdf4; color: #14532d; }
+            .no-print { text-align: right; margin-bottom: 8px; }
+            .no-print button { padding: 6px 14px; background: #16a34a; color: #fff; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; }
+            @media print { .no-print { display: none; } body { padding: 0; } }
+          </style></head>
+          <body>
+            <div class="no-print"><button onclick="window.print()">🖨️ Распечатать (A4)</button></div>
+            <h1>🧪 Журнал подкормок и обработок — ${selectedYear} г. (${listToPrint.length} записей)</h1>
+            ${listToPrint.length ? `
+              <table>
+                <thead><tr><th style="width:95px;">Дата</th><th>Грядка / Участок</th><th>Подкормка / Обработка</th><th>Дозировка / Заметка</th></tr></thead>
+                <tbody>${rowsHtml}</tbody>
+              </table>
+            ` : '<p>За этот сезон подкормок пока не записано.</p>'}
+          </body></html>`);
+        printWin.document.close();
+        setTimeout(() => { try { printWin.print(); } catch (e) {} }, 300);
+      });
+    };
+
+    modal.classList.add('active');
+    renderModal();
+  },
+
   openAutoPlanModal() {
     const data = this.storage.getData();
     const activeYear = this.storage.getActiveYear();

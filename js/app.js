@@ -589,6 +589,10 @@ class GardenApp {
     if (toolbarCalBtn) {
       toolbarCalBtn.addEventListener('click', () => this.openSeasonCalendarModal());
     }
+    const toolbarFeedingBtn = document.getElementById('toolbar-feeding-btn');
+    if (toolbarFeedingBtn) {
+      toolbarFeedingBtn.addEventListener('click', () => this.openFeedingCalendarModal());
+    }
     const toolbarVarietiesBtn = document.getElementById('toolbar-varieties-btn');
     if (toolbarVarietiesBtn) {
       toolbarVarietiesBtn.addEventListener('click', () => this.openVarietyCatalogModal());
@@ -770,6 +774,7 @@ class GardenApp {
 
     bindMobileAction('m-autoplan-btn', () => this.openAutoPlanModal());
     bindMobileAction('m-calendar-btn', () => this.openSeasonCalendarModal());
+    bindMobileAction('m-feeding-btn', () => this.openFeedingCalendarModal());
     bindMobileAction('m-print-btn', () => this.printGardenPlan());
     bindMobileAction('m-water-btn', () => this.openGardenWaterModal());
     bindMobileAction('m-varieties-btn', () => this.openVarietyCatalogModal());
