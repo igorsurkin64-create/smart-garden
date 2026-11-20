@@ -516,8 +516,13 @@
           const cap = effectiveCropId ? calculateCropCapacity(effectiveCropId, secArea, currentLang) : null;
 
           const rowNum = `${bIdx + 1}.${sIdx + 1}`;
-          const secDisplayName = window.i18n && window.i18n.getSectionName ? window.i18n.getSectionName(sec.name) : sec.name;
+          const secDisplayName = window.i18n && window.i18n.getBedName ? window.i18n.getBedName(sec) : sec.name;
           const rowTitle = `${bName} (${secDisplayName})`;
+          const mUnit = currentLang === 'ru' ? 'м' : 'm';
+          const m2Unit = currentLang === 'ru' ? 'м²' : 'm²';
+          const rotOpt = window.t ? window.t('legend_perfect') : 'Отлично';
+          const rotWarn = window.t ? window.t('legend_warning') : 'Внимание';
+          const rotDang = window.t ? window.t('legend_danger') : 'Нарушение';
 
           let varietyDisplay = planting.variety || '—';
           let capacityDisplay = cap ? `~${cap.quantity} ${cap.unit}` : '—';
@@ -531,14 +536,14 @@
             num: rowNum,
             name: rowTitle,
             type: bType,
-            dimensions: `${bed.width}×${(bed.height / bed.sections.length).toFixed(1)} м`,
-            area: `${secArea.toFixed(1)} м²`,
+            dimensions: `${bed.width}×${(bed.height / bed.sections.length).toFixed(1)} ${mUnit}`,
+            area: `${secArea.toFixed(1)} ${m2Unit}`,
             cropName: crop ? getCropName(crop, currentLang) : '—',
             cropEmoji: crop?.emoji || '',
             variety: varietyDisplay,
             capacity: capacityDisplay,
             prevCrop: prevCrop ? `${prevCrop.emoji || ''} ${getCropName(prevCrop, currentLang)}` : (window.t ? window.t('print_empty_bed') : 'Пустовала'),
-            rotation: rot ? `${rot.status === 'optimal' ? '✅ Отлично' : (rot.status === 'warning' ? '⚠️ Внимание' : '⛔ Нарушение')}` : '—',
+            rotation: rot ? `${rot.status === 'optimal' ? `✅ ${rotOpt}` : (rot.status === 'warning' ? `⚠️ ${rotWarn}` : `⛔ ${rotDang}`)}` : '—',
             note: planting.note || ''
           });
         });
@@ -555,6 +560,11 @@
         const cap = effectiveCropId ? calculateCropCapacity(effectiveCropId, bedArea, currentLang) : null;
 
         const rowNum = `${bIdx + 1}`;
+        const mUnit = currentLang === 'ru' ? 'м' : 'm';
+        const m2Unit = currentLang === 'ru' ? 'м²' : 'm²';
+        const rotOpt = window.t ? window.t('legend_perfect') : 'Отлично';
+        const rotWarn = window.t ? window.t('legend_warning') : 'Внимание';
+        const rotDang = window.t ? window.t('legend_danger') : 'Нарушение';
         let varietyDisplay = planting.variety || '—';
         let capacityDisplay = cap ? `~${cap.quantity} ${cap.unit}` : '—';
         const hDetails = buildHolesDetails(planting, crop, rowNum, bName);
@@ -567,14 +577,14 @@
           num: rowNum,
           name: bName,
           type: bType,
-          dimensions: `${bed.width}×${bed.height} м`,
-          area: `${bedArea.toFixed(1)} м²`,
+          dimensions: `${bed.width}×${bed.height} ${mUnit}`,
+          area: `${bedArea.toFixed(1)} ${m2Unit}`,
           cropName: crop ? getCropName(crop, currentLang) : '—',
           cropEmoji: crop?.emoji || '',
           variety: varietyDisplay,
           capacity: capacityDisplay,
           prevCrop: prevCrop ? `${prevCrop.emoji || ''} ${getCropName(prevCrop, currentLang)}` : (window.t ? window.t('print_empty_bed') : 'Пустовала'),
-          rotation: rot ? `${rot.status === 'optimal' ? '✅ Отлично' : (rot.status === 'warning' ? '⚠️ Внимание' : '⛔ Нарушение')}` : '—',
+          rotation: rot ? `${rot.status === 'optimal' ? `✅ ${rotOpt}` : (rot.status === 'warning' ? `⚠️ ${rotWarn}` : `⛔ ${rotDang}`)}` : '—',
           note: planting.note || ''
         });
       }
@@ -612,7 +622,9 @@
       const fillCol = isGh ? '#f0f9ff' : (isRaised ? '#fffbeb' : '#f0fdf4');
       const clipId = `bed-clip-${b.id || idx}`;
 
-      let label = `№${idx + 1} ${b.name}`;
+      const locBName = window.i18n && window.i18n.getBedName ? window.i18n.getBedName(b) : b.name;
+      const mShort = currentLang === 'ru' ? 'м' : 'm';
+      let label = `№${idx + 1} ${locBName}`;
       const planting = b.history?.[activeYear];
       const crop = planting?.cropId ? getCropById(planting.cropId) : null;
       if (crop) label += ` (${crop.emoji || ''} ${getCropName(crop, currentLang)})`;
@@ -713,11 +725,46 @@
       </div>
     ` : '';
 
+    const PR = {
+      ru: {
+        title: `🌿 Умный Огород — План посадок на сезон ${activeYear} года`,
+        meta: `Сформировано: ${printDate} • Участок: ${beds.length} грядок • Полезная площадь: ${totalArea.toFixed(1)} м²`,
+        cNo: '№', cBed: 'Грядка / Рядок', cType: 'Тип', cDim: 'Размеры', cArea: 'Площадь',
+        cCrop: `Культура (${activeYear} г.)`, cVar: 'Сорт / Гибрид (лунки)', cCap: 'Схема и кол-во',
+        cPrev: `Предшественник (${activeYear - 1})`, cRot: 'Севооборот', cNote: 'Заметки и уход',
+        notesTitle: '📝 Заметки и полевой дневник огородника:'
+      },
+      et: {
+        title: `🌿 Minu Aed — Istutusplaan ${activeYear}. hooajaks`,
+        meta: `Koostatud: ${printDate} • Peenraid: ${beds.length} • Kasulik pind: ${totalArea.toFixed(1)} m²`,
+        cNo: 'Nr', cBed: 'Peenar / Rida', cType: 'Tüüp', cDim: 'Mõõdud', cArea: 'Pindala',
+        cCrop: `Kultuur (${activeYear})`, cVar: 'Sort / Hübriid (pesad)', cCap: 'Skeem ja kogus',
+        cPrev: `Eelvili (${activeYear - 1})`, cRot: 'Külvikord', cNote: 'Märkmed ja hooldus',
+        notesTitle: '📝 Aedniku märkmed ja põllupäevik:'
+      },
+      lv: {
+        title: `🌿 Mans Dārzs — Stādīšanas plāns ${activeYear}. gada sezonai`,
+        meta: `Izveidots: ${printDate} • Dobes: ${beds.length} • Lietderīgā platība: ${totalArea.toFixed(1)} m²`,
+        cNo: 'Nr.', cBed: 'Dobe / Rinda', cType: 'Veids', cDim: 'Izmēri', cArea: 'Platība',
+        cCrop: `Kultūra (${activeYear}. g.)`, cVar: 'Šķirne / Hibrīds (bedrītes)', cCap: 'Shēma un skaits',
+        cPrev: `Priekšaugs (${activeYear - 1})`, cRot: 'Augu seka', cNote: 'Piezīmes un kopšana',
+        notesTitle: '📝 Dārznieka piezīmes un dienasgrāmata:'
+      },
+      lt: {
+        title: `🌿 Mano Daržas — Sodinimo planas ${activeYear} m. sezonui`,
+        meta: `Sudaryta: ${printDate} • Lysvių: ${beds.length} • Naudingas plotas: ${totalArea.toFixed(1)} m²`,
+        cNo: 'Nr.', cBed: 'Lysvė / Eilutė', cType: 'Tipas', cDim: 'Matmenys', cArea: 'Plotas',
+        cCrop: `Augalas (${activeYear} m.)`, cVar: 'Veislė / Hibridas (duobutės)', cCap: 'Schema ir kiekis',
+        cPrev: `Priešsėlis (${activeYear - 1})`, cRot: 'Sėjomaina', cNote: 'Pastabos ir priežiūra',
+        notesTitle: '📝 Daržininko pastabos ir dienoraštis:'
+      }
+    }[currentLang] || {};
+
     printContainer.innerHTML = `
       <div class="print-header">
         <div>
-          <h1>🌿 Умный Огород — План посадок на сезон ${activeYear} года</h1>
-          <div class="print-meta">Сформировано: ${printDate} • Участок: ${beds.length} грядок • Полезная площадь: ${totalArea.toFixed(1)} м²</div>
+          <h1>${PR.title}</h1>
+          <div class="print-meta">${PR.meta}</div>
         </div>
       </div>
 
@@ -730,17 +777,17 @@
       <table class="print-table">
         <thead>
           <tr>
-            <th style="width: 30px;">№</th>
-            <th>Грядка / Рядок</th>
-            <th>Тип</th>
-            <th>Размеры</th>
-            <th>Площадь</th>
-            <th>Культура (${activeYear} г.)</th>
-            <th>Сорт / Гибрид (лунки)</th>
-            <th>Схема и кол-во</th>
-            <th>Предшественник (${activeYear - 1})</th>
-            <th>Севооборот</th>
-            <th>Заметки и уход</th>
+            <th style="width: 30px;">${PR.cNo}</th>
+            <th>${PR.cBed}</th>
+            <th>${PR.cType}</th>
+            <th>${PR.cDim}</th>
+            <th>${PR.cArea}</th>
+            <th>${PR.cCrop}</th>
+            <th>${PR.cVar}</th>
+            <th>${PR.cCap}</th>
+            <th>${PR.cPrev}</th>
+            <th>${PR.cRot}</th>
+            <th>${PR.cNote}</th>
           </tr>
         </thead>
         <tbody>
@@ -765,7 +812,7 @@
       ${holesCheatSheetHtml}
 
       <div class="print-notes-section">
-        <strong>📝 Заметки и полевой дневник огородника:</strong>
+        <strong>${PR.notesTitle}</strong>
         <div class="print-note-line"></div>
         <div class="print-note-line"></div>
         <div class="print-note-line"></div>
