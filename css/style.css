@@ -668,6 +668,22 @@ html, body {
   max-height: 32px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.nav-map-hint {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 1080px) {
+  .nav-map-hint {
+    display: none !important;
+  }
 }
 
 .nav-tabs-wrapper {
@@ -814,6 +830,7 @@ html, body {
   outline: none;
   cursor: pointer;
   font-weight: 600;
+  max-width: 112px;
 }
 
 .toolbar-toggle-btn {
@@ -866,12 +883,6 @@ html, body {
   font-size: 0.72rem;
   color: var(--text-muted);
   white-space: nowrap;
-}
-
-@media (max-width: 1620px) {
-  .map-hint {
-    display: none !important;
-  }
 }
 
 @media (max-width: 1460px) {

@@ -22,7 +22,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Умный Огород">
   
-  <link rel="stylesheet" href="css/style.css?v=20261120_v77">
+  <link rel="stylesheet" href="css/style.css?v=20261120_v83">
   <link rel="stylesheet" href="css/cartoon-theme.css?v=20261120_v82">
 
   <!-- Yandex.Metrika counter -->
@@ -189,6 +189,7 @@
           <span class="tab-text-short" data-i18n="tab_rules_short">Правила</span>
         </button>
       </div>
+      <span class="map-hint nav-map-hint" data-i18n="hint_pan">🖐️ Перетаскивайте огород мышью (Pan). Колёсико — масштаб.</span>
     </nav>
 
     <!-- Основная рабочая область -->
@@ -198,12 +199,12 @@
       <section class="view-panel view-map active" id="view-map">
         <div class="map-toolbar">
           <div class="toolbar-left">
-            <div class="toolbar-pill">
-              <span class="pill-label" data-i18n="filter_label">🔍 Фильтр:</span>
+            <div class="toolbar-pill toolbar-filter-pill" title="Фильтр грядок на плане">
+              <span class="pill-label">🔍</span>
               <select id="map-filter-select" class="toolbar-select">
                 <option value="all" data-i18n="filter_all">Все грядки</option>
-                <option value="danger" data-i18n="filter_danger">⚠️ Только с нарушениями севооборота</option>
-                <option value="empty" data-i18n="filter_empty">🌱 Только незасеянные грядки</option>
+                <option value="danger" data-i18n="filter_danger">⚠️ Нарушения</option>
+                <option value="empty" data-i18n="filter_empty">🌱 Пустые</option>
               </select>
             </div>
             
@@ -227,8 +228,6 @@
           </div>
 
           <div class="toolbar-right">
-            <span class="map-hint" data-i18n="hint_pan">🖐️ Перетаскивайте огород мышью (Pan). Колёсико — масштаб.</span>
-            
             <button class="btn btn-sm btn-outline" id="toolbar-varieties-btn" title="Каталог сортов с фото, описанием и печатью на лист A4" style="border-color: #16a34a; color: #15803d; font-weight: 700;">
               🏷️ Каталог сортов
             </button>
