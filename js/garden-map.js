@@ -1123,7 +1123,7 @@ class GardenMap {
             if (isInternalHorizontal) {
               // Горизонтальные полосы/рядки
               return `
-                <div class="gh-internal-bed gh-bed-horizontal ${isSectionSelected ? 'gh-sec-selected' : ''} ${currentCrop ? 'is-planted-bed' : ''}"
+                <div class="gh-internal-bed gh-bed-horizontal ${isSectionSelected ? 'gh-sec-selected' : ''} ${currentCrop ? 'is-planted-bed' : ''} ${holeSummary && holeSummary.totalHoles > 0 ? 'has-active-holes' : ''}"
                      data-bed-id="${bed.id}"
                      data-section-id="${sec.id}"
                      data-crop-id="${currentCrop ? currentCrop.id : ''}"
@@ -1221,7 +1221,7 @@ class GardenMap {
             } else {
               // Вертикальные рядки-колонки
               return `
-                <div class="gh-internal-bed gh-internal-bed-vertical ${isSectionSelected ? 'gh-sec-selected' : ''} ${currentCrop ? 'is-planted-bed' : ''}"
+                <div class="gh-internal-bed gh-internal-bed-vertical ${isSectionSelected ? 'gh-sec-selected' : ''} ${currentCrop ? 'is-planted-bed' : ''} ${holeSummary && holeSummary.totalHoles > 0 ? 'has-active-holes' : ''}"
                      data-bed-id="${bed.id}"
                      data-section-id="${sec.id}"
                      data-crop-id="${currentCrop ? currentCrop.id : ''}"
@@ -1420,7 +1420,7 @@ class GardenMap {
     const typeIcon = typeIcons[bed.type] || '🌱';
 
     return `
-      <div class="bed-item ${bedTypeClass} ${isVertical ? 'orient-vertical' : 'orient-horizontal'} ${isSelected ? 'selected' : ''} ${currentCrop ? 'is-planted-bed' : ''}"
+      <div class="bed-item ${bedTypeClass} ${isVertical ? 'orient-vertical' : 'orient-horizontal'} ${isSelected ? 'selected' : ''} ${currentCrop ? 'is-planted-bed' : ''} ${holeSummary && holeSummary.totalHoles > 0 ? 'has-active-holes' : ''}"
            id="bed-el-${bed.id}"
            data-bed-id="${bed.id}"
            data-crop-id="${currentCrop ? currentCrop.id : ''}"
