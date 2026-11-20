@@ -747,6 +747,13 @@ body.theme-cartoon .inspector-section {
 .decor-item.decor-z-mid { z-index: 3; }
 .decor-item.decor-z-high { z-index: 5; }
 
+/* Убираем подписи сортов с самих грядок на карте (оставляем только растения — сорта видны при клике на грядку) */
+.bed-item .crop-variety,
+.bed-item .gh-crop-var,
+.bed-item .gh-v-variety-label {
+  display: none !important;
+}
+
 /* Простой режим инспектора (по умолчанию скрыты «шумные» блоки агронома) */
 body:not(.inspector-advanced-mode) .inspector-advanced-only {
   display: none !important;
