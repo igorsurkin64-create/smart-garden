@@ -140,15 +140,15 @@ class GardenMap {
           <button type="button" class="dpad-btn dpad-down" id="dpad-down" title="Сдвинуть карту вниз">▼</button>
         </div>
 
-        <!-- Плашка отмены случайного переноса грядки/декора (особенно удобно на телефоне и планшете!) -->
-        <div class="map-undo-move-bar" id="map-undo-move-bar" style="display: none;">
-          <span class="undo-move-text" id="map-undo-move-text">📍 Грядка перемещена</span>
-          <button type="button" class="undo-move-btn" id="map-undo-move-btn">↩️ Отменить</button>
-          <button type="button" class="undo-move-close" id="map-undo-move-close" title="Скрыть">&times;</button>
-        </div>
-
         <!-- Оверлей чистого плана / Пустой огород (Onboarding Hero) -->
         <div class="empty-garden-overlay" id="empty-garden-overlay" style="display: none;"></div>
+      </div>
+
+      <!-- Плашка отмены случайного переноса грядки/декора (вынесена из вьюпорта, чтобы тач-события карты не перехватывали нажатие!) -->
+      <div class="map-undo-move-bar" id="map-undo-move-bar" style="display: none;">
+        <span class="undo-move-text" id="map-undo-move-text">📍 Грядка перемещена</span>
+        <button type="button" class="undo-move-btn" id="map-undo-move-btn">↩️ Отменить</button>
+        <button type="button" class="undo-move-close" id="map-undo-move-close" title="Скрыть">&times;</button>
       </div>
     `;
 
@@ -174,14 +174,31 @@ class GardenMap {
 
     this.lastMoveUndo = null;
     this._undoMoveTimer = null;
-    document.getElementById('map-undo-move-btn')?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.undoLastMove();
-    });
-    document.getElementById('map-undo-move-close')?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.hideMoveUndoBar();
-    });
+    const undoBtnEl = document.getElementById('map-undo-move-btn');
+    const undoCloseEl = document.getElementById('map-undo-move-close');
+    const undoBarEl = document.getElementById('map-undo-move-bar');
+    if (undoBarEl) {
+      undoBarEl.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+      undoBarEl.addEventListener('mousedown', (e) => e.stopPropagation());
+    }
+    if (undoBtnEl) {
+      const triggerUndo = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.undoLastMove();
+      };
+      undoBtnEl.addEventListener('click', triggerUndo);
+      undoBtnEl.addEventListener('touchend', triggerUndo, { passive: false });
+    }
+    if (undoCloseEl) {
+      const triggerClose = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.hideMoveUndoBar();
+      };
+      undoCloseEl.addEventListener('click', triggerClose);
+      undoCloseEl.addEventListener('touchend', triggerClose, { passive: false });
+    }
 
     document.getElementById('map-zoom-in-btn').addEventListener('click', () => this.zoomBy(1.2, null, null, true));
     document.getElementById('map-zoom-out-btn').addEventListener('click', () => this.zoomBy(0.83, null, null, true));
@@ -2002,6 +2019,9 @@ class GardenMap {
   }
 
   handleTouchStart(e) {
+    if (e.target && e.target.closest && e.target.closest('.map-undo-move-bar, .map-controls-floating, .map-pan-dpad')) {
+      return;
+    }
     if (e.touches.length === 2) {
       this.isPinching = true;
       this.initialPinchDistance = Math.hypot(

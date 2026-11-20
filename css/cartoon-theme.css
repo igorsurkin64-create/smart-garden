@@ -1300,11 +1300,11 @@ body.theme-cartoon.season-autumn .al-5 { left: 86%; animation-duration: 17s; ani
 
 /* Плашка отмены случайного переноса грядки/декора */
 .map-undo-move-bar {
-  position: absolute;
+  position: fixed;
   left: 50%;
-  bottom: 22px;
+  bottom: 24px;
   transform: translateX(-50%);
-  z-index: 60;
+  z-index: 9999;
   display: flex;
   align-items: center;
   gap: 10px;
