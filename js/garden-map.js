@@ -1139,10 +1139,24 @@ class GardenMap {
                           ${escapeHtml(secShortName || `${secIdx + 1}`)}
                           ${rotationEval ? `<span class="gh-pill-rot rot-${rotationEval.status}" title="${escapeHtml(rotationEval.reasons?.join('. ') || rotationEval.title)}">${rotationEval.status === 'optimal' ? '✓' : (rotationEval.status === 'warning' ? '!' : '✕')}</span>` : ''}
                         </span>
-                        ${currentCrop ? `
-                          <div class="gh-crop-icon">${cropSvg}</div>
-                          <strong class="gh-crop-name">${escapeHtml(cleanCropName)}</strong>
-                        ` : `
+                        ${currentCrop ? (() => {
+                          const extraIds = [];
+                          if (currentPlanting?.secondCropId && currentPlanting.secondCropId !== currentCrop.id) extraIds.push(currentPlanting.secondCropId);
+                          holes.forEach(h => {
+                            if (h && h.cropId && h.cropId !== currentCrop.id && !extraIds.includes(h.cropId)) extraIds.push(h.cropId);
+                          });
+                          const extraHtml = extraIds.slice(0, 2).map(cid => {
+                            const ec = getCropById(cid);
+                            if (!ec) return '';
+                            const eName = (typeof getCropName === 'function' ? getCropName(ec, currentLang) : ec.name).replace(/\s*\(.*?\)/g, '').trim();
+                            return `<span class="crop-plus-sep">+</span><div class="gh-crop-icon">${getCropSvg(ec.id)}</div><strong class="gh-crop-name">${escapeHtml(eName)}</strong>`;
+                          }).join('');
+                          return `
+                            <div class="gh-crop-icon">${cropSvg}</div>
+                            <strong class="gh-crop-name">${escapeHtml(cleanCropName)}</strong>
+                            ${extraHtml}
+                          `;
+                        })() : `
                           <div class="gh-h-cta-btn" title="${escapeHtml(freeText)}">
                             <span class="gh-cta-plus">➕</span>
                             <span class="gh-cta-text">${escapeHtml(plantText)}</span>
@@ -1461,6 +1475,19 @@ class GardenMap {
               <div class="bed-crop-lead">
                 <div class="crop-svg-avatar">${cropSvgIcon}</div>
                 <strong class="crop-name">${escapeHtml(cleanCropName)}</strong>
+                ${(() => {
+                  const extraIds = [];
+                  if (currentPlanting?.secondCropId && currentPlanting.secondCropId !== currentCrop.id) extraIds.push(currentPlanting.secondCropId);
+                  holes.forEach(h => {
+                    if (h && h.cropId && h.cropId !== currentCrop.id && !extraIds.includes(h.cropId)) extraIds.push(h.cropId);
+                  });
+                  return extraIds.slice(0, 2).map(cid => {
+                    const ec = getCropById(cid);
+                    if (!ec) return '';
+                    const eName = (typeof getCropName === 'function' ? getCropName(ec, currentLang) : ec.name).replace(/\s*\(.*?\)/g, '').trim();
+                    return `<span class="crop-plus-sep">+</span><div class="crop-svg-avatar">${getCropSvg(ec.id)}</div><strong class="crop-name">${escapeHtml(eName)}</strong>`;
+                  }).join('');
+                })()}
               </div>
               <div style="display: flex; align-items: center; gap: 5px;">
                 ${holeSummary && holeSummary.varieties.length > 0 ? `

@@ -936,7 +936,7 @@ class GardenStorage {
     this.saveData();
   }
 
-  updateBedPlanting(bedId, year, cropId, variety = '', note = '', sectionId = null) {
+  updateBedPlanting(bedId, year, cropId, variety = '', note = '', sectionId = null, secondCropId = null) {
     const bed = this.getBedById(bedId);
     if (!bed) return false;
 
@@ -949,6 +949,7 @@ class GardenStorage {
         sec.history[year] = {
           ...oldSec,
           cropId,
+          secondCropId: secondCropId !== null ? secondCropId : (oldSec.secondCropId || ''),
           variety,
           note,
           updatedAt: new Date().toISOString()
@@ -963,6 +964,7 @@ class GardenStorage {
     bed.history[year] = {
       ...oldBed,
       cropId,
+      secondCropId: secondCropId !== null ? secondCropId : (oldBed.secondCropId || ''),
       variety,
       note,
       updatedAt: new Date().toISOString()

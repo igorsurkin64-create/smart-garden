@@ -213,14 +213,34 @@ body.theme-cartoon .bed-item.selected {
 .gh-internal-bed.is-planted-bed::before {
   content: '';
   position: absolute;
-  inset: 3px;
-  border-radius: 10px;
+  top: 3px;
+  left: 3px;
+  right: 3px;
+  bottom: 34px;
+  border-radius: 10px 10px 4px 4px;
   pointer-events: none;
   z-index: 0;
   opacity: 0.36;
-  /* Базовые пушистые зелёные мультяшные кустики в рядках */
+  /* Базовые пушистые зелёные мультяшные кустики в рядках — строго НАД нижней плашкой с названием! */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='68' height='54' viewBox='0 0 68 54'%3E%3Cg transform='translate(6,8)'%3E%3Cellipse cx='14' cy='24' rx='12' ry='4.5' fill='%232e1a0c' opacity='0.45'/%3E%3Ccircle cx='9' cy='18' r='8' fill='%232e7d32' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='20' cy='18' r='8' fill='%23388e3c' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='14' cy='12' r='9' fill='%234caf50' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='12' cy='9' r='3.2' fill='%23a5d6a7' opacity='0.8'/%3E%3C/g%3E%3Cg transform='translate(38,24)'%3E%3Cellipse cx='14' cy='22' rx='11' ry='4' fill='%232e1a0c' opacity='0.45'/%3E%3Ccircle cx='9' cy='16' r='7.5' fill='%232e7d32' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='19' cy='16' r='7.5' fill='%23388e3c' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='14' cy='11' r='8.5' fill='%2366bb6a' stroke='%23163d18' stroke-width='1.5'/%3E%3Ccircle cx='12' cy='8.5' r='3' fill='%23c8e6c9' opacity='0.8'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 68px 54px;
+}
+
+/* В теплицах и многорядных грядках опускаем плашку с названием ПОД растения (как на обычных грядках!) */
+.gh-bed-horizontal .gh-bed-h-container {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  gap: 4px !important;
+}
+
+/* Разделитель «+» для совместных посадок (например: Горох + Морковь) */
+.crop-plus-sep {
+  font-weight: 900;
+  color: #16a34a;
+  margin: 0 3px;
+  font-size: 0.95rem;
 }
 
 body.theme-cartoon .bed-item.is-planted-bed::before,

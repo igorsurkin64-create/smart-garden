@@ -339,6 +339,18 @@
               </div>
             </div>
 
+            <div class="form-group mt-2">
+              <label class="form-sublabel" for="inspector-second-crop-select" style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">
+                🌿 ${currentLang === 'et' ? 'Teine kultuur samal peenral (valikuline):' : currentLang === 'lv' ? 'Otrā kultūra tajā pašā dobē (neobligāti):' : currentLang === 'lt' ? 'Antroji kultūra toje pačioje lysvėje (nebūtina):' : 'Вторая культура рядом (необязательно):'}
+              </label>
+              <select id="inspector-second-crop-select" class="form-select">
+                <option value="">${currentLang === 'et' ? '— Pole (ainult 1 kultuur)' : currentLang === 'lv' ? '— Nav (tikai 1 kultūra)' : currentLang === 'lt' ? '— Nėra (tik 1 kultūra)' : '— Нет (только 1 культура)'}</option>
+                ${(window.CROPS_DATABASE || []).filter(c => c.id !== 'fallow').map(c => `
+                  <option value="${c.id}" ${currentPlanting.secondCropId === c.id ? 'selected' : ''}>${c.emoji || '🌱'} ${escapeHtml(getCropName(c, currentLang))}</option>
+                `).join('')}
+              </select>
+            </div>
+
             <div class="form-group mt-3">
               <label class="form-sublabel" for="inspector-variety-input" style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">
                 🏷️ ${varietyLabel}
@@ -587,10 +599,11 @@
       // Сохранение посадки
       document.getElementById('inspector-save-planting-btn').addEventListener('click', () => {
         const cropId = document.getElementById('inspector-crop-select').value;
+        const secondCropId = document.getElementById('inspector-second-crop-select')?.value || '';
         const variety = document.getElementById('inspector-variety-input').value.trim();
         const note = document.getElementById('inspector-note-input').value.trim();
 
-        this.storage.updateBedPlanting(bedId, activeYear, cropId, variety, note, activeSection ? activeSection.id : null);
+        this.storage.updateBedPlanting(bedId, activeYear, cropId, variety, note, activeSection ? activeSection.id : null, secondCropId);
         this.showToast(`Посадка на ${activeYear} г. обновлена!`);
         this.gardenMap.render();
         this.openBedInspector(bedId, activeSection ? activeSection.id : null);
