@@ -672,6 +672,36 @@ html, body {
   gap: 0.75rem;
 }
 
+.nav-save-reminder {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1.5px solid #f59e0b;
+  background: linear-gradient(180deg, #fefce8 0%, #fef08a 100%);
+  color: #92400e;
+  font-family: var(--font-family);
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(245, 158, 11, 0.25);
+  transition: transform 0.12s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nav-save-reminder:hover {
+  background: linear-gradient(180deg, #fef08a 0%, #fde047 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(245, 158, 11, 0.35);
+}
+
+@media (max-width: 900px) {
+  .nav-save-reminder {
+    display: none !important;
+  }
+}
+
 .nav-map-hint {
   font-size: 0.74rem;
   color: var(--text-muted);

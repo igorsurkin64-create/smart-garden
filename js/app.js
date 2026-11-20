@@ -545,6 +545,10 @@ class GardenApp {
     if (dbModalBtn) {
       dbModalBtn.addEventListener('click', () => this.openDbModal());
     }
+    const navSaveReminderBtn = document.getElementById('nav-save-reminder-btn');
+    if (navSaveReminderBtn) {
+      navSaveReminderBtn.addEventListener('click', () => this.openDbModal());
+    }
 
     // Руководство пользователя / Инструкция
     const helpModalBtn = document.getElementById('help-modal-btn');
