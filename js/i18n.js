@@ -1965,7 +1965,10 @@ class I18nManager {
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
       if (key) {
-        el.textContent = this.t(key);
+        const text = this.t(key);
+        if (text && text !== key) {
+          el.textContent = text;
+        }
       }
     });
 
@@ -1973,7 +1976,10 @@ class I18nManager {
     document.querySelectorAll('[data-i18n-title]').forEach(el => {
       const key = el.getAttribute('data-i18n-title');
       if (key) {
-        el.setAttribute('title', this.t(key));
+        const title = this.t(key);
+        if (title && title !== key) {
+          el.setAttribute('title', title);
+        }
       }
     });
 
@@ -1981,11 +1987,21 @@ class I18nManager {
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
       const key = el.getAttribute('data-i18n-placeholder');
       if (key) {
-        el.setAttribute('placeholder', this.t(key));
+        const placeholder = this.t(key);
+        if (placeholder && placeholder !== key) {
+          el.setAttribute('placeholder', placeholder);
+        }
       }
     });
 
-    // 4. Update html lang attribute
+    // 4. Update Header Support button text
+    const supportTextEl = document.querySelector('#header-support-btn .header-support-text');
+    if (supportTextEl) {
+      const supportWords = { ru: 'Поддержка', et: 'Toetus', lv: 'Atbalsts', lt: 'Parama' };
+      supportTextEl.textContent = supportWords[this.currentLanguage] || 'Поддержка';
+    }
+
+    // 5. Update html lang attribute
     document.documentElement.lang = this.currentLanguage;
   }
 }
