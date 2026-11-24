@@ -25,6 +25,9 @@ class GardenApp {
     this.setupBackupReminder();
     this.renderActiveTab();
     this.initVisitCounter();
+    if (typeof this.checkDemoWelcome === 'function') {
+      this.checkDemoWelcome();
+    }
 
     // Слушаем изменение данных
     window.addEventListener('garden-data-changed', () => {

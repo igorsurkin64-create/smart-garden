@@ -1662,6 +1662,209 @@
         window.location.href = mailtoUrl;
       });
     }
+  },
+
+  /**
+   * Обучающее приветственное окно демо-плана
+   */
+  openDemoWelcomeModal() {
+    const modal = document.getElementById('general-modal');
+    const modalContent = document.getElementById('modal-dynamic-content');
+    if (!modal || !modalContent) return;
+
+    const lang = (window.i18n && window.i18n.getLanguage()) || document.documentElement.lang || 'ru';
+    const DEMO_WELCOME_I18N = {
+      ru: {
+        title: "🌿 Добро пожаловать в «Умный Огород»!",
+        badge: "Демонстрационный план",
+        lead: "Перед вами <strong>готовый демонстрационный огород</strong>, созданный для наглядного примера и быстрого знакомства со всеми возможностями программы.",
+        featuresTitle: "Что можно посмотреть и попробовать прямо сейчас:",
+        feat1: "🏡 <strong>2 большие теплицы</strong> (на 3 грядки каждая: томаты, перцы, огурцы) с капельным поливом",
+        feat2: "🪵 <strong>Приподнятые деревянные грядки</strong>, чесночник, посадки клубники и картофеля",
+        feat3: "🔄 <strong>Умный севооборот</strong>: кликните на любую грядку, чтобы открыть историю предшественников и цветные подсказки",
+        feat4: "🖱️ <strong>Интерактивность</strong>: свободно двигайте грядки, меняйте культуры и экспериментируйте",
+        tipTitle: "Как начать строить свой собственный огород?",
+        tipText: "Если хотите сразу распланировать свой участок с нуля — нажмите <strong>«Убрать демо-грядки»</strong>. Вы в любой момент сможете вернуть этот пример через верхнее <strong>«Меню ⚙️» ➔ «🔄 Демо-пример»</strong>.",
+        btnExplore: "👀 Изучить демо-огород",
+        btnClear: "🧹 Убрать демо-грядки",
+        dontShow: "Больше не показывать это окно при запуске",
+        toastExplore: "🌱 Приятного изучения! Кликайте по грядкам для просмотра деталей",
+        toastCleared: "🧹 Демо-грядки убраны! Нажмите «➕ Новая грядка» для создания своего плана. Вернуть демо можно через Меню ⚙️"
+      },
+      et: {
+        title: "🌿 Tere tulemast «Nutikas Aed» rakendusse!",
+        badge: "Näidisplaan",
+        lead: "Teie ees on <strong>valmis näidispeenarde plaan</strong>, mis aitab tutvuda kõigi aia planeerimise võimalustega.",
+        featuresTitle: "Mida saate kohe proovida ja uurida:",
+        feat1: "🏡 <strong>2 kolmeosalist kasvuhoonet</strong> (tomatid, paprikad, kurgid) koos tilkkastmisega",
+        feat2: "🪵 <strong>Kõrgpeenrad</strong>, küüslauk, maasikad ja kartul 3 aasta ajalooga",
+        feat3: "🔄 <strong>Nutikas külvikord</strong>: klõpsake peenral, et näha sobivaid ja ebasoovitavaid eelvilju",
+        feat4: "🖱️ <strong>Interaktiivne</strong>: liigutage peenraid vabalt ja katsetage taimede vahetamist",
+        tipTitle: "Kuidas luua omaenda aed?",
+        tipText: "Kui soovite alustada puhtalt lehelt, vajutage <strong>«Eemalda näidispeenrad»</strong>. Näidise saab alati tagasi menüüst <strong>«⚙️ Menüü» ➔ «🔄 Näidisplaan»</strong>.",
+        btnExplore: "👀 Uuri näidispeenraid",
+        btnClear: "🧹 Eemalda näidispeenrad",
+        dontShow: "Ära näita seda akent käivitamisel enam",
+        toastExplore: "🌱 Head avastamist! Klõpsake peenral selle vaatamiseks",
+        toastCleared: "🧹 Näidis eemaldatud! Vajutage «➕ Uus peenar» oma aia loomiseks. Näidise saab tagasi Menüüst ⚙️"
+      },
+      lv: {
+        title: "🌿 Laipni lūdzam «Gudrais Dārzs»!",
+        badge: "Demo paraugs",
+        lead: "Jūsu priekšā ir <strong>gatavs demonstrācijas dārza plāns</strong>, kas parāda visas programmas iespējas.",
+        featuresTitle: "Ko varat apskatīt un izmēģināt tūlīt:",
+        feat1: "🏡 <strong>2 siltumnīcas ar 3 sekcijām</strong> (tomāti, paprika, gurķi) un pilienlaistīšanu",
+        feat2: "🪵 <strong>Paaugstinātās koka dobes</strong>, ķiploki, zemenes un kartupeļi ar vēsturi",
+        feat3: "🔄 <strong>Gudrā augseka</strong>: uzklikšķiniet uz jebkuras dobes, lai redzētu 3 gadu vēsturi un padomus",
+        feat4: "🖱️ <strong>Interaktivitāte</strong>: brīvi pārvietojiet dobes un mainiet kultūras bez uztraukuma",
+        tipTitle: "Kā sākt savu dārzu?",
+        tipText: "Ja vēlaties uzreiz veidot savu dārzu no nulles, spiediet <strong>«Noņemt demo dobes»</strong>. Jebkurā brīdī varat atgriezt paraugu caur <strong>«⚙️ Izvēlne» ➔ «🔄 Demo paraugs»</strong>.",
+        btnExplore: "👀 Apskatīt demo dobes",
+        btnClear: "🧹 Noņemt demo dobes",
+        dontShow: "Vairs nerādīt šo logu startēšanas laikā",
+        toastExplore: "🌱 Patīkamu izpēti! Noklikšķiniet uz dobes, lai skatītu detaļas",
+        toastCleared: "🧹 Demo dobes noņemtas! Spiediet «➕ Jauna dobe», lai veidotu savu plānu. Paraugu var atgriezt Izvēlnē ⚙️"
+      },
+      lt: {
+        title: "🌿 Sveiki atvykę į «Išmanusis Daržas»!",
+        badge: "Demo pavyzdys",
+        lead: "Prieš jus yra <strong>paruoštas demonstracinis daržo planas</strong>, skirtas susipažinti su visomis galimybėmis.",
+        featuresTitle: "Ką galite pamatyti ir išbandyti dabar:",
+        feat1: "🏡 <strong>2 šiltnamiai su 3 zonomis</strong> (pomidorai, paprikos, agurkai) ir laistymu",
+        feat2: "🪵 <strong>Pakeltos medinės lysvės</strong>, braškių, česnakų ir bulvių plotai",
+        feat3: "🔄 <strong>Išmani sėjomaina</strong>: spustelėkite bet kurią lysvę ir pamatykite 3 metų istoriją bei patarimus",
+        feat4: "🖱️ <strong>Interaktyvu</strong>: laisvai vilkite lysves ir keiskite augalus be baimės suklysti",
+        tipTitle: "Kaip pradėti savo daržą?",
+        tipText: "Jei norite pradėti kurti savo daržą nuo švaraus lapo, spauskite <strong>«Pašalinti demo lysves»</strong>. Bet kada pavyzdį galite grąžinti per <strong>«⚙️ Meniu» ➔ «🔄 Demo pavyzdys»</strong>.",
+        btnExplore: "👀 Apžiūrėti demo daržą",
+        btnClear: "🧹 Pašalinti demo lysves",
+        dontShow: "Daugiau nerodyti šio lango paleidžiant",
+        toastExplore: "🌱 Malonaus tyrinėjimo! Spustelėkite lysvę norėdami pamatyti detales",
+        toastCleared: "🧹 Demo lysvės pašalintos! Paspauskite «➕ Nauja lysvė» savo planui kurti. Pavyzdį grąžinti galite Meniu ⚙️"
+      }
+    };
+
+    const txt = DEMO_WELCOME_I18N[lang] || DEMO_WELCOME_I18N.ru;
+
+    modalContent.innerHTML = `
+      <div class="modal-card modal-demo-welcome">
+        <div class="demo-welcome-hero">
+          <div class="demo-welcome-title-wrap">
+            <span class="demo-welcome-badge">${txt.badge}</span>
+            <h3 class="demo-welcome-title">${txt.title}</h3>
+          </div>
+          <button class="modal-close-btn" aria-label="Закрыть">&times;</button>
+        </div>
+
+        <div class="demo-welcome-body">
+          <p class="demo-welcome-lead">${txt.lead}</p>
+
+          <div class="demo-welcome-features">
+            <div class="demo-welcome-features-title">${txt.featuresTitle}</div>
+            <ul class="demo-welcome-list">
+              <li>${txt.feat1}</li>
+              <li>${txt.feat2}</li>
+              <li>${txt.feat3}</li>
+              <li>${txt.feat4}</li>
+            </ul>
+          </div>
+
+          <div class="demo-welcome-tip-box">
+            <span class="demo-welcome-tip-icon">💡</span>
+            <div class="demo-welcome-tip-text">
+              <strong>${txt.tipTitle}</strong><br>
+              ${txt.tipText}
+            </div>
+          </div>
+
+          <div class="demo-welcome-checkbox-row">
+            <label class="demo-welcome-checkbox-label">
+              <input type="checkbox" id="demo-welcome-never-cb">
+              <span>${txt.dontShow}</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="demo-welcome-footer">
+          <button class="btn btn-outline btn-demo-clear" id="demo-welcome-clear-btn">${txt.btnClear}</button>
+          <button class="btn btn-primary btn-demo-explore" id="demo-welcome-explore-btn">${txt.btnExplore}</button>
+        </div>
+      </div>
+    `;
+
+    modal.classList.add('active');
+
+    const cb = document.getElementById('demo-welcome-never-cb');
+    if (cb) {
+      cb.addEventListener('change', () => {
+        if (cb.checked) {
+          localStorage.setItem('sg_hide_demo_welcome', 'true');
+        } else {
+          localStorage.removeItem('sg_hide_demo_welcome');
+        }
+      });
+    }
+
+    const saveCheckboxState = () => {
+      if (cb && cb.checked) {
+        localStorage.setItem('sg_hide_demo_welcome', 'true');
+      }
+    };
+
+    const closeModal = () => {
+      saveCheckboxState();
+      modal.classList.remove('active');
+    };
+
+    const closeBtn = modalContent.querySelector('.modal-close-btn');
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    // Кнопка: Изучить демо-огород
+    const exploreBtn = document.getElementById('demo-welcome-explore-btn');
+    if (exploreBtn) {
+      exploreBtn.addEventListener('click', () => {
+        closeModal();
+        this.showToast(txt.toastExplore);
+      });
+    }
+
+    // Кнопка: Убрать демо-грядки (с чистого листа)
+    const clearBtn = document.getElementById('demo-welcome-clear-btn');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        closeModal();
+        this.executeClearPlan();
+        this.showToast(txt.toastCleared);
+      });
+    }
+  },
+
+  /**
+   * Проверка и автоматический показ приветственного окна
+   * (только на ПК / ноутбуках, при наличии демо-плана и если не выключено галочкой)
+   */
+  checkDemoWelcome() {
+    // 1. На телефонах и планшетах (сенсорных и узких экранах <= 768px) не выскакивает
+    const isMobileDevice = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+      (typeof window !== 'undefined' && (window.innerWidth <= 768 || (window.matchMedia && window.matchMedia('(max-width: 768px)').matches)));
+    if (isMobileDevice) {
+      return;
+    }
+
+    // 2. Не показывать, если пользователь уже поставил галочку «Больше не показывать»
+    if (localStorage.getItem('sg_hide_demo_welcome') === 'true') {
+      return;
+    }
+
+    // 3. Показывать только если текущий план — демонстрационный
+    if (!this.storage || typeof this.storage.isDemoData !== 'function' || !this.storage.isDemoData()) {
+      return;
+    }
+
+    // 4. Пауза 500мс для плавной отрисовки карты на заднем плане
+    setTimeout(() => {
+      this.openDemoWelcomeModal();
+    }, 500);
   }
   });
 })();

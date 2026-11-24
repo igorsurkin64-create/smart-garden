@@ -1073,6 +1073,11 @@ class GardenStorage {
     return this.data;
   }
 
+  isDemoData() {
+    if (!this.data || !Array.isArray(this.data.beds) || this.data.beds.length === 0) return false;
+    return this.data.beds.some(b => b.id === 'bed-gh-1' || b.id === 'bed-gh-2');
+  }
+
   clearAll() {
     this.data = {
       meta: {
