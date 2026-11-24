@@ -557,7 +557,7 @@ class GardenApp {
     }
     const navSaveReminderBtn = document.getElementById('nav-save-reminder-btn');
     if (navSaveReminderBtn) {
-      navSaveReminderBtn.addEventListener('click', () => this.openDbModal());
+      navSaveReminderBtn.addEventListener('click', () => this.savePlanViaExplorer());
     }
 
     // Руководство пользователя / Инструкция
@@ -582,10 +582,14 @@ class GardenApp {
       feedbackModalBtn.addEventListener('click', () => this.openFeedbackModal());
     }
 
-    // PWA Установка на устройство
+    // PWA Установка на устройство (в меню и на переднем плане в шапке)
     const pwaInstallBtn = document.getElementById('pwa-install-btn');
     if (pwaInstallBtn) {
       pwaInstallBtn.addEventListener('click', () => this.promptPwaInstall());
+    }
+    const headerInstallBtn = document.getElementById('header-install-btn');
+    if (headerInstallBtn) {
+      headerInstallBtn.addEventListener('click', () => this.promptPwaInstall());
     }
 
     // Печать плана А4 и памятки огородника
@@ -1349,6 +1353,22 @@ class GardenApp {
     }
 
     this.showExportSuccessModal(fileName);
+  }
+
+  async savePlanViaExplorer() {
+    let fileName = null;
+    if (this.storage) {
+      if (typeof this.storage.savePlanWithExplorer === 'function') {
+        fileName = await this.storage.savePlanWithExplorer();
+      } else {
+        fileName = this.storage.exportJson();
+      }
+    }
+    if (fileName) {
+      localStorage.setItem('sg_last_backup_time', Date.now().toString());
+      const toastMsg = (window.t ? window.t('backup_saved_toast') : null) || '✓ План огорода успешно сохранён в файл!';
+      this.showToast(toastMsg);
+    }
   }
 
   showExportSuccessModal(fileName) {

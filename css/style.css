@@ -6501,6 +6501,39 @@ html, body {
   color: #1e1e1e !important;
 }
 
+.header-install-btn {
+  border-color: rgba(16, 185, 129, 0.45) !important;
+  color: #059669 !important;
+  background: rgba(16, 185, 129, 0.08) !important;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.88rem;
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.header-install-btn:hover {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .header-install-btn {
+  border-color: rgba(16, 185, 129, 0.5) !important;
+  color: #34d399 !important;
+  background: rgba(16, 185, 129, 0.15) !important;
+}
+
+[data-theme="dark"] .header-install-btn:hover {
+  background: #10b981 !important;
+  color: #1e1e1e !important;
+}
+
 .modal-card.modal-donate-card {
   width: 580px;
   max-width: 96vw;
@@ -7106,6 +7139,23 @@ html, body {
   }
 
   #header-support-btn .header-support-text {
+    display: none !important;
+  }
+
+  /* Показываем кнопку Установить (📲) в шапке мобильного как аккуратную иконку 34x34 */
+  #header-install-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    padding: 0 !important;
+    font-size: 1.15rem !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  #header-install-btn .header-install-text {
     display: none !important;
   }
 

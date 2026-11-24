@@ -1090,6 +1090,39 @@ class GardenStorage {
     return this.data;
   }
 
+  async savePlanWithExplorer() {
+    const jsonStr = JSON.stringify(this.data, null, 2);
+    const dateStr = new Date().toISOString().split('T')[0];
+    const year = this.getActiveYear ? this.getActiveYear() : 2026;
+    const fileName = `Мой_Огород_План_${year}_(${dateStr}).json`;
+
+    // 1. Попытка открыть нативный проводник Windows / Mac через File System Access API
+    if (typeof window !== 'undefined' && window.showSaveFilePicker) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: fileName,
+          types: [{
+            description: 'Файл плана огорода (*.json)',
+            accept: { 'application/json': ['.json'] }
+          }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write("\ufeff" + jsonStr);
+        await writable.close();
+        return fileName;
+      } catch (err) {
+        // Если пользователь нажал «Отмена» в проводнике
+        if (err.name === 'AbortError') {
+          return null;
+        }
+        console.warn('showSaveFilePicker error, fallback to browser download:', err);
+      }
+    }
+
+    // 2. Fallback для браузеров без File System Access API
+    return this.exportJson();
+  }
+
   exportJson() {
     const jsonStr = JSON.stringify(this.data, null, 2);
     // Добавляем маркер UTF-8 BOM (\ufeff), чтобы Windows и текстовые редакторы

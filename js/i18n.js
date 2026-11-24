@@ -326,8 +326,8 @@ const UI_TRANSLATIONS = {
     mobile_help_item: "❓ Инструкция пользователя",
     mobile_theme_label: "🌙 Тема оформления",
     mobile_visits_label: "👁️ Посещения сайта:",
-    nav_save_reminder_text: "💾 Внесли изменения? Не забудьте сохранить!",
-    nav_save_reminder_title: "Нажмите, чтобы сохранить резервную копию плана огорода в файл (.json)",
+    nav_save_reminder_text: "💾 Для сохранения жми здесь",
+    nav_save_reminder_title: "Нажмите, чтобы открыть проводник и сохранить план огорода в файл (.json)",
     backup_card_desc: "Все ваши грядки и посадки хранятся в браузере. Сохраните файл с планом на свой компьютер или телефон, чтобы записи не пропали при очистке истории.",
     backup_card_save: "📥 Сохранить план в файл",
     backup_card_later: "✕ Напомнить позже",
@@ -741,8 +741,8 @@ const UI_TRANSLATIONS = {
     mobile_help_item: "❓ Kasutusjuhend",
     mobile_theme_label: "🌙 Teema",
     mobile_visits_label: "👁️ Külastusi:",
-    nav_save_reminder_text: "💾 Tegid muudatusi? Ära unusta salvestada!",
-    nav_save_reminder_title: "Klõpsa, et salvestada aiaplaani varukoopia faili (.json)",
+    nav_save_reminder_text: "💾 Salvestamiseks klõpsa siia",
+    nav_save_reminder_title: "Klõpsa, et avada Explorer ja salvestada aiaplaani fail (.json)",
     backup_card_desc: "Kõik peenrad ja istutused salvestuvad brauseris. Salvesta fail arvutisse või telefoni, et andmed ei kaoks brauseri ajaloo puhastamisel.",
     backup_card_save: "📥 Salvesta plaan faili",
     backup_card_later: "✕ Tuleta hiljem meelde",
@@ -1156,8 +1156,8 @@ const UI_TRANSLATIONS = {
     mobile_help_item: "❓ Lietošanas instrukcija",
     mobile_theme_label: "🌙 Noformējuma tēma",
     mobile_visits_label: "👁️ Apmeklējumi:",
-    nav_save_reminder_text: "💾 Veicāt izmaiņas? Neaizmirstiet saglabāt!",
-    nav_save_reminder_title: "Noklikšķiniet, lai saglabātu dārza plāna rezerves kopiju failā (.json)",
+    nav_save_reminder_text: "💾 Lai saglabātu, spiediet šeit",
+    nav_save_reminder_title: "Noklikšķiniet, lai atvērtu pārlūku un saglabātu dārza plānu failā (.json)",
     backup_card_desc: "Visas dobes un stādījumi tiek glabāti pārlūkprogrammā. Saglabājiet failu datorā vai tālrunī, lai dati nepazustu, notīrot vēsturi.",
     backup_card_save: "📥 Saglabāt plānu failā",
     backup_card_later: "✕ Atgādināt vēlāk",
@@ -1571,8 +1571,8 @@ const UI_TRANSLATIONS = {
     mobile_help_item: "❓ Naudojimo instrukcija",
     mobile_theme_label: "🌙 Tema",
     mobile_visits_label: "👁️ Apsilankymai:",
-    nav_save_reminder_text: "💾 Atlikote pakeitimus? Nepamirškite išsaugoti!",
-    nav_save_reminder_title: "Spustelėkite, kad išsaugotumėte daržo plano atsarginę kopiją faile (.json)",
+    nav_save_reminder_text: "💾 Norėdami išsaugoti, spauskite čia",
+    nav_save_reminder_title: "Spustelėkite, kad atidarytumėte naršyklę ir išsaugotumėte daržo planą į failą (.json)",
     backup_card_desc: "Visos lysvės ir sodinimai saugomi naršyklėje. Išsaugokite failą kompiuteryje ar telefone, kad duomenys nedingtų išvalius istoriją.",
     backup_card_save: "📥 Išsaugoti planą į failą",
     backup_card_later: "✕ Priminti vėliau",
@@ -2001,7 +2001,14 @@ class I18nManager {
       supportTextEl.textContent = supportWords[this.currentLanguage] || 'Поддержка';
     }
 
-    // 5. Update html lang attribute
+    // 5. Update Header Install button text
+    const installTextEl = document.querySelector('#header-install-btn .header-install-text');
+    if (installTextEl) {
+      const installWords = { ru: 'Установить', et: 'Paigalda', lv: 'Instalēt', lt: 'Įdiegti' };
+      installTextEl.textContent = installWords[this.currentLanguage] || 'Установить';
+    }
+
+    // 6. Update html lang attribute
     document.documentElement.lang = this.currentLanguage;
   }
 }
