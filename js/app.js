@@ -566,10 +566,14 @@ class GardenApp {
       helpModalBtn.addEventListener('click', () => this.openHelpModal());
     }
 
-    // Поддержка автора
+    // Поддержка автора (кнопка в меню и сердечко в шапке)
     const donateModalBtn = document.getElementById('donate-modal-btn');
     if (donateModalBtn) {
       donateModalBtn.addEventListener('click', () => this.openDonateModal());
+    }
+    const headerSupportBtn = document.getElementById('header-support-btn');
+    if (headerSupportBtn) {
+      headerSupportBtn.addEventListener('click', () => this.openDonateModal());
     }
 
     // Обратная связь и предложения

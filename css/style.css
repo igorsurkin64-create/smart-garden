@@ -6469,11 +6469,18 @@ html, body {
    Кнопка и модальное окно «Поддержать автора» / Donate Styles
    ========================================================================== */
 .donate-header-btn {
-  border-color: #f59e0b !important;
-  color: #b45309 !important;
-  background: rgba(245, 158, 11, 0.08) !important;
-  font-weight: 600;
+  border-color: rgba(245, 158, 11, 0.45) !important;
+  color: #d97706 !important;
+  background: rgba(245, 158, 11, 0.1) !important;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.88rem;
+  border-radius: var(--radius-md);
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .donate-header-btn:hover {
@@ -6484,9 +6491,9 @@ html, body {
 }
 
 [data-theme="dark"] .donate-header-btn {
-  border-color: #f59e0b !important;
+  border-color: rgba(245, 158, 11, 0.5) !important;
   color: #fbbf24 !important;
-  background: rgba(245, 158, 11, 0.15) !important;
+  background: rgba(245, 158, 11, 0.18) !important;
 }
 
 [data-theme="dark"] .donate-header-btn:hover {
@@ -7082,6 +7089,23 @@ html, body {
   }
 
   .mobile-menu-text {
+    display: none !important;
+  }
+
+  /* Показываем кнопку Автор и поддержка (🧡) в шапке мобильного как аккуратную иконку 34x34 */
+  #header-support-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    padding: 0 !important;
+    font-size: 1.15rem !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  #header-support-btn .header-support-text {
     display: none !important;
   }
 
