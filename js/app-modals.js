@@ -1217,22 +1217,6 @@
             </div>
           </div>
 
-          <!-- Раздел 4: Другие программы автора (Vercel) -->
-          <div style="background: rgba(16, 185, 129, 0.08); border: 1.5px solid rgba(16, 185, 129, 0.28); border-radius: var(--radius-md, 12px); padding: 12px 14px; text-align: left;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-              <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.95rem; color: #10b981;">
-                <span style="font-size: 1.2rem;">🛒</span> ${tr('other_apps_title')}
-              </div>
-              <span style="font-size: 0.72rem; color: #10b981; font-weight: 700; background: rgba(16, 185, 129, 0.15); padding: 2px 6px; border-radius: 4px;">Vercel</span>
-            </div>
-            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin: 0 0 9px 0;">
-              ${tr('other_apps_reminder_desc')}
-            </p>
-            <a href="https://reminder-eight-blush.vercel.app" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 14px; border-radius: var(--radius-sm, 8px); background: #10b981; color: white; font-weight: 800; font-size: 0.88rem; text-decoration: none; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);">
-              <span>🛒</span> <span>${tr('other_apps_reminder_btn')}</span>
-            </a>
-          </div>
-
         </div>
 
         <div class="modal-footer" style="padding: 0.85rem 1.25rem; background: var(--bg-tertiary); display: flex; justify-content: flex-end;">
