@@ -488,31 +488,30 @@ class GardenStorage {
         if (!bed.history) bed.history = {};
       }
 
-      // Санитизация названий секций (исправление ошибочного "Левый, Правый, Правый" на "Левый, Центр, Правый")
+      // Санитизация названий секций (исправляем только пустые имена или дублирующиеся дефолтные)
       if (bed.sections && Array.isArray(bed.sections)) {
         const isGh = bed.type === 'greenhouse';
         if (bed.sections.length === 3) {
           const defaultNames3 = isGh
             ? ['Левая грядка', 'Центральная грядка', 'Правая грядка']
             : ['Рядок 1 (Левый)', 'Рядок 2 (Центр)', 'Рядок 3 (Правый)'];
-          
-          if (!bed.sections[1].name || /прав|right|lab|parem|dešin/i.test(bed.sections[1].name)) {
-            bed.sections[1].name = defaultNames3[1];
-          }
-          if (!bed.sections[0].name || /прав|right|lab|parem|dešin/i.test(bed.sections[0].name)) {
+          if (!bed.sections[0].name || !bed.sections[0].name.trim()) {
             bed.sections[0].name = defaultNames3[0];
           }
-          if (!bed.sections[2].name || /центр|лев|center|kesk|centr|left|vasak|kair/i.test(bed.sections[2].name)) {
+          if (!bed.sections[1].name || !bed.sections[1].name.trim() || bed.sections[1].name === bed.sections[2].name) {
+            bed.sections[1].name = defaultNames3[1];
+          }
+          if (!bed.sections[2].name || !bed.sections[2].name.trim()) {
             bed.sections[2].name = defaultNames3[2];
           }
         } else if (bed.sections.length === 2) {
           const defaultNames2 = isGh
             ? ['Левая грядка', 'Правая грядка']
             : ['Рядок 1 (Левый)', 'Рядок 2 (Правый)'];
-          if (!bed.sections[0].name || /прав|right|lab|parem|dešin/i.test(bed.sections[0].name)) {
+          if (!bed.sections[0].name || !bed.sections[0].name.trim()) {
             bed.sections[0].name = defaultNames2[0];
           }
-          if (!bed.sections[1].name || /лев|left|vasak|kair/i.test(bed.sections[1].name)) {
+          if (!bed.sections[1].name || !bed.sections[1].name.trim() || bed.sections[1].name === bed.sections[0].name) {
             bed.sections[1].name = defaultNames2[1];
           }
         }
@@ -1095,8 +1094,24 @@ class GardenStorage {
     return this.data;
   }
 
+  async buildBackupPayload() {
+    const payload = JSON.parse(JSON.stringify(this.data));
+    if (typeof window !== 'undefined' && window.photoStorage && typeof window.photoStorage.exportAll === 'function') {
+      try {
+        const media = await window.photoStorage.exportAll();
+        if ((media.photos && media.photos.length) || (media.varieties && media.varieties.length)) {
+          payload._mediaBackup = media;
+        }
+      } catch (err) {
+        console.warn('Не удалось включить фото/сорта в резервную копию:', err);
+      }
+    }
+    return payload;
+  }
+
   async savePlanWithExplorer() {
-    const jsonStr = JSON.stringify(this.data, null, 2);
+    const payload = await this.buildBackupPayload();
+    const jsonStr = JSON.stringify(payload, null, 2);
     const dateStr = new Date().toISOString().split('T')[0];
     const year = this.getActiveYear ? this.getActiveYear() : 2026;
     const fileName = `Мой_Огород_План_${year}_(${dateStr}).json`;
@@ -1114,7 +1129,7 @@ class GardenStorage {
         const writable = await handle.createWritable();
         await writable.write("\ufeff" + jsonStr);
         await writable.close();
-        return fileName;
+        return handle.name || fileName;
       } catch (err) {
         // Если пользователь нажал «Отмена» в проводнике
         if (err.name === 'AbortError') {
@@ -1125,11 +1140,11 @@ class GardenStorage {
     }
 
     // 2. Fallback для браузеров без File System Access API
-    return this.exportJson();
+    return this.exportJson(payload);
   }
 
-  exportJson() {
-    const jsonStr = JSON.stringify(this.data, null, 2);
+  exportJson(customPayload = null) {
+    const jsonStr = JSON.stringify(customPayload || this.data, null, 2);
     // Добавляем маркер UTF-8 BOM (\ufeff), чтобы Windows и текстовые редакторы
     // гарантированно открывали файл в правильной кодировке с русскими буквами.
     const blob = new Blob(["\ufeff", jsonStr], { type: 'application/json;charset=utf-8' });
@@ -1161,8 +1176,19 @@ class GardenStorage {
       if (!parsed || !Array.isArray(parsed.beds)) {
         throw new Error('Некорректный формат файла плана огорода');
       }
+      // Извлекаем медиа-бэкап (фото и картотеку сортов) до сохранения в localStorage
+      const mediaBackup = parsed._mediaBackup || null;
+      if ('_mediaBackup' in parsed) {
+        delete parsed._mediaBackup;
+      }
       this.data = this.sanitizeData(parsed);
+      this.syncCustomCropsToGlobal();
       this.saveData();
+      if (mediaBackup && typeof window !== 'undefined' && window.photoStorage && typeof window.photoStorage.importAll === 'function') {
+        window.photoStorage.importAll(mediaBackup).catch(err => {
+          console.warn('Ошибка восстановления фото/сортов из резервной копии:', err);
+        });
+      }
       return { success: true };
     } catch (e) {
       return { success: false, error: e.message };
@@ -1666,6 +1692,59 @@ class GardenPhotoStorage {
         const req = store.delete(id);
         req.onsuccess = () => resolve(true);
         req.onerror = () => resolve(false);
+      } catch (e) {
+        resolve(false);
+      }
+    });
+  }
+
+  async exportAll() {
+    const varieties = await this.getVarieties(null);
+    const memPhotos = Array.from(this.memoryFallback.values());
+    const db = await this.open();
+    if (!db) {
+      return { photos: memPhotos, varieties };
+    }
+    const photos = await new Promise((resolve) => {
+      try {
+        const tx = db.transaction('photos', 'readonly');
+        const store = tx.objectStore('photos');
+        const req = store.getAll();
+        req.onsuccess = () => {
+          const list = req.result || [];
+          const ids = new Set(list.map(p => p.id));
+          memPhotos.forEach(mp => { if (!ids.has(mp.id)) list.push(mp); });
+          resolve(list);
+        };
+        req.onerror = () => resolve(memPhotos);
+      } catch (e) {
+        resolve(memPhotos);
+      }
+    });
+    return { photos, varieties };
+  }
+
+  async importAll(mediaBackup) {
+    if (!mediaBackup || typeof mediaBackup !== 'object') return false;
+    const photos = Array.isArray(mediaBackup.photos) ? mediaBackup.photos : [];
+    const varieties = Array.isArray(mediaBackup.varieties) ? mediaBackup.varieties : [];
+    const db = await this.open();
+
+    if (!db) {
+      photos.forEach(p => { if (p && p.id) this.memoryFallback.set(p.id, p); });
+      varieties.forEach(v => { if (v && v.id) this.varietyFallback.set(v.id, v); });
+      return true;
+    }
+
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction(['photos', 'varieties'], 'readwrite');
+        const pStore = tx.objectStore('photos');
+        const vStore = tx.objectStore('varieties');
+        photos.forEach(p => { if (p && p.id) pStore.put(p); });
+        varieties.forEach(v => { if (v && v.id) vStore.put(v); });
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => resolve(false);
       } catch (e) {
         resolve(false);
       }

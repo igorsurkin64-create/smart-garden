@@ -232,6 +232,7 @@ class RotationAdvisor {
     const crop = getCropById(cropId);
     if (!crop) return '<p>Культура не найдена</p>';
 
+    const currentLang = (typeof window !== 'undefined' && window.i18n) ? window.i18n.getLanguage() : 'ru';
     const tr = (k, p) => (typeof window !== 'undefined' && window.t ? window.t(k, p) : null);
     const family = getFamilyById(crop.family);
     const cropName = typeof getCropName === 'function' ? getCropName(crop) : crop.name;

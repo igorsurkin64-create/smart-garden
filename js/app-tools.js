@@ -1328,9 +1328,19 @@
       lt: { title: '🏷️ Veislių katalogas su nuotraukomis', formTitleAdd: '🌱 Nauja veislė', formTitleEdit: '✏️ Redaguoti veislę', cropLbl: '1. Kultūra:', nameLbl: '2. Veislės pavadinimas:', namePlh: 'Pvz.: Jaučio širdis, Kuraž F1...', popLbl: 'Greitas pasirinkimas:', photoLbl: '3. Sėklų pakelio ar vaisiaus foto:', photoHint: 'Spustelėkite, įtempkite foto čia arba įklijuokite Ctrl+V', replacePhoto: 'Pakeisti foto', removePhoto: 'Pašalinti foto', notesLbl: '4. Trumpas aprašymas (skonis, aukštis):', notesPlh: 'Pvz.: stambiavaisis, saldus, iki 450g', cancelEdit: 'Atšaukti', save: '💾 Išsaugoti veislę', saveEdit: '💾 Atnaujinti veislę', allCrops: 'Visos', searchPlh: '🔍 Ieškoti veislės ar aprašymo...', emptyTitle: 'Šiame skyriuje dar nėra veislių', emptySub: 'Užpildykite kortelę kairėje — įrašykite pavadinimą, aprašymą ir pridėkite foto!', noCrop: 'Kultūra nenurodyta', delTitle: 'Trinti', editTitle: 'Redaguoti', done: 'Uždaryti', enterNameAlert: 'Įveskite veislės pavadinimą.', savedToast: (n) => `✓ Veislė «${n}» išsaugota!`, delConfirm: 'Ištrinti šią veislę iš katalogo?' }
     }[currentLang] || {};
 
+    // Снимаем возможный предыдущий обработчик paste (если окно закрывалось через Esc или клик по фону)
+    if (this._varietyPasteHandler) {
+      document.removeEventListener('paste', this._varietyPasteHandler);
+      this._varietyPasteHandler = null;
+    }
+
     // Обработчик вставки картинки через Ctrl+V, пока открыта картотека
     const handlePaste = async (e) => {
-      if (!modal.classList.contains('active')) return;
+      if (!modal.classList.contains('active') || !modalContent.querySelector('#vc-name-input')) {
+        document.removeEventListener('paste', handlePaste);
+        if (this._varietyPasteHandler === handlePaste) this._varietyPasteHandler = null;
+        return;
+      }
       const items = e.clipboardData?.items;
       if (!items) return;
       for (const item of items) {
@@ -1356,8 +1366,10 @@
     const closeModal = () => {
       modal.classList.remove('active');
       document.removeEventListener('paste', handlePaste);
+      if (this._varietyPasteHandler === handlePaste) this._varietyPasteHandler = null;
     };
 
+    this._varietyPasteHandler = handlePaste;
     document.addEventListener('paste', handlePaste);
 
     const render = async () => {

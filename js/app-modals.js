@@ -1063,23 +1063,92 @@
     const modalContent = document.getElementById('modal-dynamic-content');
     if (!modal || !modalContent) return;
 
+    const lang = (window.i18n && window.i18n.getLanguage()) || document.documentElement.lang || 'ru';
     const tr = (k) => (window.t ? window.t(k) : k);
     const iban = "EE882200001105095456";
     const recipient = "IGOR SURKIN";
     const bank = "Swedbank AS (Estonia, SEPA)";
     const revolutUrl = "https://revolut.me/isurkin";
     const telegramUrl = "https://t.me/igorSurkin";
-    const emailUrl = "mailto:igor.surkin64@gmail.com?subject=Разработка%20программы%20на%20заказ";
+
+    const DONATE_TXT = {
+      ru: {
+        customTitle: 'Разработка программ на заказ',
+        customBadge: 'Принимаю заказы',
+        customDesc: 'Если у вас есть желание, чтобы я создал удобную программу или приложение лично для вас, семьи или бизнеса — обращайтесь! Буду рад обсудить идею и разработать решение под ваши задачи.',
+        btnTelegram: 'В Telegram',
+        btnEmail: 'На Email',
+        emailSubject: 'Разработка программы на заказ',
+        supportTitle: 'Поддержать проект',
+        supportDesc: 'Программа бесплатна и без рекламы. Если она вам помогла и сберегла силы — вы можете угостить автора чашкой кофе!',
+        revolutBtn: 'Поддержать автора (Revolut) ➔',
+        revolutMethods: '⚡ Оплата в 1 клик без регистрации: Apple Pay • Google Pay • Любая банковская карта • Revolut',
+        sepaTitle: '🇪🇪 🇱🇻 🇱🇹 🇪🇺 Банковский перевод (SEPA Instant)',
+        recipientLabel: 'Получатель:',
+        copyBtn: '📋 Скопировать IBAN',
+        copiedBtn: '✓ Скопировано!'
+      },
+      et: {
+        customTitle: 'Tarkvara arendus tellimusel',
+        customBadge: 'Võtan tellimusi',
+        customDesc: 'Kui soovite, et looksin mugava programmi või rakenduse isiklikult teile, perele või ettevõttele — võtke ühendust! Arutame hea meelega ideed ja loome teie vajadustele sobiva lahenduse.',
+        btnTelegram: 'Telegramis',
+        btnEmail: 'E-postiga',
+        emailSubject: 'Tarkvara tellimus',
+        supportTitle: 'Toeta projekti',
+        supportDesc: 'Programm on tasuta ja reklaamivaba. Kui see aitas teid ja säästis aega — saate autorile tassi kohvi välja teha!',
+        revolutBtn: 'Toeta autorit (Revolut) ➔',
+        revolutMethods: '⚡ Makse 1 klõpsuga ilma registreerimiseta: Apple Pay • Google Pay • Pangakaart • Revolut',
+        sepaTitle: '🇪🇪 🇱🇻 🇱🇹 🇪🇺 Pangaülekanne (SEPA Instant)',
+        recipientLabel: 'Saaja:',
+        copyBtn: '📋 Kopeeri IBAN',
+        copiedBtn: '✓ Kopeeritud!'
+      },
+      lv: {
+        customTitle: 'Programmu izstrāde pēc pasūtījuma',
+        customBadge: 'Pieņemu pasūtījumus',
+        customDesc: 'Ja vēlaties, lai es izveidotu ērtu programmu vai lietotni tieši jums, ģimenei vai biznesam — sazinieties! Ar prieku apspriedīsim ideju un izstrādāsim risinājumu jūsu vajadzībām.',
+        btnTelegram: 'Telegram',
+        btnEmail: 'Uz e-pastu',
+        emailSubject: 'Programmas izstrādes pasūtījums',
+        supportTitle: 'Atbalstīt projektu',
+        supportDesc: 'Programma ir bezmaksas un bez reklāmām. Ja tā jums palīdzēja un ietaupīja laiku — varat uzsaukt autoram kafiju!',
+        revolutBtn: 'Atbalstīt autoru (Revolut) ➔',
+        revolutMethods: '⚡ Maksājums 1 klikšķī bez reģistrācijas: Apple Pay • Google Pay • Bankas karte • Revolut',
+        sepaTitle: '🇪🇪 🇱🇻 🇱🇹 🇪🇺 Bankas pārskaitījums (SEPA Instant)',
+        recipientLabel: 'Saņēmējs:',
+        copyBtn: '📋 Kopēt IBAN',
+        copiedBtn: '✓ Nokopēts!'
+      },
+      lt: {
+        customTitle: 'Programų kūrimas pagal užsakymą',
+        customBadge: 'Priimu užsakymus',
+        customDesc: 'Jei norite, kad sukurčiau patogią programą ar programėlę asmeniškai jums, šeimai ar verslui — susisiekite! Mielai aptarsiu idėją ir sukursiu sprendimą pagal jūsų poreikius.',
+        btnTelegram: 'Į Telegram',
+        btnEmail: 'El. paštu',
+        emailSubject: 'Programos kūrimo užsakymas',
+        supportTitle: 'Paremti projektą',
+        supportDesc: 'Programa nemokama ir be reklamos. Jei ji jums padėjo ir sutaupė laiko — galite pavaišinti autorių puodeliu kavos!',
+        revolutBtn: 'Paremti autorių (Revolut) ➔',
+        revolutMethods: '⚡ Mokėjimas 1 paspaudimu be registracijos: Apple Pay • Google Pay • Banko kortelė • Revolut',
+        sepaTitle: '🇪🇪 🇱🇻 🇱🇹 🇪🇺 Bankinis pavedimas (SEPA Instant)',
+        recipientLabel: 'Gavėjas:',
+        copyBtn: '📋 Kopijuoti IBAN',
+        copiedBtn: '✓ Nukopijuota!'
+      }
+    }[lang] || {};
+
+    const emailUrl = `mailto:igor.surkin64@gmail.com?subject=${encodeURIComponent(DONATE_TXT.emailSubject || 'Разработка программы на заказ')}`;
 
     modalContent.innerHTML = `
       <div class="modal-card modal-donate-card" style="max-height: 88vh; display: flex; flex-direction: column;">
         <div class="modal-header">
           <div class="modal-header-info">
             <h3 style="display: flex; align-items: center; gap: 0.5rem; margin: 0;">
-              <span>🧡</span> ${tr('donate_modal_title') || 'Автор и поддержка проекта'}
+              <span>🧡</span> ${tr('donate_modal_title')}
             </h3>
             <span class="modal-subtitle" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">
-              ${tr('donate_modal_subtitle') || '«Умный Огород» — бесплатная программа для всех садоводов.'}
+              ${tr('donate_modal_subtitle')}
             </span>
           </div>
           <button class="modal-close-btn">&times;</button>
@@ -1089,21 +1158,21 @@
           
           <!-- Раздел 1: Разработка программ на заказ (TOP - Сразу на виду!) -->
           <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%); border: 1.5px solid rgba(99, 102, 241, 0.35); border-radius: var(--radius-md, 12px); padding: 13px 14px; text-align: left; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 6px;">
               <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.98rem; color: var(--primary, #4f46e5);">
-                <span style="font-size: 1.25rem;">💻</span> Разработка программ на заказ
+                <span style="font-size: 1.25rem;">💻</span> ${DONATE_TXT.customTitle}
               </div>
-              <span style="background: #10b981; color: white; font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.3px;">Принимаю заказы</span>
+              <span style="background: #10b981; color: white; font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;">${DONATE_TXT.customBadge}</span>
             </div>
             <p style="font-size: 0.83rem; color: var(--text-primary); line-height: 1.45; margin: 0 0 10px 0;">
-              Если у вас есть желание, чтобы я создал удобную программу или приложение лично для вас, семьи или бизнеса — обращайтесь! Буду рад обсудить идею и разработать решение под ваши задачи.
+              ${DONATE_TXT.customDesc}
             </p>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
               <a href="${telegramUrl}" target="_blank" rel="noopener noreferrer" style="flex: 1; min-width: 135px; text-align: center; padding: 10px 12px; border-radius: var(--radius-sm, 8px); background: #0088cc; color: white; font-weight: 800; font-size: 0.86rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 8px rgba(0, 136, 204, 0.35);">
-                <span>💬</span> В Telegram
+                <span>💬</span> ${DONATE_TXT.btnTelegram}
               </a>
               <a href="${emailUrl}" style="flex: 1; min-width: 135px; text-align: center; padding: 10px 12px; border-radius: var(--radius-sm, 8px); background: var(--bg-card, var(--bg-secondary)); border: 1.5px solid var(--border-subtle); color: var(--text-primary); font-weight: 700; font-size: 0.86rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                <span>✉️</span> На Email
+                <span>✉️</span> ${DONATE_TXT.btnEmail}
               </a>
             </div>
           </div>
@@ -1112,20 +1181,20 @@
           <div style="background: rgba(241, 95, 44, 0.08); border: 1.5px solid rgba(241, 95, 44, 0.28); border-radius: var(--radius-md, 12px); padding: 12px 14px; text-align: left;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
               <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.95rem; color: #f15f2c;">
-                <span style="font-size: 1.2rem;">☕</span> Поддержать проект
+                <span style="font-size: 1.2rem;">☕</span> ${DONATE_TXT.supportTitle}
               </div>
               <span style="font-size: 0.72rem; color: #f15f2c; font-weight: 700; background: rgba(241, 95, 44, 0.12); padding: 2px 6px; border-radius: 4px;">Revolut</span>
             </div>
             <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin: 0 0 9px 0;">
-              Программа бесплатна и без рекламы. Если она вам помогла и сберегла силы — вы можете угостить автора чашкой кофе!
+              ${DONATE_TXT.supportDesc}
             </p>
 
             <a href="${revolutUrl}" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px 16px; border-radius: var(--radius-sm, 8px); background: linear-gradient(135deg, #f15f2c 0%, #ff7343 100%); color: white; font-weight: 800; font-size: 0.94rem; text-decoration: none; box-shadow: 0 2px 8px rgba(241, 95, 44, 0.35); transition: transform 0.15s ease;">
-              <span>☕</span> <span>Поддержать автора (Revolut) ➔</span>
+              <span>☕</span> <span>${DONATE_TXT.revolutBtn}</span>
             </a>
 
             <div style="font-size: 0.73rem; color: var(--text-muted); text-align: center; margin-top: 6px; line-height: 1.35;">
-              ⚡ Оплата в 1 клик без регистрации: Apple Pay • Google Pay • Любая банковская карта • Revolut
+              ${DONATE_TXT.revolutMethods}
             </div>
           </div>
 
@@ -1133,17 +1202,17 @@
           <div style="background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md, 12px); padding: 11px 14px; text-align: left;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
               <span style="font-size: 0.86rem; font-weight: 700; color: var(--text-primary);">
-                🇪🇪 🇱🇻 🇱🇹 🇪🇺 Банковский перевод (SEPA Instant)
+                ${DONATE_TXT.sepaTitle}
               </span>
               <span style="font-size: 0.7rem; font-weight: 700; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 4px;">EUR</span>
             </div>
             <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px;">
-              Получатель: <b>${recipient}</b> (${bank})
+              ${DONATE_TXT.recipientLabel} <b>${recipient}</b> (${bank})
             </div>
             <div class="donate-iban-wrap" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
               <span class="donate-iban-code" id="donate-iban-text" style="font-family: monospace; font-size: 0.92rem; font-weight: 700;">${iban}</span>
               <button type="button" class="donate-copy-btn" id="donate-copy-iban-btn" style="padding: 6px 12px; font-size: 0.78rem; border-radius: 6px;">
-                📋 Скопировать IBAN
+                ${DONATE_TXT.copyBtn}
               </button>
             </div>
           </div>
@@ -1152,15 +1221,15 @@
           <div style="background: rgba(16, 185, 129, 0.08); border: 1.5px solid rgba(16, 185, 129, 0.28); border-radius: var(--radius-md, 12px); padding: 12px 14px; text-align: left;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
               <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.95rem; color: #10b981;">
-                <span style="font-size: 1.2rem;">🛒</span> ${tr('other_apps_title') || 'Другие программы автора'}
+                <span style="font-size: 1.2rem;">🛒</span> ${tr('other_apps_title')}
               </div>
               <span style="font-size: 0.72rem; color: #10b981; font-weight: 700; background: rgba(16, 185, 129, 0.15); padding: 2px 6px; border-radius: 4px;">Vercel</span>
             </div>
             <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin: 0 0 9px 0;">
-              ${tr('other_apps_reminder_desc') || 'Попробуйте также моё мобильное приложение для удобных покупок, рецептов и списков дел:'}
+              ${tr('other_apps_reminder_desc')}
             </p>
             <a href="https://reminder-eight-blush.vercel.app" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 14px; border-radius: var(--radius-sm, 8px); background: #10b981; color: white; font-weight: 800; font-size: 0.88rem; text-decoration: none; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);">
-              <span>🛒</span> <span>${tr('other_apps_reminder_btn') || 'Открыть «Список покупок» на Vercel ➔'}</span>
+              <span>🛒</span> <span>${tr('other_apps_reminder_btn')}</span>
             </a>
           </div>
 
@@ -1168,7 +1237,7 @@
 
         <div class="modal-footer" style="padding: 0.85rem 1.25rem; background: var(--bg-tertiary); display: flex; justify-content: flex-end;">
           <button class="btn btn-primary modal-close-action-btn">
-            ${tr('help_btn_close') || 'Понятно'}
+            ${tr('help_btn_close')}
           </button>
         </div>
       </div>
@@ -1184,11 +1253,11 @@
     if (copyIbanBtn) {
       copyIbanBtn.addEventListener('click', () => {
         navigator.clipboard.writeText(iban).then(() => {
-          copyIbanBtn.textContent = '✓ Скопировано!';
+          copyIbanBtn.textContent = DONATE_TXT.copiedBtn;
           copyIbanBtn.classList.add('copied');
-          this.showToast(tr('donate_copied_toast') || '✓ Номер счёта (IBAN) скопирован в буфер обмена!');
+          this.showToast(tr('donate_copied_toast'));
           setTimeout(() => {
-            copyIbanBtn.textContent = '📋 Скопировать IBAN';
+            copyIbanBtn.textContent = DONATE_TXT.copyBtn;
             copyIbanBtn.classList.remove('copied');
           }, 2500);
         }).catch(() => {

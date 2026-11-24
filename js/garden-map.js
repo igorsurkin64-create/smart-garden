@@ -577,6 +577,7 @@ class GardenMap {
 
     // Горячие клавиши: Delete для удаления выделенного декора, стрелки для плавного сдвига карты
     document.addEventListener('keydown', (e) => {
+      if (document.getElementById('general-modal')?.classList.contains('active')) return;
       const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
       if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target?.isContentEditable) return;
 

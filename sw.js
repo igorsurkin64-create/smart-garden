@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smart-garden-v9.5';
+const CACHE_NAME = 'smart-garden-v9.6';
 
 const STATIC_ASSETS = [
   './',
@@ -57,24 +57,29 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // Skip chrome-extension, non-http(s), and external analytics (Yandex.Metrika)
-  if (!url.protocol.startsWith('http') || url.hostname.includes('yandex.ru')) return;
+  // Skip non-http(s) and ALL external origins (Yandex.Metrika, Google Apps Script, CDN, etc.)
+  if (!url.protocol.startsWith('http') || url.origin !== self.location.origin) return;
+
+  // Normalize cache key without ?v=... query string so assets are not stored twice
+  const cleanCacheUrl = url.origin + url.pathname;
 
   event.respondWith(
     fetch(event.request).then((networkResponse) => {
       if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
         const responseToCache = networkResponse.clone();
         caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
+          cache.put(cleanCacheUrl, responseToCache);
         });
       }
       return networkResponse;
-    }).catch(() => {
+    }).catch(async () => {
       // Offline fallback: return cached version
       if (event.request.mode === 'navigate') {
-        return caches.match('./index.html', { ignoreSearch: true });
+        const page = await caches.match('./index.html', { ignoreSearch: true });
+        if (page) return page;
       }
-      return caches.match(event.request, { ignoreSearch: true });
+      const cached = await caches.match(cleanCacheUrl, { ignoreSearch: true });
+      return cached || new Response('Offline', { status: 503, statusText: 'Offline' });
     })
   );
 });

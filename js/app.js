@@ -679,7 +679,7 @@ class GardenApp {
     });
 
     dropdown.addEventListener('click', (e) => {
-      if (e.target.closest('button')) {
+      if (e.target.closest('button, a')) {
         toggle(false);
       }
     });
@@ -1358,22 +1358,6 @@ class GardenApp {
     }
 
     this.showExportSuccessModal(fileName);
-  }
-
-  async savePlanViaExplorer() {
-    let fileName = null;
-    if (this.storage) {
-      if (typeof this.storage.savePlanWithExplorer === 'function') {
-        fileName = await this.storage.savePlanWithExplorer();
-      } else {
-        fileName = this.storage.exportJson();
-      }
-    }
-    if (fileName) {
-      localStorage.setItem('sg_last_backup_time', Date.now().toString());
-      const toastMsg = (window.t ? window.t('backup_saved_toast') : null) || '✓ План огорода успешно сохранён в файл!';
-      this.showToast(toastMsg);
-    }
   }
 
   showExportSuccessModal(fileName) {
