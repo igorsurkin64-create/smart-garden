@@ -239,19 +239,19 @@
           ],
           donate: [
             {
-              icon: '❤️',
-              title: 'Программа бесплатна для всех дачников',
-              desc: '«Умный Огород» создан с душой и распространяется свободно. Если программа вам помогла и сберегла силы, вы можете поблагодарить автора любой приятной суммой или чашкой кофе!'
+              icon: '💻',
+              title: 'Разработка программ на заказ',
+              desc: 'Хотите персональную программу, веб-сервис или бота лично для себя, семьи или бизнеса? Напишите мне в Telegram: <a href="https://t.me/igorSurkin" target="_blank" style="color: #0088cc; font-weight: 700;">@igorSurkin</a> или на почту <strong style="color:var(--primary);">igor.surkin64@gmail.com</strong>.'
+            },
+            {
+              icon: '🧡',
+              title: 'Поддержка автора (Revolut, Apple Pay, карты)',
+              desc: 'Быстрая поддержка автора в 1 клик через Revolut, Apple Pay, Google Pay или любую банковскую карту:<br><a href="https://revolut.me/isurkin" target="_blank" style="color: #f15f2c; font-weight: 700; text-decoration: underline;">https://revolut.me/isurkin</a>'
             },
             {
               icon: '🇪🇪',
-              title: 'Страны Балтии и Европа (EUR): Swedbank',
+              title: 'Банковский перевод (EUR): Swedbank SEPA',
               desc: 'Получатель: <strong>IGOR SURKIN</strong><br>Банк: <strong>Swedbank AS (Estonia, SEPA Instant)</strong><br>IBAN: <strong class="help-kbd" style="font-size:0.95rem;">EE882200001105095456</strong><br>Назначение: <em>Toetus / Благодарность за программу</em>'
-            },
-            {
-              icon: '🇷🇺',
-              title: 'Россия и другие страны (RUB): Сервис Boosty',
-              desc: 'Удобная добровольная поддержка с любых российских карт (МИР, Сбербанк, Т-Банк, СБП):<br><a href="https://boosty.to/igor.surkin/donate" target="_blank" style="color: #ea580c; font-weight: 700; text-decoration: underline;">https://boosty.to/igor.surkin/donate</a>'
             }
           ],
           feedback: [
@@ -474,19 +474,19 @@
           ],
           donate: [
             {
-              icon: '❤️',
-              title: 'Programm on kõigile aednikele tasuta',
-              desc: '«Minu Aed» on loodud armastusega aiapidamise vastu ja levitatakse täiesti tasuta. Kui programm on teile abiks olnud, saate autorit tänada teile sobiva toetusega!'
+              icon: '💻',
+              title: 'Tarkvara arendus tellimusel',
+              desc: 'Soovite personaalset programmi, veebiteenust või rakendust endale või ettevõttele? Kirjutage Telegramis: <a href="https://t.me/igorSurkin" target="_blank" style="color: #0088cc; font-weight: 700;">@igorSurkin</a> või e-posti teel <strong style="color:var(--primary);">igor.surkin64@gmail.com</strong>.'
+            },
+            {
+              icon: '🧡',
+              title: 'Toeta autorit (Revolut, Apple Pay, kaardid)',
+              desc: 'Kiire toetus ühe klõpsuga Revolut, Apple Pay, Google Pay või pangakaardiga:<br><a href="https://revolut.me/isurkin" target="_blank" style="color: #f15f2c; font-weight: 700; text-decoration: underline;">https://revolut.me/isurkin</a>'
             },
             {
               icon: '🇪🇪',
-              title: 'Balti riigid ja Euroopa (EUR): Swedbank',
+              title: 'Pangaülekanne (EUR): Swedbank SEPA',
               desc: 'Saaja: <strong>IGOR SURKIN</strong><br>Pank: <strong>Swedbank AS (Estonia, SEPA Instant)</strong><br>IBAN: <strong class="help-kbd" style="font-size:0.95rem;">EE882200001105095456</strong><br>Selgitus: <em>Toetus aiatarkvarale</em>'
-            },
-            {
-              icon: '🇷🇺',
-              title: 'Venemaa ja teised riigid (RUB): Boosty',
-              desc: 'Vabatahtlik toetus Boosty kaudu (MIR kaardid, SBP, pangad):<br><a href="https://boosty.to/igor.surkin/donate" target="_blank" style="color: #ea580c; font-weight: 700; text-decoration: underline;">https://boosty.to/igor.surkin/donate</a>'
             }
           ],
           feedback: [
@@ -704,19 +704,19 @@
           ],
           donate: [
             {
-              icon: '❤️',
-              title: 'Programma ir bezmaksas ikvienam dārzniekam',
-              desc: '«Mans Dārzs» ir radīts ar mīlestību un tiek izplatīts bez maksas. Ja programma jums ir noderējusi, varat pateikties autoram ar brīvprātīgu atbalstu!'
+              icon: '💻',
+              title: 'Programmu izstrāde pēc pasūtījuma',
+              desc: 'Vēlaties personisku programmu, tīmekļa pakalpojumu vai lietotni sev vai uzņēmumam? Rakstiet Telegram: <a href="https://t.me/igorSurkin" target="_blank" style="color: #0088cc; font-weight: 700;">@igorSurkin</a> vai e-pastā <strong style="color:var(--primary);">igor.surkin64@gmail.com</strong>.'
+            },
+            {
+              icon: '🧡',
+              title: 'Atbalstīt autoru (Revolut, Apple Pay, kartes)',
+              desc: 'Ātrs atbalsts 1 klikšķī caur Revolut, Apple Pay, Google Pay vai bankas karti:<br><a href="https://revolut.me/isurkin" target="_blank" style="color: #f15f2c; font-weight: 700; text-decoration: underline;">https://revolut.me/isurkin</a>'
             },
             {
               icon: '🇪🇪',
-              title: 'Baltijas valstis un Eiropa (EUR): Swedbank',
+              title: 'Bankas pārskaitījums (EUR): Swedbank SEPA',
               desc: 'Saņēmējs: <strong>IGOR SURKIN</strong><br>Banka: <strong>Swedbank AS (Estonia, SEPA Instant)</strong><br>IBAN: <strong class="help-kbd" style="font-size:0.95rem;">EE882200001105095456</strong><br>Mērķis: <em>Toetus / Ziedojums dārza programmai</em>'
-            },
-            {
-              icon: '🇷🇺',
-              title: 'Krievija un citas valstis (RUB): Boosty',
-              desc: 'Brīvprātīgs atbalsts caur Boosty platformu (MIR kartes, SBP, bankas):<br><a href="https://boosty.to/igor.surkin/donate" target="_blank" style="color: #ea580c; font-weight: 700; text-decoration: underline;">https://boosty.to/igor.surkin/donate</a>'
             }
           ],
           feedback: [
@@ -934,19 +934,19 @@
           ],
           donate: [
             {
-              icon: '❤️',
-              title: 'Programa yra nemokama kiekvienam sodininkui',
-              desc: '«Mano Daržas» sukurtas su meile ir platinamas visiškai nemokamai. Jei programa jums padėjo patogiai susiplanuoti daržą, galite padėkoti autoriui savanoriška parama!'
+              icon: '💻',
+              title: 'Programinės įrangos kūrimas pagal užsakymą',
+              desc: 'Norite asmeninės programos, interneto paslaugos ar programėlės sau ar verslui? Parašykite Telegram: <a href="https://t.me/igorSurkin" target="_blank" style="color: #0088cc; font-weight: 700;">@igorSurkin</a> arba el. paštu <strong style="color:var(--primary);">igor.surkin64@gmail.com</strong>.'
+            },
+            {
+              icon: '🧡',
+              title: 'Paremti autorių (Revolut, Apple Pay, kortelės)',
+              desc: 'Greita parama vienu paspaudimu per Revolut, Apple Pay, Google Pay ar banko kortelę:<br><a href="https://revolut.me/isurkin" target="_blank" style="color: #f15f2c; font-weight: 700; text-decoration: underline;">https://revolut.me/isurkin</a>'
             },
             {
               icon: '🇪🇪',
-              title: 'Baltijos šalys ir Europa (EUR): Swedbank',
+              title: 'Banko pavedimas (EUR): Swedbank SEPA',
               desc: 'Gavėjas: <strong>IGOR SURKIN</strong><br>Bankas: <strong>Swedbank AS (Estonia, SEPA Instant)</strong><br>IBAN: <strong class="help-kbd" style="font-size:0.95rem;">EE882200001105095456</strong><br>Paskirtis: <em>Toetus / Parama daržo programai</em>'
-            },
-            {
-              icon: '🇷🇺',
-              title: 'Rusija ir kitos šalys (RUB): Boosty',
-              desc: 'Savanoriškas palaikymas per Boosty platformą (MIR kortelės, SBP, bankai):<br><a href="https://boosty.to/igor.surkin/donate" target="_blank" style="color: #ea580c; font-weight: 700; text-decoration: underline;">https://boosty.to/igor.surkin/donate</a>'
             }
           ],
           feedback: [
@@ -1067,95 +1067,90 @@
     const iban = "EE882200001105095456";
     const recipient = "IGOR SURKIN";
     const bank = "Swedbank AS (Estonia, SEPA)";
-    const boostyUrl = "https://boosty.to/igor.surkin/donate";
+    const revolutUrl = "https://revolut.me/isurkin";
+    const telegramUrl = "https://t.me/igorSurkin";
+    const emailUrl = "mailto:igor.surkin64@gmail.com?subject=Разработка%20программы%20на%20заказ";
 
     modalContent.innerHTML = `
-      <div class="modal-card modal-donate-card">
+      <div class="modal-card modal-donate-card" style="max-height: 88vh; display: flex; flex-direction: column;">
         <div class="modal-header">
           <div class="modal-header-info">
             <h3 style="display: flex; align-items: center; gap: 0.5rem; margin: 0;">
-              ${tr('donate_modal_title') || '☕ Поддержка автора проекта'}
+              <span>🧡</span> ${tr('donate_modal_title') || 'Автор и поддержка проекта'}
             </h3>
             <span class="modal-subtitle" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">
-              ${tr('donate_modal_subtitle') || '«Умный Огород» — бесплатная программа для всех садоводов. Любая поддержка помогает развивать проект!'}
+              ${tr('donate_modal_subtitle') || '«Умный Огород» — бесплатная программа для всех садоводов.'}
             </span>
           </div>
           <button class="modal-close-btn">&times;</button>
         </div>
 
-        <div class="modal-body" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem;">
+        <div class="modal-body" style="padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.85rem; overflow-y: auto;">
           
-          <!-- Вариант 1: Страны Балтии и Европа (EUR) -->
-          <div class="donate-method-card">
-            <div class="donate-method-header">
-              <span class="donate-method-title">
-                ${tr('donate_baltic_title') || '🇪🇪 🇱🇻 🇱🇹 🇪🇺 Для стран Балтии и Европы (EUR)'}
-              </span>
-              <span class="donate-method-badge">SEPA Instant</span>
-            </div>
-            
-            <p style="font-size: 0.86rem; color: var(--text-secondary); margin: 0;">
-              ${tr('donate_baltic_desc') || 'Прямой банковский перевод SEPA без комиссии:'}
-            </p>
-
-            <div class="donate-field-row">
-              <span class="donate-field-label">${tr('donate_recipient_label') || 'Получатель:'}</span>
-              <span class="donate-field-val">${recipient}</span>
-            </div>
-
-            <div class="donate-field-row">
-              <span class="donate-field-label">${tr('donate_bank_label') || 'Банк:'}</span>
-              <span class="donate-field-val">${bank}</span>
-            </div>
-
-            <div class="donate-field-row">
-              <span class="donate-field-label">${tr('donate_iban_label') || 'Номер счёта (IBAN):'}</span>
-              <div class="donate-iban-wrap">
-                <span class="donate-iban-code" id="donate-iban-text">${iban}</span>
-                <button type="button" class="donate-copy-btn" id="donate-copy-iban-btn">
-                  ${tr('donate_btn_copy') || '📋 Скопировать IBAN'}
-                </button>
+          <!-- Раздел 1: Разработка программ на заказ (TOP - Сразу на виду!) -->
+          <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%); border: 1.5px solid rgba(99, 102, 241, 0.35); border-radius: var(--radius-md, 12px); padding: 13px 14px; text-align: left; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.98rem; color: var(--primary, #4f46e5);">
+                <span style="font-size: 1.25rem;">💻</span> Разработка программ на заказ
               </div>
+              <span style="background: #10b981; color: white; font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.3px;">Принимаю заказы</span>
             </div>
-
-            <div class="donate-sepa-callout">
-              <span>💡</span>
-              <span>${tr('donate_sepa_note') || 'Мгновенные переводы SEPA без комиссии из любых банков Эстонии, Латвии, Литвы и Европы.'}</span>
+            <p style="font-size: 0.83rem; color: var(--text-primary); line-height: 1.45; margin: 0 0 10px 0;">
+              Если у вас есть желание, чтобы я создал удобную программу или приложение лично для вас, семьи или бизнеса — обращайтесь! Буду рад обсудить идею и разработать решение под ваши задачи.
+            </p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="${telegramUrl}" target="_blank" rel="noopener noreferrer" style="flex: 1; min-width: 135px; text-align: center; padding: 10px 12px; border-radius: var(--radius-sm, 8px); background: #0088cc; color: white; font-weight: 800; font-size: 0.86rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 8px rgba(0, 136, 204, 0.35);">
+                <span>💬</span> В Telegram
+              </a>
+              <a href="${emailUrl}" style="flex: 1; min-width: 135px; text-align: center; padding: 10px 12px; border-radius: var(--radius-sm, 8px); background: var(--bg-card, var(--bg-secondary)); border: 1.5px solid var(--border-subtle); color: var(--text-primary); font-weight: 700; font-size: 0.86rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <span>✉️</span> На Email
+              </a>
             </div>
           </div>
 
-          <!-- Вариант 2: Россия и страны СНГ (RUB) -->
-          <div class="donate-method-card">
-            <div class="donate-method-header">
-              <span class="donate-method-title">
-                ${tr('donate_rub_title') || '🇷🇺 Для жителей России и других стран (RUB)'}
-              </span>
-              <span class="donate-method-badge" style="background: rgba(234, 88, 12, 0.1); color: #ea580c; border-color: rgba(234, 88, 12, 0.3);">
-                МИР / СБП
-              </span>
+          <!-- Раздел 2: Поддержка автора через Revolut -->
+          <div style="background: rgba(241, 95, 44, 0.08); border: 1.5px solid rgba(241, 95, 44, 0.28); border-radius: var(--radius-md, 12px); padding: 12px 14px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.95rem; color: #f15f2c;">
+                <span style="font-size: 1.2rem;">☕</span> Поддержать проект
+              </div>
+              <span style="font-size: 0.72rem; color: #f15f2c; font-weight: 700; background: rgba(241, 95, 44, 0.12); padding: 2px 6px; border-radius: 4px;">Revolut</span>
             </div>
-
-            <p style="font-size: 0.86rem; color: var(--text-secondary); margin: 0;">
-              ${tr('donate_rub_desc') || 'Добровольная поддержка через сервис Boosty (любые карты МИР, СБП, Сбербанк, Т-Банк):'}
+            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin: 0 0 9px 0;">
+              Программа бесплатна и без рекламы. Если она вам помогла и сберегла силы — вы можете угостить автора чашкой кофе!
             </p>
 
-            <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-              <a href="${boostyUrl}" target="_blank" rel="noopener noreferrer" class="donate-boosty-btn" id="donate-boosty-link">
-                ${tr('donate_btn_boosty') || '☕ Поддержать на Boosty'} ↗
-              </a>
-              <button type="button" class="btn btn-outline btn-sm" id="donate-copy-link-btn">
-                ${tr('donate_btn_copy_link') || '📋 Скопировать ссылку'}
-              </button>
-            </div>
+            <a href="${revolutUrl}" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px 16px; border-radius: var(--radius-sm, 8px); background: linear-gradient(135deg, #f15f2c 0%, #ff7343 100%); color: white; font-weight: 800; font-size: 0.94rem; text-decoration: none; box-shadow: 0 2px 8px rgba(241, 95, 44, 0.35); transition: transform 0.15s ease;">
+              <span>☕</span> <span>Поддержать автора (Revolut) ➔</span>
+            </a>
 
-            <div class="donate-link-row">
-              <span class="donate-link-text">${boostyUrl}</span>
+            <div style="font-size: 0.73rem; color: var(--text-muted); text-align: center; margin-top: 6px; line-height: 1.35;">
+              ⚡ Оплата в 1 клик без регистрации: Apple Pay • Google Pay • Любая банковская карта • Revolut
+            </div>
+          </div>
+
+          <!-- Раздел 3: Банковский перевод SEPA (Swedbank) -->
+          <div style="background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md, 12px); padding: 11px 14px; text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <span style="font-size: 0.86rem; font-weight: 700; color: var(--text-primary);">
+                🇪🇪 🇱🇻 🇱🇹 🇪🇺 Банковский перевод (SEPA Instant)
+              </span>
+              <span style="font-size: 0.7rem; font-weight: 700; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 4px;">EUR</span>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px;">
+              Получатель: <b>${recipient}</b> (${bank})
+            </div>
+            <div class="donate-iban-wrap" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span class="donate-iban-code" id="donate-iban-text" style="font-family: monospace; font-size: 0.92rem; font-weight: 700;">${iban}</span>
+              <button type="button" class="donate-copy-btn" id="donate-copy-iban-btn" style="padding: 6px 12px; font-size: 0.78rem; border-radius: 6px;">
+                📋 Скопировать IBAN
+              </button>
             </div>
           </div>
 
         </div>
 
-        <div class="modal-footer" style="padding: 1rem 1.5rem; background: var(--bg-tertiary); display: flex; justify-content: flex-end;">
+        <div class="modal-footer" style="padding: 0.85rem 1.25rem; background: var(--bg-tertiary); display: flex; justify-content: flex-end;">
           <button class="btn btn-primary modal-close-action-btn">
             ${tr('help_btn_close') || 'Понятно'}
           </button>
@@ -1177,27 +1172,11 @@
           copyIbanBtn.classList.add('copied');
           this.showToast(tr('donate_copied_toast') || '✓ Номер счёта (IBAN) скопирован в буфер обмена!');
           setTimeout(() => {
-            copyIbanBtn.textContent = tr('donate_btn_copy') || '📋 Скопировать IBAN';
+            copyIbanBtn.textContent = '📋 Скопировать IBAN';
             copyIbanBtn.classList.remove('copied');
           }, 2500);
         }).catch(() => {
           this.showToast(iban);
-        });
-      });
-    }
-
-    // Копирование ссылки Boosty
-    const copyLinkBtn = document.getElementById('donate-copy-link-btn');
-    if (copyLinkBtn) {
-      copyLinkBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(boostyUrl).then(() => {
-          copyLinkBtn.textContent = '✓ Скопировано!';
-          this.showToast(tr('donate_link_copied_toast') || '✓ Ссылка на Boosty скопирована в буфер обмена!');
-          setTimeout(() => {
-            copyLinkBtn.textContent = tr('donate_btn_copy_link') || '📋 Скопировать ссылку';
-          }, 2500);
-        }).catch(() => {
-          this.showToast(boostyUrl);
         });
       });
     }
