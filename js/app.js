@@ -557,7 +557,7 @@ class GardenApp {
     }
     const navSaveReminderBtn = document.getElementById('nav-save-reminder-btn');
     if (navSaveReminderBtn) {
-      navSaveReminderBtn.addEventListener('click', () => this.savePlanViaExplorer());
+      navSaveReminderBtn.addEventListener('click', () => this.openDbModal());
     }
 
     // Руководство пользователя / Инструкция
@@ -1137,8 +1137,9 @@ class GardenApp {
     modalContent.querySelector('.modal-close-btn').addEventListener('click', closeModal);
 
     // Экспорт
-    document.getElementById('db-export-btn').addEventListener('click', () => {
-      const fileName = this.storage.exportJson();
+    document.getElementById('db-export-btn').addEventListener('click', async () => {
+      const fileName = await this.storage.savePlanWithExplorer();
+      if (!fileName) return; // пользователь отменил выбор файла
       localStorage.setItem('sg_last_backup_time', Date.now().toString());
       const card = document.getElementById('backup-reminder-card');
       if (card) card.style.display = 'none';
@@ -1336,11 +1337,12 @@ class GardenApp {
     localStorage.setItem('sg_backup_reminder_dismissed_time', Date.now().toString());
   }
 
-  downloadBackupFromReminder() {
+  async downloadBackupFromReminder() {
     let fileName = '';
     if (this.storage) {
-      fileName = this.storage.exportJson();
+      fileName = await this.storage.savePlanWithExplorer();
     }
+    if (!fileName) return;
     localStorage.setItem('sg_last_backup_time', Date.now().toString());
 
     const card = document.getElementById('backup-reminder-card');
